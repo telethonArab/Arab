@@ -1,6 +1,6 @@
 import sys
-import userbot
-from userbot import BOTLOG_CHATID, HEROKU_APP, PM_LOGGER_GROUP_ID
+import iqthon
+from iqthon import BOTLOG_CHATID, HEROKU_APP, PM_LOGGER_GROUP_ID
 from telethon import functions
 from .Config import Config
 from .core.logger import logging
@@ -10,9 +10,9 @@ LOGS = logging.getLogger(
 "تليثون العرب"
 )
 print(
-userbot.__copyright__)
+iqthon.__copyright__)
 print(
-"المرخصة بموجب شروط " + userbot.__license__)
+"المرخصة بموجب شروط " + iqthon.__license__)
 cmdhr = Config.COMMAND_HAND_LER
 try:
     LOGS.info(
