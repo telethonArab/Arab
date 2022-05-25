@@ -10,7 +10,7 @@ from telethon import Button, types, version
 from telethon.errors import QueryIdInvalidError
 from telethon.events import CallbackQuery, InlineQuery
 from youtubesearchpython import VideosSearch
-from userbot import iqthon, catversion, StartTime
+from iqthon import iqthon, catversion, StartTime
 from ..Config import Config
 from ..helpers.functions import rand_key, catalive, check_data_base_heal_th, get_readable_time
 from ..helpers.functions.utube import download_button, get_yt_video_id, get_ytthumb, result_formatter, ytsearch_data
@@ -127,7 +127,7 @@ async def inline_handler(event):
             query = query[7:]
             user, txct = query.split(" ", 1)
             builder = event.builder
-            secret = os.path.join("./userbot", "secrets.txt")
+            secret = os.path.join("./iqthon", "secrets.txt")
             try:
                 jsondata = json.load(open(secret))
             except Exception:
