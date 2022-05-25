@@ -1,10 +1,7 @@
 from datetime import datetime
 from math import floor
-
 from telethon.utils import get_display_name
-
-from userbot import iqthon
-
+from iqthon import iqthon
 from ..Config import Config
 from ..core.logger import logging
 from ..helpers import reply_id
