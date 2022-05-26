@@ -9,10 +9,7 @@ from .utils import add_bot_to_logger_group, load_plugins, setup_bot, startupmess
 LOGS = logging.getLogger(
 "تليثون العرب"
 )
-print(
-iqthon.__copyright__)
-print(
-"المرخصة بموجب شروط " + iqthon.__license__)
+
 cmdhr = Config.COMMAND_HAND_LER
 try:
     LOGS.info(
