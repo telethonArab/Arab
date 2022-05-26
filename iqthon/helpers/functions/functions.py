@@ -107,7 +107,7 @@ def higlighted_text(
     source_img = templait.convert("RGBA").resize((1024, 1024))
     w, h = source_img.size
     if font_name is None:
-        font_name = "userbot/helpers/styles/impact.ttf"
+        font_name = "iqthon/helpers/styles/impact.ttf"
     font = ImageFont.truetype(font_name, font_size)
     ew, eh = position
     # get text size
