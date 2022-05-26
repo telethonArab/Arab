@@ -18,8 +18,8 @@ from telethon.errors.rpcerrorlist import YouBlockedUserError
 from telethon.tl.functions.messages import ExportChatInviteRequest
 from collections import deque
 from random import choice
-from userbot import iqthon
-from userbot.core.logger import logging
+from iqthon import iqthon
+from iqthon.core.logger import logging
 from ..Config import Config
 from ..core.managers import edit_delete, edit_or_reply
 from ..helpers.utils import reply_id, _catutils, parse_pre, yaml_format, install_pip, get_user_from_event, _format
@@ -39,7 +39,7 @@ from barcode.writer import ImageWriter
 from bs4 import BeautifulSoup
 from PIL import Image, ImageColor
 from telethon.errors.rpcerrorlist import YouBlockedUserError
-from userbot.utils import admin_cmd
+from iqthon.utils import admin_cmd
 from ..helpers import AioHttp
 from ..helpers.utils import _catutils, _format, reply_id
 CACHE = {}
