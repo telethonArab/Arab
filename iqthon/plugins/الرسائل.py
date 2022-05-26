@@ -35,8 +35,8 @@ from telethon.tl.types import ChannelParticipantCreator as owner
 from telethon.tl.types import UserStatusOffline as off
 from telethon.tl.types import UserStatusOnline as onn
 from telethon.tl.types import UserStatusRecently as rec
-from userbot import iqthon
-from userbot.core.logger import logging
+from iqthon import iqthon
+from iqthon.core.logger import logging
 from ..Config import Config
 from ..core.managers import edit_delete, edit_or_reply
 from ..helpers.tools import media_type
@@ -374,7 +374,7 @@ async def gps(event):
     reply_to_id = await reply_id(event)
     input_str = event.pattern_match.group(1)
     catevent = await edit_or_reply(event, "** ♛ ⦙   جاري العثـور على الموقع  … **")
-    geolocator = Nominatim(user_agent="catuserbot")
+    geolocator = Nominatim(user_agent="catiqthon")
     geoloc = geolocator.geocode(input_str)
     if geoloc:
         lon = geoloc.longitude
