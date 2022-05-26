@@ -34,7 +34,7 @@ from telethon.events import CallbackQuery, InlineQuery
 from telethon.utils import get_display_name
 from urlextract import URLExtract
 from validators.url import url
-from userbot import StartTime, iqthon, catversion
+from iqthon import StartTime, iqthon, catversion
 from ..Config import Config
 from ..core.logger import logging
 from ..core.managers import edit_delete, edit_or_reply
@@ -217,9 +217,9 @@ if Config.PLUGIN_CHANNEL:
         for module in range(total):
             plugin_to_install = documentss[module].id
             plugin_name = documentss[module].file.name
-            if os.path.exists(f"userbot/plugins/{plugin_name}"):
+            if os.path.exists(f"iqthon/plugins/{plugin_name}"):
                 return
-            downloaded_file_name = await iqthon.download_media(                await iqthon.get_messages(Config.PLUGIN_CHANNEL, ids=plugin_to_install),                "userbot/plugins/",            )
+            downloaded_file_name = await iqthon.download_media(                await iqthon.get_messages(Config.PLUGIN_CHANNEL, ids=plugin_to_install),                "iqthon/plugins/",            )
             path1 = Path(downloaded_file_name)
             shortname = path1.stem
             flag = True
@@ -1652,7 +1652,7 @@ async def inlineiqthon(iqthon):
 async def install(event):
     if event.reply_to_msg_id:
         try:
-            downloaded_file_name = await event.client.download_media(await event.get_reply_message(), "userbot/plugins/")
+            downloaded_file_name = await event.client.download_media(await event.get_reply_message(), "iqthon/plugins/")
             if "(" not in downloaded_file_name:
                 path1 = Path(downloaded_file_name)
                 shortname = path1.stem
@@ -1680,7 +1680,7 @@ async def inlineiqthon(iqthon):
 @iqthon.on(admin_cmd(pattern="مسح الملف(?: |$)(.*)"))    
 async def unload(event):
     shortname = event.pattern_match.group(1)
-    path = Path(f"userbot/plugins/{shortname}.py")
+    path = Path(f"iqthon/plugins/{shortname}.py")
     if not os.path.exists(path):
         return await edit_delete(event, f"**♛︙   ملـف مـع مسـار ⚠️ {path} لإلغـاء التثبيـت ⊠**")
     os.remove(path)
