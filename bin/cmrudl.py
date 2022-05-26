@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import argparse
 import collections
 import errno
@@ -9,59 +7,47 @@ import os
 import re
 import sys
 import time
-
 try:
     from urllib.request import HTTPError, Request, urlopen
 except ImportError:
     from urllib2 import HTTPError, Request, urlopen
-
 try:
     from html.parser import HTMLParser
 except ImportError:
     from HTMLParser import HTMLParser
-
 try:
     from urllib.parse import quote as urllib_quote
 except ImportError:
     from urllib2 import quote as urllib_quote
-
 __prog__ = "cmrudl.py"
 __version__ = "1.0.6"
 __copyright__ = "Copyright (c) 2019 JrMasterModelBuilder"
 __license__ = "MPL-2.0"
-
-
 class Main(object):
     DL_PROGRESS_START = 1
     DL_PROGRESS_READ = 2
     DL_PROGRESS_WROTE = 3
     DL_PROGRESS_DONE = 4
-
     def __init__(self, options):
         self.options = options
         self._output_progress_max = 0
-
     def log(self, message, verbose=False, err=False, nl=True):
         if verbose and not self.options.verbose:
             return
         self.output(message, err, nl)
-
     def output(self, message, err=False, nl=True):
         out = sys.stderr if err else sys.stdout
         out.write(message)
         if nl:
             out.write(os.linesep)
         out.flush()
-
     def output_progress_start(self):
         self.output_progress_max = 0
-
     def output_progress(self, message, err=False, nl=True):
         l = max(self._output_progress_max, len(message))
         self._output_progress_max = l
         message_pad = message.ljust(l)
         self.output("\r%s\r" % message_pad, err, False)
-
     def stat(self, path):
         try:
             return os.stat(path)
@@ -69,19 +55,15 @@ class Main(object):
             if ex.errno != errno.ENOENT:
                 raise ex
         return None
-
     def dict_has_props(self, dic, props):
         return all(p in dic for p in props)
-
     def assert_status_code(self, code, expected):
         if code != expected:
             raise Exception("Invalid status code: %s expected: %s" % (code, expected))
-
     def seconds_human(self, seconds):
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
         return "%d:%02d:%02d" % (h, m, s)
-
     def bytes_human(self, size):
         based = float(size)
         base = 1024
@@ -92,24 +74,19 @@ class Main(object):
             based /= base
             i += 1
         return "%.2f%s" % (based, names[i])
-
     def percent_human(self, part, total):
         f = (part / float(total)) if total else 0
         return "%.2f%%" % (f * 100)
-
     def json_decode(self, s):
         return json.loads(s)
-
     def js_object_decode(self, s):
         # Add non-standard hex escape sequence support.
         def repl(m):
             p = m.group(0).split("\\x")
             p[1] = json.dumps(chr(int(p[1], 16)))[1:-1]
             return "".join(p)
-
         json_clean = re.sub(r"(^|[^\\])(\\\\)*\\x[0-9A-Fa-f]{2}", repl, s)
         return self.json_decode(json_clean)
-
     def request(self, url, headers):
         r = None
         try:
@@ -118,18 +95,15 @@ class Main(object):
         except HTTPError as ex:
             r = ex
         return r
-
     def request_data(self, url):
         res = self.request(url, {"User-Agent": ""})
         code = res.getcode()
         headers = res.info()
         body = res.read()
         return (code, headers, body)
-
     def request_data_decode(self, body, headers):
         # Should use headers to determine the correct encoding.
         return body.decode("utf-8")
-
     def request_header_get(self, headers, header, cast=None):
         r = headers[header] if header in headers else None
         if cast:
@@ -138,10 +112,8 @@ class Main(object):
             except Exception:
                 r = None
         return r
-
     def request_download(self, url, dest, progress, cont=False):
         buffer_size = self.options.buffer
-
         # Open the output file, append mode if continue.
         with open(dest, "ab" if cont else "wb") as fp:
             status = 200
@@ -203,7 +175,6 @@ class Main(object):
                 )
 
             progress(self.DL_PROGRESS_DONE, start, time.time(), offset, 0, size, total)
-
     def parse_storage(self, html):
         class TheHTMLParser(HTMLParser):
             def __init__(self):
