@@ -221,7 +221,7 @@ def errors_handler(func):
             if Config.PRIVATE_GROUP_BOT_API_ID != 0:
                 return
             date = (datetime.datetime.now()).strftime("%m/%d/%Y, %H:%M:%S")
-            ftext = f"\n--------BEGIN USERBOT TRACEBACK LOG--------\
+            ftext = f"\n--------BEGIN iqthon TRACEBACK LOG--------\
                                   \nDate: {date}\nGroup ID: {str(check.chat_id)}\
                                   \nSender ID: {str(check.sender_id)}\
                                   \n\nEvent Trigger:\n{str(check.text)}\
@@ -232,7 +232,7 @@ def errors_handler(func):
                 "date": datetime.datetime.now(),
             }
 
-            ftext += "\n\n--------END USERBOT TRACEBACK LOG--------"
+            ftext += "\n\n--------END iqthon TRACEBACK LOG--------"
             command = 'git log --pretty=format:"%an: %s" -5'
             ftext += "\n\n\nLast 5 commits:\n"
             output = (await runcmd(command))[:2]
