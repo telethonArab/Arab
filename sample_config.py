@@ -29,7 +29,7 @@ class Config(object):
     PLUGIN_CHANNEL = int(os.environ.get("PLUGIN_CHANNEL") or 0)
     TELEGRAPH_SHORT_NAME = os.environ.get("TELEGRAPH_SHORT_NAME", "iqthon")
     THUMB_IMAGE = os.environ.get("THUMB_IMAGE", "https://telegra.ph/file/f1b9e7e1a5b0f719bc5d9.jpg")
-    # specify NO_LOAD with plugin names for not loading in userbot
+    # specify NO_LOAD with plugin names for not loading in iqthon
     NO_LOAD = [x for x in os.environ.get("NO_LOAD", "").split()]
     # for custom pic for .digitalpfp
     DIGITAL_PIC = os.environ.get("DIGITAL_PIC", None)
@@ -57,7 +57,7 @@ class Config(object):
     FINISHED_PROGRESS_STR = os.environ.get("FINISHED_PROGRESS_STR", "▰")
     UNFINISHED_PROGRESS_STR = os.environ.get("UNFINISHED_PROGRESS_STR", "▱")
 
-    # API VARS FOR USERBOT
+    # API VARS FOR iqthon
     # Get your own ACCESS_KEY from http://api.screenshotlayer.com/api/capture for screen shot
     SCREEN_SHOT_LAYER_ACCESS_KEY = os.environ.get("SCREEN_SHOT_LAYER_ACCESS_KEY", None)
     # Get your own APPID from https://api.openweathermap.org/data/2.5/weather
@@ -74,7 +74,7 @@ class Config(object):
     REM_BG_API_KEY = os.environ.get("REM_BG_API_KEY", None)
     # Get this value from https://free.currencyconverterapi.com/
     CURRENCY_API = os.environ.get("CURRENCY_API", None)
-    # Google Drive plugin https://telegra.ph/G-Drive-guide-for-catuserbot-01-01
+    # Google Drive plugin https://telegra.ph/G-Drive-guide-for-catiqthon-01-01
     G_DRIVE_CLIENT_ID = os.environ.get("G_DRIVE_CLIENT_ID", None)
     G_DRIVE_CLIENT_SECRET = os.environ.get("G_DRIVE_CLIENT_SECRET", None)
     G_DRIVE_FOLDER_ID = os.environ.get("G_DRIVE_FOLDER_ID", None)
