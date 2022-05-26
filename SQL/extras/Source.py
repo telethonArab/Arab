@@ -1,9 +1,9 @@
 import re
 import time
 from datetime import datetime
-from userbot import StartTime, iqthon
-from userbot.Config import Config
-from userbot.plugins import mention
+from iqthon import StartTime, iqthon
+from iqthon.Config import Config
+from iqthon.plugins import mention
 help1 = ("**♛ ⦙ كيفيه التنصيب :**")
 help2 = ("**♛ ⦙ قـائمـه الاوامـر :**\n**♛ ⦙ قنـاه السـورس :** @iqthon\n**♛ ⦙ شـرح اوامـر السـورس : @l3ll3**\n**♛ ⦙ شـرح فـارات السـورس : @teamtelethon** \n - اوامر الاونلاين تشتغل فقط في المجموعات ")
 TG_BOT = Config.TG_BOT_USERNAME
