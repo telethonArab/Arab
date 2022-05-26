@@ -6,7 +6,7 @@ from asyncio.exceptions import CancelledError
 from datetime import timedelta
 from pathlib import Path
 from telethon import Button, functions, types, utils
-from userbot import BOTLOG, BOTLOG_CHATID, PM_LOGGER_GROUP_ID
+from iqthon import BOTLOG, BOTLOG_CHATID, PM_LOGGER_GROUP_ID
 from ..Config import Config
 from ..core.logger import logging
 from ..core.session import iqthon
@@ -18,7 +18,7 @@ from .tools import create_supergroup
 LOGS = logging.getLogger("تليثون العرب \n ")
 cmdhr = Config.COMMAND_HAND_LER
 async def load_plugins(folder):
-    path = f"userbot/{folder}/*.py"
+    path = f"iqthon/{folder}/*.py"
     files = glob.glob(path)
     files.sort()
     for name in files:
@@ -31,7 +31,7 @@ async def load_plugins(folder):
                     check = 0
                     while flag:
                         try:
-                            load_module(shortname.replace(".py", ""),  plugin_path=f"userbot/{folder}")
+                            load_module(shortname.replace(".py", ""),  plugin_path=f"iqthon/{folder}")
                             break
                         except ModuleNotFoundError as e:
                             install_pip(e.name)
@@ -39,9 +39,9 @@ async def load_plugins(folder):
                             if check > 5:
                                 break
                 else:
-                    os.remove(Path(f"userbot/{folder}/{shortname}.py"))
+                    os.remove(Path(f"iqthon/{folder}/{shortname}.py"))
             except Exception as e:
-                os.remove(Path(f"userbot/{folder}/{shortname}.py"))
+                os.remove(Path(f"iqthon/{folder}/{shortname}.py"))
                 LOGS.info(f"♛ ︙غير قادر على التحميل {shortname} يوجد هناك خطا بسبب : {e}"                )
 async def startupmessage():
     try:
@@ -125,6 +125,6 @@ async def verifyLoggerGroup():
         flag = True
     if flag:
         executable = sys.executable.replace(" ", "\\ ")
-        args = [executable, "-m", "userbot"]
+        args = [executable, "-m", "iqthon"]
         os.execle(executable, *args, os.environ)
         sys.exit(0)
