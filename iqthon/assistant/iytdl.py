@@ -1,8 +1,3 @@
-""" Download Youtube Video / Audio in a User friendly interface """
-# --------------------------- #
-#   Modded ytdl by code-rgb   #
-# --------------------------- #
-
 import asyncio
 import glob
 import io
@@ -10,16 +5,13 @@ import os
 import re
 from pathlib import Path
 from time import time
-
 import ujson
 from telethon import Button, types
 from telethon.errors import BotResponseTimeoutError
 from telethon.events import CallbackQuery
 from telethon.utils import get_attributes
 from wget import download
-
 from iqthon import iqthon
-
 from ..Config import Config
 from ..core import check_owner, pool
 from ..core.logger import logging
@@ -40,7 +32,7 @@ BASE_YT_URL = "https://www.youtube.com/watch?v="
 YOUTUBE_REGEX = re.compile(
     r"(?:youtube\.com|youtu\.be)/(?:[\w-]+\?v=|embed/|v/|shorts/)?([\w-]{11})"
 )
-PATH = "./iqthon/cache/ytsearch.json"
+PATH = "./iqthon/sql_klanr/ytsearch.json"
 plugin_category = "bot"
 
 
