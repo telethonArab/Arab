@@ -23,7 +23,6 @@ async def startup_process():
     await verifyLoggerGroup()
     await load_plugins("plugins")
     await load_plugins("assistant")
-    await load_plugins("MusicTelethon")
     print(f"<b> ⌔︙ اهلا بك لقد نصبت تليثون العرب بنجاح 🥁 اذهب الى قناتنا لمعرفة المزيـد ⤵️. </b>\n CH : https://t.me/iqthon ")
     await verifyLoggerGroup()
     await add_bot_to_logger_group(BOTLOG_CHATID)
