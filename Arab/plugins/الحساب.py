@@ -45,25 +45,25 @@ from telethon.tl.functions.messages import SaveDraftRequest
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from ..helpers.progress import humanbytes as hb
-from iqthon.utils import admin_cmd, sudo_cmd, eor
+from Arab.utils import admin_cmd, sudo_cmd, eor
 from telethon.utils import get_display_name
 from telethon.tl.functions.account import UpdateUsernameRequest
 from telethon.tl.functions.channels import GetAdminedPublicChannelsRequest
 from telethon.tl.functions.photos import DeletePhotosRequest, GetUserPhotosRequest
 from ..helpers.utils import reply_id as rd
 from telethon.tl.types import Channel, Chat, InputPhoto, User
-from iqthon import iqthon
-from iqthon.core.logger import logging
+from Arab import iqthon
+from Arab.core.logger import logging
 from ..Config import Config
 from ..core.managers import edit_delete, edit_or_reply
 from . import ALIVE_NAME, AUTONAME, BOTLOG, BOTLOG_CHATID, DEFAULT_BIO, get_user_from_event
 from ..helpers import get_user_from_event, reply_id
 from ..sql_helper.locks_sql import *
 from ..helpers.functions import deEmojify, hide_inlinebot, waifutxt
-from iqthon.utils.decorators import register
+from Arab.utils.decorators import register
 from ..helpers.utils import reply_id, _catutils, parse_pre, yaml_format, install_pip, get_user_from_event, _format
-from iqthon.helpers.functions import convert_toimage,    deEmojify,    phcomment,    threats,    trap,    trash
-from iqthon.helpers.functions import convert_tosticker,    flip_image,    grayscale,    invert_colors,    mirror_file,    solarize
+from Arab.helpers.functions import convert_toimage,    deEmojify,    phcomment,    threats,    trap,    trash
+from Arab.helpers.functions import convert_tosticker,    flip_image,    grayscale,    invert_colors,    mirror_file,    solarize
 from ..sql_helper.global_list import add_to_list, get_collection_list, is_in_list, rm_from_list
 from ..sql_helper.globals import addgvar, delgvar, gvarstatus
 from ..sql_helper.locks_sql import *
