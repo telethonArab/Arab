@@ -35,8 +35,8 @@ from telethon.tl.types import ChannelParticipantCreator as owner
 from telethon.tl.types import UserStatusOffline as off
 from telethon.tl.types import UserStatusOnline as onn
 from telethon.tl.types import UserStatusRecently as rec
-from iqthon import iqthon
-from iqthon.core.logger import logging
+from Arab import iqthon
+from Arab.core.logger import logging
 from ..Config import Config
 from ..core.managers import edit_delete, edit_or_reply
 from ..helpers.tools import media_type
