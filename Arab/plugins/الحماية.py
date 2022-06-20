@@ -18,8 +18,8 @@ from telethon.errors.rpcerrorlist import YouBlockedUserError
 from telethon.tl.functions.messages import ExportChatInviteRequest
 from collections import deque
 from random import choice
-from iqthon import iqthon
-from iqthon.core.logger import logging
+from Arab import iqthon
+from Arab.core.logger import logging
 from ..Config import Config
 from ..core.managers import edit_delete, edit_or_reply
 from ..helpers.utils import reply_id, _catutils, parse_pre, yaml_format, install_pip, get_user_from_event, _format
