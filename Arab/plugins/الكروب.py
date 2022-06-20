@@ -96,7 +96,7 @@ TYPES = [
     "Round Video",
 ]
 thumb_image_path = os.path.join(Config.TMP_DOWNLOAD_DIRECTORY, "thumb_image.jpg")
-from iqthon import iqthon
+from Arab import iqthon
 try:
     import pyminizip
 except Exception:
