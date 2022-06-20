@@ -17,7 +17,7 @@ from telethon.tl import functions, types
 from telethon.tl.functions.messages import GetStickerSetRequest
 from telethon.tl.functions.messages import ImportChatInviteRequest as Get
 from telethon.tl.types import     DocumentAttributeFilename,    DocumentAttributeSticker,    InputStickerSetID,    MessageMediaPhoto
-from iqthon import iqthon
+from Arab import iqthon
 from ..core.managers import edit_delete, edit_or_reply
 from ..helpers.functions import crop_and_divide
 from ..helpers.tools import media_type
