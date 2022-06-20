@@ -11,7 +11,7 @@ from telethon.errors import BotResponseTimeoutError
 from telethon.events import CallbackQuery
 from telethon.utils import get_attributes
 from wget import download
-from iqthon import iqthon
+from Arab import iqthon
 from ..Config import Config
 from ..core import check_owner, pool
 from ..core.logger import logging
