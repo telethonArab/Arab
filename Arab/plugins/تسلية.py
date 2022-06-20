@@ -23,13 +23,13 @@ from telethon.events import CallbackQuery
 from telethon.utils import get_display_name
 from collections import deque
 from random import choice
-from iqthon import iqthon
+from Arab import iqthon
 from ..helpers import catmemes
 from ..core.managers import edit_or_reply, edit_delete
 from . import ALIVE_NAME
 from ..helpers import fonts as emojify
-from iqthon.helpers.functions import convert_toimage,    deEmojify,    phcomment,    threats,    trap,    trash
-from iqthon.helpers.functions import convert_tosticker,    flip_image,    grayscale,    invert_colors,    mirror_file,    solarize
+from Arab.helpers.functions import convert_toimage,    deEmojify,    phcomment,    threats,    trap,    trash
+from Arab.helpers.functions import convert_tosticker,    flip_image,    grayscale,    invert_colors,    mirror_file,    solarize
 from ..helpers.utils import reply_id, _catutils, parse_pre, yaml_format, install_pip, get_user_from_event, _format
 from . import deEmojify
 from typing import Optional, Tuple
@@ -39,7 +39,7 @@ import os, logging, asyncio
 from telethon import events
 from telethon.tl.types import ChannelParticipantsAdmins
 from ..helpers import get_user_from_event
-from iqthon.helpers.utils.tools import take_screen_shot
+from Arab.helpers.utils.tools import take_screen_shot
 async def runcmd(cmd: str) -> Tuple[str, str, int, int]:
     args = shlex.split(cmd)
     process = await asyncio.create_subprocess_exec(        *args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE    )
