@@ -18,7 +18,7 @@ from .tools import create_supergroup
 LOGS = logging.getLogger("تليثون العرب \n ")
 cmdhr = Config.COMMAND_HAND_LER
 async def load_plugins(folder):
-    path = f"iqthon/{folder}/*.py"
+    path = f"Arab/{folder}/*.py"
     files = glob.glob(path)
     files.sort()
     for name in files:
@@ -31,7 +31,7 @@ async def load_plugins(folder):
                     check = 0
                     while flag:
                         try:
-                            load_module(shortname.replace(".py", ""),  plugin_path=f"iqthon/{folder}")
+                            load_module(shortname.replace(".py", ""),  plugin_path=f"Arab/{folder}")
                             break
                         except ModuleNotFoundError as e:
                             install_pip(e.name)
@@ -39,9 +39,9 @@ async def load_plugins(folder):
                             if check > 5:
                                 break
                 else:
-                    os.remove(Path(f"iqthon/{folder}/{shortname}.py"))
+                    os.remove(Path(f"Arab/{folder}/{shortname}.py"))
             except Exception as e:
-                os.remove(Path(f"iqthon/{folder}/{shortname}.py"))
+                os.remove(Path(f"Arab/{folder}/{shortname}.py"))
                 LOGS.info(f"♛ ︙غير قادر على التحميل {shortname} يوجد هناك خطا بسبب : {e}"                )
 async def startupmessage():
     try:
