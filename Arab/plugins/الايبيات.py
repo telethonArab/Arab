@@ -57,12 +57,12 @@ from telethon.errors.rpcerrorlist import YouBlockedUserError
 from telethon import Button, custom, events, functions
 from telethon.tl.functions.messages import ImportChatInviteRequest as Get
 from validators.url import url
-from iqthon import iqthon
+from Arab import iqthon
 from ..Config import Config
 from ..core.logger import logging
 from youtubesearchpython import SearchVideos
 from ..core.managers import edit_delete, edit_or_reply
-from iqthon.utils.decorators import register
+from Arab.utils.decorators import register
 from ..helpers import media_type, progress, thumb_from_audio
 from ..helpers.functions import name_dl, song_dl, video_dl, yt_search, deEmojify, yt_data, convert_toimage, convert_tosticker, invert_frames, l_frames, r_frames, spin_frames, ud_frames, vid_to_gif
 from ..helpers.tools import media_type
