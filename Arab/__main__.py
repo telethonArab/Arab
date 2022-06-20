@@ -1,6 +1,6 @@
 import sys
-import iqthon
-from iqthon import BOTLOG_CHATID, HEROKU_APP, PM_LOGGER_GROUP_ID
+import Arab
+from Arab import BOTLOG_CHATID, HEROKU_APP, PM_LOGGER_GROUP_ID
 from telethon import functions
 from .Config import Config
 from .core.logger import logging
