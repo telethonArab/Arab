@@ -1,4 +1,4 @@
-from iqthon import iqthon
+from Arab import iqthon
 
 from ..core.managers import edit_or_reply
 @iqthon.on(admin_cmd(pattern="رموز1(?:\s|$)([\s\S]*)"))
