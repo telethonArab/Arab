@@ -7,8 +7,8 @@ from telethon.tl import types
 from telethon.tl.functions.messages import EditMessageRequest
 from telethon.tl.types import MessageEntityBold,    MessageEntityCode,    MessageEntityItalic,    MessageEntityPre,    MessageEntityTextUrl,    MessageEntityUnderline 
 from telethon.utils import add_surrogate, del_surrogate
-from iqthon import iqthon
-from iqthon.core.logger import logging
+from Arab import iqthon
+from Arab.core.logger import logging
 LOGS = logging.getLogger(__name__)
 plugin_category = "utils"
 usernexp = re.compile(r"@(\w{3,32})\[(.+?)\]")
