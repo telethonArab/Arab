@@ -9,7 +9,7 @@ import math
 import base64
 import urllib
 from telethon.tl import functions
-from iqthon.utils.decorators import register
+from Arab.utils.decorators import register
 from telethon import events
 from telethon.errors.rpcerrorlist import YouBlockedUserError
 from telethon.errors import ChatSendInlineForbiddenError, ChatSendStickersForbiddenError
