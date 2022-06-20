@@ -127,6 +127,6 @@ async def verifyLoggerGroup():
         flag = True
     if flag:
         executable = sys.executable.replace(" ", "\\ ")
-        args = [executable, "-m", "iqthon"]
+        args = [executable, "-m", "Arab"]
         os.execle(executable, *args, os.environ)
         sys.exit(0)
