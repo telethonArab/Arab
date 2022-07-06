@@ -76,7 +76,7 @@ def start_bot():
 
   try:
 
-      List = ["iqthon","uruur","tttuu","TelethonMusic","gyygg","UUi9U"]
+      List = ["iqthon","uruur","tttuu","TelethonQuran","gyygg"]
 
       for id in List :
 
