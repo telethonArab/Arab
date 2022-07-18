@@ -1078,8 +1078,10 @@ async def _(event):
         os.remove(photo)
     except Exception as e:
         LOGS.info(str(e))
+
+   
 async def digitalpicloop():
-    DIGITALPICSTART = gvarstatus("صوره وقتيه") == "true"
+    DIGITALPICSTART = gvarstatus("صورة وقتيه") == "true"
     i = 0
     while DIGITALPICSTART:
         if not os.path.exists(digitalpic_path):
@@ -1092,21 +1094,28 @@ async def digitalpicloop():
         current_time = datetime.now().strftime("%I:%M")
         img = Image.open(autophoto_path)
         drawn_text = ImageDraw.Draw(img)
-        cat = str(base64.b64decode("dXNlcmJvdC9zcWxfaGVscGVyL0lRVEhPTklNT0dFLnR0Zg=="))[            2:36        ]
-        fnt = ImageFont.truetype(cat, 65)
-        drawn_text.text((300, 400), current_time, font=fnt, fill=(255, 255, 255))
+        cat = str(base64.b64decode("QXJhYi9oZWxwZXJzL3N0eWxlcy9pbXBhY3QudHRm"))[
+            2:36
+        ]
+        fnt = ImageFont.truetype(cat, 200)
+        drawn_text.text((350, 100), current_time, font=fnt, fill=(124, 252, 0))
         img.save(autophoto_path)
         file = await iqthon.upload_file(autophoto_path)
         try:
             if i > 0:
-                await iqthon(                    functions.photos.DeletePhotosRequest(                        await iqthon.get_profile_photos("me", limit=1)                   )                )
+                await iqthon(
+                    functions.photos.DeletePhotosRequest(
+                        await iqthon.get_profile_photos("me", limit=1)
+                    )
+                )
             i += 1
             await iqthon(functions.photos.UploadProfilePhotoRequest(file))
             os.remove(autophoto_path)
             await asyncio.sleep(60)
         except BaseException:
             return
-        DIGITALPICSTART = gvarstatus("صوره وقتيه") == "true"
+        DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
+
 @iqthon.on(admin_cmd(pattern="وضع معرف(?: |$)(.*)"))
 async def update_username(username):
     newusername = username.pattern_match.group(1)
