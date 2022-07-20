@@ -43,7 +43,9 @@ def start_bot():
 Checker = start_bot()
 if Checker == False:
     print("عذرا لديك حظر مؤقت حاول التنصيب غدا او بعد 24 ساعة")
-    
+    iqthon.disconnect()
+    sys.exit()
+
 if len(sys.argv) not in (1, 3, 4):
     iqthon.disconnect()
 elif not Catcheck.sucess:
