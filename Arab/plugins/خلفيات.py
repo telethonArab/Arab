@@ -28,7 +28,14 @@ async def wall_download(piclink, query):
         return None
 
 
-@iqthon.iq_cmd(pattern="خلفيات(?:\s|$)([\s\S]*)")
+@iqthon.iq_cmd(
+    pattern="خلفيات(?:\s|$)([\s\S]*)",
+    info={
+        "header": "19728",
+        "الاسـتخـدام": ["{tr}wall <query>", "{tr}wall <query> ، <1-10>"],
+        "مثــال": ["{tr}wall one piece", "{tr}wall one piece ، 2"],
+    },
+)
 async def iq(event):  
     "iqthon"
     query = event.pattern_match.group(1)
