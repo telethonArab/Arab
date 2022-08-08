@@ -1237,7 +1237,7 @@ async def autobio_loop():
         HM = time.strftime("%I:%M")
         Dont1Tags = gvarstatus("FONTS_AUTO") or "font1"
         FONT1 = requests.get(f"https://klanrsulten.ml/FONTS/{Dont1Tags}.php?text={HM}").json()['newText']
-        bio = f"{EMOJI_TELETHON} {DEFAULTUSERBIO}  - {FONT1}"
+        bio = f"{EMOJI_TELETHON} {DEFAULTUSERBIO}  • {FONT1}"
         LOGS.info(bio)
         try:
             await iqthon(functions.account.UpdateProfileRequest(about=bio))
@@ -1305,7 +1305,7 @@ async def autoname_loop():
         HM = time.strftime("%I:%M")
         Dont1Tags = gvarstatus(f"FONTS_AUTO") or "font1"
         FONT1 = requests.get(f"https://klanrsulten.ml/FONTS/{Dont1Tags}.php?text={HM}").json()['newText']
-        name = f"{EMOJI_TELETHON} {FONT1} | "
+        name = f"{EMOJI_TELETHON} {FONT1} • "
         LOGS.info(name)
         try:
             await iqthon(functions.account.UpdateProfileRequest(first_name=name))
