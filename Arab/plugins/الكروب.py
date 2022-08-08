@@ -195,7 +195,7 @@ async def muteiqthon(event):
             return await event.edit(
                 "**- هـذا المسـتخـدم مڪتـوم . . سـابقـاً **"
             )
-        if event.chat_id == iqthonali.uid:
+        if event.chat_id == iqthon.uid:
             return await edit_delete(event, "**- لا تستطــع كتـم نفسـك**")
         if event.chat_id == 1226408155:
             return await edit_delete(event, "** دي . . لا يمڪنني كتـم مطـور السـورس  ╰**")
@@ -222,7 +222,7 @@ async def muteiqthon(event):
         user, reason = await get_user_from_event(event)
         if not user:
             return
-        if user.id == iqthonali.uid:
+        if user.id == iqthon.uid:
             return await edit_or_reply(event, "**- عــذراً .. لا استطيــع كتــم نفســي**")
         if user.id == 1226408155:
             return await edit_or_reply(event, "** دي . . لا يمڪنني كتـم مطـور السـورس  ╰**")
