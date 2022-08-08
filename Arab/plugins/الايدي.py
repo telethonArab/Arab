@@ -92,8 +92,15 @@ async def fetch_info(replied_user, event):
     caption += f"ٴ{iqthonF} "
     return photo, caption
 
-@iqthon.iq_cmd(pattern="ايدي(?: |$)(.*)",)
+@iqthon.iq_cmd(pattern="ايدي(?: |$)(.*)",
+    command=("ايدي", plugin_category),
+    info={
+        "header": "لـ عـرض معلومـات الشخـص",
+        "الاستـخـدام": " {tr}ايدي بالـرد او {tr}ايدي + معـرف/ايـدي الشخص",
+    },
+)
 async def who(event):
+    "Gets info of an user"
     iqthon = await edit_or_reply(event, "⇆")
     if not os.path.isdir(Config.TMP_DOWNLOAD_DIRECTORY):
         os.makedirs(Config.TMP_DOWNLOAD_DIRECTORY)
