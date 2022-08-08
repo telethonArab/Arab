@@ -7,6 +7,9 @@ import os
 import shlex
 import math
 import base64
+from bs4 import BeautifulSoup
+from ..helpers.utils import reply_id
+plugin_category = "@iqthon"
 import urllib
 from telethon.tl import functions
 from Arab.utils.decorators import register
@@ -53,7 +56,6 @@ async def crop(imagefile, endname, x):
     image = Image.open(imagefile)
     inverted_image = PIL.ImageOps.crop(image, border=x)
     inverted_image.save(endname)
-plugin_category = "fun"
 CMD_FIG = {    "slant": "slant",    "3D": "3-d",    "5line": "5lineoblique",    "alpha": "alphabet",    "banner": "banner3-D",    "doh": "doh",    "basic": "basic",    "binary": "binary",    "iso": "isometric1",    "letter": "letters",    "allig": "alligator",    "dotm": "dotmatrix",    "bubble": "bubble",    "bulb": "bulbhead",    "digi": "digital"}
 button = ["0", "1", "2", "3", "4", "5", "6", "7"]
 kno = [    "100% تحبك وتخاف عليك",    "100% يحبج ويخاف عليج",    "91% جـزء من گـلبه ",    "81% تموت عليك ههاي ",    "81% يموت عليج ههذا ",    "هاه اخي ؟  🏳‍🌈",    "40% واحد حيوان ومصلحه عوفه ",    "50% شوف شعندك وياه ",    "30% خاين نصحيا عوفيه ميفيدج ",    "25% مصادق غيرج ويكلج احبج",    "25% واحد كلب ابن كلب عوفه",    "0% يكهرك ",    "0% تكرهك ",    "@iqthon",]
@@ -218,6 +220,101 @@ async def _(event):
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
         await event.edit(animation_chars[i % 15])
+async def wall_download(piclink, query):
+    try:
+        if not os.path.isdir("./temp"):
+            os.mkdir("./temp")
+        picpath = f"./temp/{query.title().replace(' ', '')}.jpg"
+        if os.path.exists(picpath):
+            i = 1
+            while os.path.exists(picpath) and i < 11:
+                picpath = f"./temp/{query.title().replace(' ', '')}-{i}.jpg"
+                i += 1
+        with open(picpath, "wb") as f:
+            f.write(requests.get(piclink).content)
+        return picpath
+    except Exception as e:
+        LOGS.info(str(e))
+        return None
+
+
+@iqthon.iq_cmd(pattern="خلفيات(?:\s|$)([\s\S]*)",    info={        "header": "19728",        "الاسـتخـدام": ["{tr}wall <query>", "{tr}wall <query> ، <1-10>"],        "مثــال": ["{tr}wall one piece", "{tr}wall one piece ، 2"],    },)
+async def iq(event):  
+    "iqthon"
+    query = event.pattern_match.group(1)
+    reply_to_id = await reply_id(event)
+    limit = 1
+    if not query:
+        return await edit_delete(event, "**- اعطـني نـص للبحـث . . .**", 10)
+    if "،" in query:
+        query, limit = query.split("،")
+    if int(limit) > 10:
+        return await edit_delete(event, "**- اقصـى عـدد للبحـث هـو 10 . . .**", 10)
+    iqthonevent = await edit_or_reply(event, "**- جـارِ البحـث عـن خلفيـات HD . . .**")
+    r = requests.get(
+        f"https://wall.alphacoders.com/search.php?search={query.replace(' ','+')}"
+    )
+    soup = BeautifulSoup(r.content, "lxml")
+    walls = soup.find_all("img", class_="img-responsive")
+    if not walls:
+        return await edit_delete(
+            iqthonevent, f"**لايوجد هكذا بحث** `{query}`", 10
+        )
+    i = count = 0
+    piclist = []
+    piclinks = []
+    captionlist = []
+    await edit_or_reply(iqthonevent, "**- جــارِ . . .**⏳")
+    url2 = "https://api.alphacoders.com/content/get-download-link"
+    for x in walls:
+        wall = random.choice(walls)["src"][8:-4]
+        server = wall.split(".")[0]
+        fileid = wall.split("-")[-1]
+        data = {
+            "content_id": fileid,
+            "content_type": "wallpaper",
+            "file_type": "jpg",
+            "image_server": server,
+        }
+        res = requests.post(url2, data=data)
+        a = res.json()["link"]
+        if "We are sorry," not in requests.get(a).text and a not in piclinks:
+            await edit_or_reply(iqthonevent, "**- جـارِ التحميـل . . .📥**")
+            pic = await wall_download(a, query)
+            if pic is None:
+                return await edit_delete(
+                    iqthonevent, "__Sorry i can't download wallpaper.__"
+                )
+            piclist.append(pic)
+            piclinks.append(a)
+            captionlist.append("")
+            count += 1
+            i = 0
+        else:
+            i += 1
+        await edit_or_reply(
+            iqthonevent, f"**- تم تحميـل 📥 :** {count}/{limit}\n\n**- خطـأ بتحميـل ❌ :** {i}/5"
+        )
+        if count == int(limit):
+            break
+        if i == 5:
+            await edit_or_reply(iqthonevent, "`Max search error limit exceed..`")
+    try:
+        await edit_or_reply(iqthonevent, "**- جـارِ التنزيـل . . .**")
+        captionlist[-1] = f"**➥ البحـث :-** `{query.title()}`"
+        await event.client.send_file(
+            event.chat_id,
+            piclist,
+            caption=captionlist,
+            reply_to=reply_to_id,
+            force_document=True,
+        )
+        await iqthonevent.delete()
+    except Exception as e:
+        LOGS.info(str(e))
+    for i in piclist:
+        os.remove(i)
+
 @iqthon.on(admin_cmd(pattern="حلويات(?: |$)(.*)"))
 async def _(event):
     "أمر الرسوم المتحركة"
