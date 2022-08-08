@@ -92,8 +92,7 @@ async def fetch_info(replied_user, event):
     caption += f"ٴ{iqthonF} "
     return photo, caption
 
-
-@iqthon.on(  pattern="ايدي(?: |$)(.*)",   },)
+@iqthon.iq_cmd(pattern="ايدي(?: |$)(.*)",)
 async def who(event):
     iqthon = await edit_or_reply(event, "⇆")
     if not os.path.isdir(Config.TMP_DOWNLOAD_DIRECTORY):
