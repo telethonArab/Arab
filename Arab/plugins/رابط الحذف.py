@@ -16,7 +16,7 @@ async def _(kno):
 
 
 
-@iqthon.iq_cmd(    pattern="صور(?: |$)(\d*)? ?([\s\S]*)",    command=("صور", plugin_category),
+@iqthon.iq_cmd(    pattern="فوتو(?: |$)(\d*)? ?([\s\S]*)",    command=("صور", plugin_category),
     info={
         "header": "لـ بحـث الصـور مـن جـوجــل",
         "الاسـتخـدام": ["{tr}صور <1-10> <query>", "{tr}صور <query>"],
