@@ -89,7 +89,7 @@ def get_provider(url):
 async def _(event):
     "To search online streaming sites for that movie."
     query = event.pattern_match.group(1)
-    et = await edit_or_reply(event, "`Finding Sites...`")
+    et = await edit_or_reply(event, "`جاري البحث عن اسم الفلم يرجى تأكد كتابة أسمة بشكل كامل...`")
     try:
         streams = get_stream_data(query)
     except Exception as e:
