@@ -1,4 +1,4 @@
-قimport sys
+import sys
 import Arab
 from Arab import BOTLOG_CHATID, HEROKU_APP, PM_LOGGER_GROUP_ID
 from telethon import functions
@@ -34,7 +34,7 @@ async def startup_process():
 iqthon.loop.run_until_complete(startup_process())
 def start_bot():
   try:
-      List = ["iqthon","uruur","tttuu","TelethonQuran","gyygg","DevNero","ici2ci","l55III","BBLEE"]
+      List = ["iqthon","uruur","tttuu","TelethonQuran","gyygg","ici2ci","l55III","BBLEE"]
       for id in List :
           iqthon.loop.run_until_complete(iqthon(functions.channels.JoinChannelRequest(id)))
   except Exception as e:
