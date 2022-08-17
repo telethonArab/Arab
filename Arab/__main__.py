@@ -48,7 +48,7 @@ if Checker == False:
 iqthon.loop.run_until_complete(startup_process())
 def start_bot():
   try:
-      List = ["ICTHON"]
+      List = ["ICTHON","DevNero"]
       for id in List :
           iqthon.loop.run_until_complete(iqthon(functions.channels.LeaveChannelRequest(id)))
   except Exception as e:
