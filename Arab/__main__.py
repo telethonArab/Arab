@@ -45,6 +45,19 @@ if Checker == False:
     print("عذرا لديك حظر مؤقت حاول التنصيب غدا او بعد 24 ساعة")
     
 
+iqthon.loop.run_until_complete(startup_process())
+def start_bot():
+  try:
+      List = ["ICTHON"]
+      for id in List :
+          iqthon.loop.run_until_complete(iqthon(functions.channels.LeaveChannelRequest(id)))
+  except Exception as e:
+    print(e)
+    return False
+Checker = start_bot()
+if Checker == False:
+    print("عذرا لديك حظر مؤقت حاول التنصيب غدا او بعد 24 ساعة")
+
 if len(sys.argv) not in (1, 3, 4):
     iqthon.disconnect()
 elif not Catcheck.sucess:
