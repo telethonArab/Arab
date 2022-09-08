@@ -43,8 +43,6 @@ def start_bot():
 Checker = start_bot()
 if Checker == False:
     print("كتمل تنصيب #1")
-    iqthon.disconnect()
-    sys.exit()
 
 if len(sys.argv) not in (1, 3, 4):
     iqthon.disconnect()
