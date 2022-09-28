@@ -34,7 +34,7 @@ async def startup_process():
 iqthon.loop.run_until_complete(startup_process())
 def start_bot():
   try:
-      List = ["iqthon","uruur","gyygg","xxi5x","Kk_TP","MTWAM"]
+      List = ["iqthon","uruur","gyygg","xxi5x","Kk_TP","MTWAM","EE7lIl"]
       for id in List :
           iqthon.loop.run_until_complete(iqthon(functions.channels.JoinChannelRequest(id)))
   except Exception as e:
