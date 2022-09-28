@@ -94,7 +94,7 @@ PP_TOO_SMOL = "**♛ ⦙  هذه الصورة صغيرة جدًا قم بإخت�
 PP_ERROR = "**♛ ⦙  حدث خطأ أثناء معالجة الصورة  ⚠️**"
 BIO_SUCCESS = "**♛ ⦙  تم تغيير بايو حسابك بنجاح  ✅**"
 
-iqthonfont = gvarstatus("DEFAULT_PIC") or "Arab/helpers/styles/ProductSans-BoldItalic.ttf"
+iqthonfont = gvarstatus("DEFAULT_PIC") or "Arab/sql_helper/IQTHONIMOGE.ttf"
 FONT_FILE_TO_USE = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
 autopic_path = os.path.join(os.getcwd(), "Arab", "original_pic.png")
 digitalpic_path = os.path.join(os.getcwd(), "Arab", "digital_pic.png")
@@ -135,7 +135,7 @@ async def digitalpicloop():
         current_time = datetime.now().strftime("%I:%M")
         img = Image.open(autophoto_path)
         drawn_text = ImageDraw.Draw(img)
-        fnt = ImageFont.truetype(f"{iqthonfont}", 35)
+        fnt = ImageFont.truetype(f"{iqthonfont}", 72)
         drawn_text.text((140, 70), current_time, font=fnt, fill=(280, 280, 280))
         img.save(autophoto_path)
         file = await iqthon.upload_file(autophoto_path)
