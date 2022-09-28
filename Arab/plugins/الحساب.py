@@ -107,7 +107,7 @@ unplagiarism = gvarstatus("OR_UNPLAG") or "الغاء الانتحال"
 idee = gvarstatus("OR_ID") or "اييديي"
 OR_NAMEAUTO = gvarstatus("OR_NAMEAUTO") or "اسم وقتي"
 OR_AUTOBIO = gvarstatus("OR_AUTOBIO") or "نبذه وقتيه"
-AUTOGRCH = VARAUTOGRCH or ""
+AUTOGRCH = ""
 FONTGRCH1 = "1234567890"
 FONTGRCH2 = Config.FONTGRCH or "𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫𝟢"
 NAME_OK = "**♛ ⦙  تم تغيير اسم حسابك بنجاح  ✅**"
