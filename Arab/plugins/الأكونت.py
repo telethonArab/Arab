@@ -96,9 +96,9 @@ BIO_SUCCESS = "**♛ ⦙  تم تغيير بايو حسابك بنجاح  ✅**"
 
 iqthonfont = gvarstatus("DEFAULT_PIC") or "Arab/helpers/styles/digital.ttf"
 FONT_FILE_TO_USE = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
-autopic_path = os.path.join(os.getcwd(), "Arab", "original_pic.png")
-digitalpic_path = os.path.join(os.getcwd(), "Arab", "digital_pic.png")
-digitalpfp = os.path.join(os.getcwd(), "Arab", "blackiqthon.png")
+autopic_path = os.path.join(os.getcwd(), "userbot", "original_pic.png")
+digitalpic_path = os.path.join(os.getcwd(), "userbot", "digital_pic.png")
+autophoto_path = os.path.join(os.getcwd(), "userbot", "photo_pfp.png")
 EMOJI_TELETHON = gvarstatus("ALIVE_EMOJI") or " "
 OR_FOTOAUTO = gvarstatus("OR_FOTOAUTO") or "صوره وقتية"
 plagiarism = gvarstatus("OR_PLAG") or "انتحال"
@@ -106,7 +106,7 @@ unplagiarism = gvarstatus("OR_UNPLAG") or "الغاء الانتحال"
 idee = gvarstatus("OR_ID") or "اييديي"
 OR_NAMEAUTO = gvarstatus("OR_NAMEAUTO") or "اسم وقتي"
 OR_AUTOBIO = gvarstatus("OR_AUTOBIO") or "نبذه وقتيه"
-autophoto_path = gvarstatus("AUTO_PIC") or "https://telegra.ph/file/5068031bf718f735303f7.jpg"
+autophoto_path = gvarstatus("AUTO_PIC") or ""
 NAME_OK = "**♛ ⦙  تم تغيير اسم حسابك بنجاح  ✅**"
 USERNAME_SUCCESS = "**♛ ⦙  تم تغيير معرّف حسابك بنجاح  ✅**"
 USERNAME_TAKEN = "**♛ ⦙  هذا المعرّف مستخدم  ❌**"
@@ -116,14 +116,16 @@ DEFAULTUSERBIO = gvarstatus("DEFAULT_BIO") or "@iqthon"
 DEFAULTUSER = AUTONAME or Config.ALIVE_NAME
 LOGS = logging.getLogger(__name__)
 
+digitalpfp = (
+    gvarstatus("DIGITAL_PIC") or "https://telegra.ph/file/5068031bf718f735303f7.jpg"
+)
 
 async def digitalpicloop():
     DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
     i = 0
     while DIGITALPICSTART:
-        if not os.path.exists(autophoto_path):
-            digitalpfp = gvarstatus("DIGITAL_PIC" or "https://telegra.ph/file/5068031bf718f735303f7.jpg")
-            downloader = SmartDL(digitalpfp, autophoto_path, progress_bar=False)
+        if not os.path.exists(digitalpic_path):
+            downloader = SmartDL(digitalpfp, digitalpic_path, progress_bar=False)
             downloader.start(blocking=False)
             while not downloader.isFinished():
                 pass
@@ -132,8 +134,11 @@ async def digitalpicloop():
         current_time = datetime.now().strftime("%I:%M")
         img = Image.open(autophoto_path)
         drawn_text = ImageDraw.Draw(img)
-        fnt = ImageFont.truetype(f"{iqthonfont}", 35)
-        drawn_text.text((140, 70), current_time, font=fnt, fill=(280, 280, 280))
+        cat = str(base64.b64decode("dXNlcmJvdC9oZWxwZXJzL3N0eWxlcy9kaWdpdGFsLnR0Zg=="))[
+            2:36
+        ]
+        fnt = ImageFont.truetype(cat, 200)
+        drawn_text.text((350, 100), current_time, font=fnt, fill=(124, 252, 0))
         img.save(autophoto_path)
         file = await iqthon.upload_file(autophoto_path)
         try:
@@ -150,8 +155,6 @@ async def digitalpicloop():
         except BaseException:
             return
         DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
-
-
 
 async def runcmd(cmd: str) -> Tuple[str, str, int, int]:
     args = shlex.split(cmd)
