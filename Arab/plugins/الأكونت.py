@@ -94,7 +94,7 @@ PP_TOO_SMOL = "**♛ ⦙  هذه الصورة صغيرة جدًا قم بإخت�
 PP_ERROR = "**♛ ⦙  حدث خطأ أثناء معالجة الصورة  ⚠️**"
 BIO_SUCCESS = "**♛ ⦙  تم تغيير بايو حسابك بنجاح  ✅**"
 
-iqthonfont = gvarstatus("DEFAULT_PIC") or "Arab/helpers/styles/digital.ttf"
+iqthonfont = gvarstatus("DEFAULT_PIC") or "Arab/helpers/styles/ProductSans-BoldItalic.ttf"
 FONT_FILE_TO_USE = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
 autopic_path = os.path.join(os.getcwd(), "Arab", "original_pic.png")
 digitalpic_path = os.path.join(os.getcwd(), "Arab", "digital_pic.png")
@@ -119,11 +119,13 @@ digitalpfp = (
     gvarstatus("AUTO_PIC") or "https://telegra.ph/file/f42bfd7d3fb2ff745aa51.jpg"
 )
 
+
 async def digitalpicloop():
     DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
     i = 0
     while DIGITALPICSTART:
         if not os.path.exists(digitalpic_path):
+            digitalpfp = gvarstatus("AUTO_PIC")
             downloader = SmartDL(digitalpfp, digitalpic_path, progress_bar=False)
             downloader.start(blocking=False)
             while not downloader.isFinished():
@@ -133,11 +135,8 @@ async def digitalpicloop():
         current_time = datetime.now().strftime("%I:%M")
         img = Image.open(autophoto_path)
         drawn_text = ImageDraw.Draw(img)
-        cat = str(base64.b64decode("QXJhYi9oZWxwZXJzL3N0eWxlcy9Qcm9kdWN0U2Fucy1Cb2xkSXRhbGljLnR0Zg=="))[
-            2:36
-        ]
-        fnt = ImageFont.truetype(cat, 24)
-        drawn_text.text((350, 100), current_time, font=fnt, fill=(124, 252, 0))
+        fnt = ImageFont.truetype(f"{iqthonfont}", 35)
+        drawn_text.text((140, 70), current_time, font=fnt, fill=(280, 280, 280))
         img.save(autophoto_path)
         file = await iqthon.upload_file(autophoto_path)
         try:
@@ -154,6 +153,11 @@ async def digitalpicloop():
         except BaseException:
             return
         DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
+
+
+
+
+
 
 async def runcmd(cmd: str) -> Tuple[str, str, int, int]:
     args = shlex.split(cmd)
