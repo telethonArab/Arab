@@ -116,7 +116,7 @@ DEFAULTUSER = AUTONAME or Config.ALIVE_NAME
 LOGS = logging.getLogger(__name__)
 
 digitalpfp = (
-    gvarstatus("DIGITAL_PIC") or "https://telegra.ph/file/5068031bf718f735303f7.jpg"
+    gvarstatus("DIGITAL_PIC") or "https://telegra.ph/file/f42bfd7d3fb2ff745aa51.jpg"
 )
 
 async def digitalpicloop():
@@ -133,10 +133,7 @@ async def digitalpicloop():
         current_time = datetime.now().strftime("%I:%M")
         img = Image.open(autophoto_path)
         drawn_text = ImageDraw.Draw(img)
-        cat = str(base64.b64decode("dXNlcmJvdC9oZWxwZXJzL3N0eWxlcy9kaWdpdGFsLnR0Zg=="))[
-            2:36
-        ]
-        fnt = ImageFont.truetype(cat, 35)
+        fnt = ImageFont.truetype({iqthonfont}", 35)
         drawn_text.text((140, 70), current_time, font=fnt, fill=(280, 280, 280))
         img.save(autophoto_path)
         file = await iqthon.upload_file(autophoto_path)
