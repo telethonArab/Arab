@@ -1133,7 +1133,7 @@ async def digitalpicloop():
             i += 1
             await iqthon(functions.photos.UploadProfilePhotoRequest(file))
             os.remove(autophoto_path)
-            await asyncio.sleep(CHANGE_TIME)
+            await asyncio.sleep(60)
         except BaseException:
             return
         DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
