@@ -115,6 +115,44 @@ DEFAULTUSER = gvarstatus("FIRST_NAME") or ALIVE_NAME
 DEFAULTUSERBIO = gvarstatus("DEFAULT_BIO") or "@iqthon"
 DEFAULTUSER = AUTONAME or Config.ALIVE_NAME
 LOGS = logging.getLogger(__name__)
+
+
+async def digitalpicloop():
+    DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
+    i = 0
+    while DIGITALPICSTART:
+        if not os.path.exists(autophoto_path):
+            digitalpfp = gvarstatus("DIGITAL_PIC" or "https://telegra.ph/file/5068031bf718f735303f7.jpg")
+            downloader = SmartDL(digitalpfp, autophoto_path, progress_bar=False)
+            downloader.start(blocking=False)
+            while not downloader.isFinished():
+                pass
+        shutil.copy(digitalpic_path, autophoto_path)
+        Image.open(autophoto_path)
+        current_time = datetime.now().strftime("%I:%M")
+        img = Image.open(autophoto_path)
+        drawn_text = ImageDraw.Draw(img)
+        fnt = ImageFont.truetype(f"{iqthonfont}", 35)
+        drawn_text.text((140, 70), current_time, font=fnt, fill=(280, 280, 280))
+        img.save(autophoto_path)
+        file = await iqthon.upload_file(autophoto_path)
+        try:
+            if i > 0:
+                await iqthon(
+                    functions.photos.DeletePhotosRequest(
+                        await iqthon.get_profile_photos("me", limit=1)
+                    )
+                )
+            i += 1
+            await iqthon(functions.photos.UploadProfilePhotoRequest(file))
+            os.remove(autophoto_path)
+            await asyncio.sleep(60)
+        except BaseException:
+            return
+        DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
+
+
+
 async def runcmd(cmd: str) -> Tuple[str, str, int, int]:
     args = shlex.split(cmd)
     process = await asyncio.create_subprocess_exec(        *args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE    )
