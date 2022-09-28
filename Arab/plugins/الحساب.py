@@ -133,8 +133,8 @@ async def digitalpicloop():
         current_time = datetime.now().strftime("%I:%M")
         img = Image.open(autophoto_path)
         drawn_text = ImageDraw.Draw(img)
-        fnt = ImageFont.truetype(f"{iqthonfont}", 75)
-        drawn_text.text((200, 200), current_time, font=fnt, fill=(280, 280, 280))
+        fnt = ImageFont.truetype(f"{iqthonfont}", 80)
+        drawn_text.text((200, 200), current_time, font=fnt, fill=(250, 250, 250))
         img.save(autophoto_path)
         file = await iqthon.upload_file(autophoto_path)
         try:
