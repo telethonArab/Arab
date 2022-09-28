@@ -100,7 +100,7 @@ autopic_path = os.path.join(os.getcwd(), "Arab", "original_pic.png")
 digitalpic_path = os.path.join(os.getcwd(), "Arab", "digital_pic.png")
 autophoto_path = os.path.join(os.getcwd(), "Arab", "photo_pfp.png")
 EMOJI_TELETHON = gvarstatus("ALIVE_EMOJI") or " "
-OR_FOTOAUTO = gvarstatus("OR_FOTOAUTO") or "صوره وقتيه"
+OR_FOTOAUTO = gvarstatus("OR_FOTOAUTO") or "صوره وقتية"
 plagiarism = gvarstatus("OR_PLAG") or "انتحال"
 unplagiarism = gvarstatus("OR_UNPLAG") or "الغاء الانتحال"
 idee = gvarstatus("OR_ID") or "اييديي"
@@ -1489,7 +1489,7 @@ async def _(event):
     while not downloader.isFinished():
         pass
     if gvarstatus(f"{OR_FOTOAUTO}") is not None and gvarstatus(f"{OR_FOTOAUTO}") == "true":
-        return await edit_delete(event, f"**♛ ⦙  صوره وقتيه مفعّلـة بالفعـل !**")
+        return await edit_delete(event, f"**♛ ⦙  صوره وقتية مفعّلـة بالفعـل !**")
     addgvar(f"{OR_FOTOAUTO}", True)
     await edit_delete(event, f"**♛ ⦙  تـمّ بـدأ الصـورة الديجيتـال بواسطـة المستخـدم ✓**")
     await digitalpicloop()
@@ -2356,8 +2356,8 @@ async def _(event):  # sourcery no-metrics
             delgvar(f"{OR_FOTOAUTO}")
             await event.client(
                 functions.photos.DeletePhotosRequest(                    await event.client.get_profile_photos("me", limit=1)                )            )
-            return await edit_delete(event, "**♛ ⦙  تم إيقـاف  صوره وقتيه الآن ✓**")
-        return await edit_delete(event, "**♛ ⦙  لم يتـم تفعيـل صوره وقتيه ✕**")
+            return await edit_delete(event, "**♛ ⦙  تم إيقـاف  صوره وقتية الآن ✓**")
+        return await edit_delete(event, "**♛ ⦙  لم يتـم تفعيـل صوره وقتية ✕**")
     if input_str == f"{OR_NAMEAUTO}":
         if gvarstatus(f"{OR_NAMEAUTO}") is not None and gvarstatus(f"{OR_NAMEAUTO}") == "true":
             delgvar(f"{OR_NAMEAUTO}")
