@@ -115,9 +115,7 @@ DEFAULTUSERBIO = gvarstatus("DEFAULT_BIO") or "الحمد الله"
 DEFAULTUSER = AUTONAME or Config.ALIVE_NAME
 LOGS = logging.getLogger(__name__)
 
-digitalpfp = (
-    gvarstatus("AUTO_PIC") or "https://telegra.ph/file/f42bfd7d3fb2ff745aa51.jpg"
-)
+digitalpfp = (gvarstatus("AUTO_PIC") or "https://telegra.ph/file/6629cc2f43156292340a5.jpg")
 
 
 async def digitalpicloop():
