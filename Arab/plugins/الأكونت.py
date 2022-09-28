@@ -1105,7 +1105,7 @@ async def _(event):
         LOGS.info(str(e))
 
 async def digitalpicloop():
-    DIGITALPICSTART = gvarstatus("صورة وقتية") == "true"
+    DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
     i = 0
     while DIGITALPICSTART:
         if not os.path.exists(digitalpic_path):
