@@ -93,10 +93,12 @@ PP_CHANGED = "**♛ ⦙  تم تغير صورة حسابك بنجاح  ✅**"
 PP_TOO_SMOL = "**♛ ⦙  هذه الصورة صغيرة جدًا قم بإختيار صورة أخرى  ⚠️**"
 PP_ERROR = "**♛ ⦙  حدث خطأ أثناء معالجة الصورة  ⚠️**"
 BIO_SUCCESS = "**♛ ⦙  تم تغيير بايو حسابك بنجاح  ✅**"
+
+iqthonfont = gvarstatus("DEFAULT_PIC") or "Arab/helpers/styles/digital.ttf"
 FONT_FILE_TO_USE = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
-autopic_path = os.path.join(os.getcwd(), "iqthon", "original_pic.png")
-digitalpic_path = os.path.join(os.getcwd(), "iqthon", "digital_pic.png")
-autophoto_path = os.path.join(os.getcwd(), "iqthon", "photo_pfp.png")
+autopic_path = os.path.join(os.getcwd(), "Arab", "original_pic.png")
+digitalpic_path = os.path.join(os.getcwd(), "Arab", "digital_pic.png")
+autophoto_path = os.path.join(os.getcwd(), "Arab", "photo_pfp.png")
 EMOJI_TELETHON = gvarstatus("ALIVE_EMOJI") or " "
 OR_FOTOAUTO = gvarstatus("OR_FOTOAUTO") or "صوره وقتيه"
 plagiarism = gvarstatus("OR_PLAG") or "انتحال"
@@ -1102,12 +1104,12 @@ async def _(event):
     except Exception as e:
         LOGS.info(str(e))
 
-   
 async def digitalpicloop():
-    DIGITALPICSTART = gvarstatus("صورة وقتيه") == "true"
+    DIGITALPICSTART = gvarstatus("صورة وقتية") == "true"
     i = 0
     while DIGITALPICSTART:
         if not os.path.exists(digitalpic_path):
+            digitalpfp = gvarstatus("DIGITAL_PIC")
             downloader = SmartDL(digitalpfp, digitalpic_path, progress_bar=False)
             downloader.start(blocking=False)
             while not downloader.isFinished():
@@ -1117,11 +1119,8 @@ async def digitalpicloop():
         current_time = datetime.now().strftime("%I:%M")
         img = Image.open(autophoto_path)
         drawn_text = ImageDraw.Draw(img)
-        cat = str(base64.b64decode("QXJhYi9oZWxwZXJzL3N0eWxlcy9pbXBhY3QudHRm"))[
-            2:36
-        ]
-        fnt = ImageFont.truetype(cat, 200)
-        drawn_text.text((350, 100), current_time, font=fnt, fill=(124, 252, 0))
+        fnt = ImageFont.truetype(f"{iqthonfont}", 35)
+        drawn_text.text((140, 70), current_time, font=fnt, fill=(280, 280, 280))
         img.save(autophoto_path)
         file = await iqthon.upload_file(autophoto_path)
         try:
@@ -1134,7 +1133,7 @@ async def digitalpicloop():
             i += 1
             await iqthon(functions.photos.UploadProfilePhotoRequest(file))
             os.remove(autophoto_path)
-            await asyncio.sleep(60)
+            await asyncio.sleep(CHANGE_TIME)
         except BaseException:
             return
         DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
