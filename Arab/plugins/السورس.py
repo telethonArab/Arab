@@ -124,7 +124,7 @@ fahs = """♛ : me  {my_mention}  𓇡.
 ♛ : up time  {uptime}  𓇡.
 ♛ : My Bot  {tg_bot}  𓇡.
 ♛ : ping  {ping}  𓇡.
-♛ : version 7.6  𓇡.
+♛ : version 7.7  𓇡.
 ♛ : Source TelethonArab : @iqthon  𓇡."""
 @iqthon.on(admin_cmd(pattern="رابط التنصيب(?: |$)(.*)"))    
 async def source(e):
