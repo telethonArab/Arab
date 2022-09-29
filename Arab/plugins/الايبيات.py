@@ -76,9 +76,9 @@ from pytz import timezone as tz
 from . import hmention
 
 LOGS = logging.getLogger(__name__)
-SONG_SEARCH_STRING = "♛ ⦙ جاري البحث عن الاغنية إنتظر رجاءًا  🎧"
-SONG_NOT_FOUND = "♛ ⦙ لم أستطع إيجاد هذه الأغنية  ⚠️"
-SONG_SENDING_STRING = "♛ ⦙ قم بإلغاء حظر البوت  🚫"
+SONG_SEARCH_STRING = "🝳 ⦙ جاري البحث عن الاغنية إنتظر رجاءًا  🎧"
+SONG_NOT_FOUND = "🝳 ⦙ لم أستطع إيجاد هذه الأغنية  ⚠️"
+SONG_SENDING_STRING = "🝳 ⦙ قم بإلغاء حظر البوت  🚫"
 
 opener = urllib.request.build_opener()
 useragent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36"
@@ -172,37 +172,37 @@ def sun(unix, ctimezone):
 
 async def ytdl_down(event, opts, url):
     try:
-        await event.edit("**♛ ⦙ يتم جلب البيانات إنتظر قليلا ⏳**")
+        await event.edit("**🝳 ⦙ يتم جلب البيانات إنتظر قليلا ⏳**")
         with YoutubeDL(opts) as ytdl:
             ytdl_data = ytdl.extract_info(url)
     except DownloadError as DE:
         await event.edit(f"`{str(DE)}`")
         return
     except ContentTooShortError:
-        await event.edit("**♛ ⦙ عُذرا هذا المحتوى قصير جدًا لتنزيله ⚠️**")
+        await event.edit("**🝳 ⦙ عُذرا هذا المحتوى قصير جدًا لتنزيله ⚠️**")
         return None
     except GeoRestrictedError:
         await event.edit(
-            "**♛ ⦙ الفيديو غير متاح من موقعك الجغرافي بسبب القيود الجغرافية التي يفرضها موقع الويب 🌍**"
+            "**🝳 ⦙ الفيديو غير متاح من موقعك الجغرافي بسبب القيود الجغرافية التي يفرضها موقع الويب 🌍**"
         )
         return None
     except MaxDownloadsReached:
-        await event.edit("**♛ ⦙  تم الوصول إلى الحد الأقصى لعدد التنزيلات 🛑**")
+        await event.edit("**🝳 ⦙  تم الوصول إلى الحد الأقصى لعدد التنزيلات 🛑**")
         return None
     except PostProcessingError:
-        await event.edit("**♛ ⦙  كان هناك خطأ أثناء المعالجة ⚠️**")
+        await event.edit("**🝳 ⦙  كان هناك خطأ أثناء المعالجة ⚠️**")
         return None
     except UnavailableVideoError:
-        await event.edit("**♛ ⦙  الوسائط غير متوفرة بالتنسيق المطلوب ⚠️**")
+        await event.edit("**🝳 ⦙  الوسائط غير متوفرة بالتنسيق المطلوب ⚠️**")
         return None
     except XAttrMetadataError as XAME:
-        await event.edit(f"♛ ⦙  `{XAME.code}: {XAME.msg}\n{XAME.reason}`")
+        await event.edit(f"🝳 ⦙  `{XAME.code}: {XAME.msg}\n{XAME.reason}`")
         return None
     except ExtractorError:
-        await event.edit("**♛ ⦙  حدث خطأ أثناء استخراج المعلومات يرجى وضعها بشكل صحيح ❗️**")
+        await event.edit("**🝳 ⦙  حدث خطأ أثناء استخراج المعلومات يرجى وضعها بشكل صحيح ❗️**")
         return None
     except Exception as e:
-        await event.edit(f"**♛ ⦙ حـدث خطأ  ⚠️ : **\n__{str(e)}__")
+        await event.edit(f"**🝳 ⦙ حـدث خطأ  ⚠️ : **\n__{str(e)}__")
         return None
     return ytdl_data
 
@@ -306,26 +306,26 @@ async def collage(event):
     catinput = event.pattern_match.group(1)
     reply = await event.get_reply_message()
     catid = await reply_id(event)
-    event = await edit_or_reply(event, "**♛ ⦙ جاري الالتقاط قـد يستغـرق هـذا الأمـر عـدة دقائـق انتضر ...**")
+    event = await edit_or_reply(event, "**🝳 ⦙ جاري الالتقاط قـد يستغـرق هـذا الأمـر عـدة دقائـق انتضر ...**")
     if not (reply and (reply.media)):
-        await event.edit("**♛ ⦙ تنسيـق الوسائـط غيـر مدعـوم ⚠️**")
+        await event.edit("**🝳 ⦙ تنسيـق الوسائـط غيـر مدعـوم ⚠️**")
         return
     if not os.path.isdir("./temp/"):
         os.mkdir("./temp/")
     catsticker = await reply.download_media(file="./temp/")
     if not catsticker.endswith((".mp4", ".mkv", ".tgs")):
         os.remove(catsticker)
-        await event.edit("**♛ ⦙ تنسيـق الوسائـط غيـر مدعـوم ⚠️**")
+        await event.edit("**🝳 ⦙ تنسيـق الوسائـط غيـر مدعـوم ⚠️**")
         return
     if catinput:
         if not catinput.isdigit():
             os.remove(catsticker)
-            await event.edit("**♛ ⦙ إدخـالك غيـر صالـح، يرجـىٰ التحـقق مـن المساعـدة ⚠️**")
+            await event.edit("**🝳 ⦙ إدخـالك غيـر صالـح، يرجـىٰ التحـقق مـن المساعـدة ⚠️**")
             return
         catinput = int(catinput)
         if not 0 < catinput < 10:
             os.remove(catsticker)
-            await event.edit("**♛ ⦙ يرجـىٰ وضـع عـدد الصـور بجانـب الأمـر إختـر رقـماً بيـن 1 إلـى 9 ✦**")
+            await event.edit("**🝳 ⦙ يرجـىٰ وضـع عـدد الصـور بجانـب الأمـر إختـر رقـماً بيـن 1 إلـى 9 ✦**")
             return
     else:
         catinput = 3
@@ -345,7 +345,7 @@ async def collage(event):
             if files and os.path.exists(files):
                 os.remove(files)
         return await edit_delete(
-            event, f"**♛ ⦙ تنسيـق الوسائـط غيـر مدعـوم، حـاول إستخـدام عـدد أصغـر  ⚠️**", 5 )
+            event, f"**🝳 ⦙ تنسيـق الوسائـط غيـر مدعـوم، حـاول إستخـدام عـدد أصغـر  ⚠️**", 5 )
     await event.client.send_file(event.chat_id, endfile, reply_to=catid)
     await event.delete()
     for files in (catsticker, collagefile, endfile):
@@ -354,7 +354,7 @@ async def collage(event):
 @iqthon.on(admin_cmd(pattern=r"رابط تطبيق ([\s\S]*)"))
 async def app_search(event):
     app_name = event.pattern_match.group(1)
-    event = await edit_or_reply(event, "♛ ⦙ جـاري البحـث ↯")
+    event = await edit_or_reply(event, "🝳 ⦙ جـاري البحـث ↯")
     try:
         remove_space = app_name.split(" ")
         final_name = "+".join(remove_space)
@@ -394,13 +394,13 @@ async def app_search(event):
         app_details = "<a href='" + app_icon + "'>📲&#8203;</a>"
         app_details += " <b>" + app_name + "</b>"
         app_details += (
-            "\n\n<code>♛ ⦙ المطـور :</code> <a href='"
+            "\n\n<code>🝳 ⦙ المطـور :</code> <a href='"
             + app_dev_link
             + "'>"
             + app_dev
             + "</a>"
         )
-        app_details += "\n<code>♛ ⦙ التقييـم :</code> " + app_rating.replace(
+        app_details += "\n<code>🝳 ⦙ التقييـم :</code> " + app_rating.replace(
             "Rated ", "⭐ "
         ).replace(" out of ", "/").replace(" stars", "", 1).replace(
             " stars", "⭐ "
@@ -408,16 +408,16 @@ async def app_search(event):
             "five", "5"
         )
         app_details += (
-            "\n<code>♛ ⦙ المميـزات :</code> <a href='"
+            "\n<code>🝳 ⦙ المميـزات :</code> <a href='"
             + app_link
-            + "'>♛ ⦙ مشاهدتـه في سـوق بلـي 🝧</a>"
+            + "'>🝳 ⦙ مشاهدتـه في سـوق بلـي 🝧</a>"
         )
         app_details += f"\n\n===> {ALIVE_NAME} <==="
         await event.edit(app_details, link_preview=True, parse_mode="HTML")
     except IndexError:
-        await event.edit("**♛ ⦙ لم يتـم العثـور على نتيجـة، الرجـاء إدخـال إسـم تطبيـق صالـح ⚠️**")
+        await event.edit("**🝳 ⦙ لم يتـم العثـور على نتيجـة، الرجـاء إدخـال إسـم تطبيـق صالـح ⚠️**")
     except Exception as err:
-        await event.edit("♛ ⦙ حـدث استثنـاء ⌭ :" + str(err))
+        await event.edit("🝳 ⦙ حـدث استثنـاء ⌭ :" + str(err))
 
 @iqthon.on(events.NewMessage(outgoing=False, pattern=r'العمر ?(.*)'))
 async def RequestAge(event):
@@ -446,9 +446,9 @@ async def time_func(tdata):
         tz_num = Config.TZ_NUMBER
         timezones = await get_tz(Config.COUNTRY)
     else:
-        return await edit_or_reply(tdata, f"**♛ ⦙  ألوقـت 🕛 : **{dt.now().strftime(t_form)} \n** لـتاريـخ :**{dt.now().strftime(d_form)}")
+        return await edit_or_reply(tdata, f"**🝳 ⦙  ألوقـت 🕛 : **{dt.now().strftime(t_form)} \n** لـتاريـخ :**{dt.now().strftime(d_form)}")
     if not timezones:
-        return await edit_or_reply(tdata, "**♛ ⦙  البـلد غيـر مـوجود 𖠕**")
+        return await edit_or_reply(tdata, "**🝳 ⦙  البـلد غيـر مـوجود 𖠕**")
     if len(timezones) == 1:
         time_zone = timezones[0]
     elif len(timezones) > 1:
@@ -456,23 +456,23 @@ async def time_func(tdata):
             tz_num = int(tz_num)
             time_zone = timezones[tz_num - 1]
         else:
-            return_str = f"**♛ ⦙  `{c_name}` لها مناطق زمنية متعددة :**\n\n"
+            return_str = f"**🝳 ⦙  `{c_name}` لها مناطق زمنية متعددة :**\n\n"
 
             for i, item in enumerate(timezones):
                 return_str += f"`{i+1}. {item}`\n"
 
-            return_str += "\n**♛ ⦙  اختر واحدة عن طريق كتابة الرقم : **"
-            return_str += "**♛ ⦙  في الأمر .**\n"
-            return_str += f"**♛ ⦙  الأمر هوه: .وقت** {c_name} 2`"
+            return_str += "\n**🝳 ⦙  اختر واحدة عن طريق كتابة الرقم : **"
+            return_str += "**🝳 ⦙  في الأمر .**\n"
+            return_str += f"**🝳 ⦙  الأمر هوه: .وقت** {c_name} 2`"
 
             return await edit_or_reply(tdata, return_str)
 
     dtnow1 = dt.now(tz(time_zone)).strftime(t_form)
     dtnow2 = dt.now(tz(time_zone)).strftime(d_form)
     if c_name != Config.COUNTRY:
-        await edit_or_reply(tdata, f"♛ ⦙  ألوقـت 🕛 :  {dtnow1} علـى {dtnow2}  فـي {c_name} ({time_zone} الـوقت العـالمي 🌍 .")
+        await edit_or_reply(tdata, f"🝳 ⦙  ألوقـت 🕛 :  {dtnow1} علـى {dtnow2}  فـي {c_name} ({time_zone} الـوقت العـالمي 🌍 .")
     if Config.COUNTRY:
-        await edit_or_reply(tdata, f"♛ ⦙  ألوقـت 🕛  : {dtnow1} على {dtnow2}  هنـا فـي 🏷️ :  {Config.COUNTRY}" f"({time_zone} الـوقت العـالمي 🌍 .")
+        await edit_or_reply(tdata, f"🝳 ⦙  ألوقـت 🕛  : {dtnow1} على {dtnow2}  هنـا فـي 🏷️ :  {Config.COUNTRY}" f"({time_zone} الـوقت العـالمي 🌍 .")
 @iqthon.on(admin_cmd(pattern="وقتي(?:\s|$)([\s\S]*)"))
 async def _(event):
     reply_msg_id = await reply_id(event)
@@ -502,7 +502,7 @@ async def get_adzan(adzan):
     request = requests.get(url)
     if request.status_code != 200:
         await edit_delete(
-            adzan, f"**♛ ⦙ لم يـتم العثور على معلومات لـهذه المدينه ⚠️ {LOKASI}\n يرجى كتابة اسم محافظتك وباللغه الانكليزي **", 5
+            adzan, f"**🝳 ⦙ لم يـتم العثور على معلومات لـهذه المدينه ⚠️ {LOKASI}\n يرجى كتابة اسم محافظتك وباللغه الانكليزي **", 5
         ) 
         return
     result = json.loads(request.text)
@@ -526,7 +526,7 @@ async def get_adzan(adzan):
 async def corona(event):
     input_str = event.pattern_match.group(1)
     country = (input_str).title() if input_str else "العالم"
-    catevent = await edit_or_reply(event, "**♛ ⦙ يتـم جلـب معلومـات فـايروس كـورونا فـي البلـد المحـدد 🔎**")
+    catevent = await edit_or_reply(event, "**🝳 ⦙ يتـم جلـب معلومـات فـايروس كـورونا فـي البلـد المحـدد 🔎**")
     covid = Covid(source="worldometers")
     try:
         country_data = covid.get_status_by_country_name(country)
@@ -536,16 +536,16 @@ async def corona(event):
         hmm1 = country_data["confirmed"] + country_data["new_cases"]
         hmm2 = country_data["deaths"] + country_data["new_deaths"]
         data = ""
-        data += f"\n♛ ⦙  الاصابات المؤكده 😟 : <code>{hmm1}</code>"
-        data += f"\n♛ ⦙  الاصابات المشبوهه 🥺 : <code>{country_data['active']}</code>"
-        data += f"\n♛ ⦙  الوفيات ⚰️ : <code>{hmm2}</code>"
-        data += f"\n♛ ⦙  الحرجه 😔 : <code>{country_data['critical']}</code>"
-        data += f"\n♛ ⦙  حالات الشفاء 😊 : <code>{country_data['recovered']}</code>"
-        data += f"\n♛ ⦙  اجمالي الاختبارات 📊 : <code>{country_data['total_tests']}</code>"
-        data += f"\n♛ ⦙  الاصابات الجديده 🥺 : <code>{country_data['new_cases']}</code>"
-        data += f"\n♛ ⦙  الوفيات الجديده ⚰️ : <code>{country_data['new_deaths']}</code>"
+        data += f"\n🝳 ⦙  الاصابات المؤكده 😟 : <code>{hmm1}</code>"
+        data += f"\n🝳 ⦙  الاصابات المشبوهه 🥺 : <code>{country_data['active']}</code>"
+        data += f"\n🝳 ⦙  الوفيات ⚰️ : <code>{hmm2}</code>"
+        data += f"\n🝳 ⦙  الحرجه 😔 : <code>{country_data['critical']}</code>"
+        data += f"\n🝳 ⦙  حالات الشفاء 😊 : <code>{country_data['recovered']}</code>"
+        data += f"\n🝳 ⦙  اجمالي الاختبارات 📊 : <code>{country_data['total_tests']}</code>"
+        data += f"\n🝳 ⦙  الاصابات الجديده 🥺 : <code>{country_data['new_cases']}</code>"
+        data += f"\n🝳 ⦙  الوفيات الجديده ⚰️ : <code>{country_data['new_deaths']}</code>"
         await catevent.edit(
-            "<b>♛ ⦙  معلومـات فـايروس كـورونا. 💉 لـ {}:{}</b>".format(country, data),
+            "<b>🝳 ⦙  معلومـات فـايروس كـورونا. 💉 لـ {}:{}</b>".format(country, data),
             parse_mode="html",
         )
     else:
@@ -555,16 +555,16 @@ async def corona(event):
             cat2 = int(data["new_death"]) - int(data["death"])
             cat3 = int(data["new_cured"]) - int(data["cured"])
             result = f"<b>Corona virus info of {data['state_name']}\
-                \n♛ ⦙  الاصابات المؤكده 😟 : <code>{data['new_positive']}</code>\
-                \n♛ ⦙  الاصابات المشبوهه 🥺 : <code>{data['new_active']}</code>\
-                \n♛ ⦙  الوفيات ⚰️ : <code>{data['new_death']}</code>\
-                \n♛ ⦙  حالات الشفاء 😊 : <code>{data['new_cured']}</code>\
-                \n♛ ⦙  اجمالي الاختبارات 📊  : <code>{cat1}</code>\
-                \n♛ ⦙  الاصابات الجديده 🥺 : <code>{cat2}</code>\
-                \n♛ ⦙  الوفيات الجديده ⚰️ : <code>{cat3}</code> </b>"
+                \n🝳 ⦙  الاصابات المؤكده 😟 : <code>{data['new_positive']}</code>\
+                \n🝳 ⦙  الاصابات المشبوهه 🥺 : <code>{data['new_active']}</code>\
+                \n🝳 ⦙  الوفيات ⚰️ : <code>{data['new_death']}</code>\
+                \n🝳 ⦙  حالات الشفاء 😊 : <code>{data['new_cured']}</code>\
+                \n🝳 ⦙  اجمالي الاختبارات 📊  : <code>{cat1}</code>\
+                \n🝳 ⦙  الاصابات الجديده 🥺 : <code>{cat2}</code>\
+                \n🝳 ⦙  الوفيات الجديده ⚰️ : <code>{cat3}</code> </b>"
             await catevent.edit(result, parse_mode="html")
         else:
-            await edit_delete(catevent, "**♛ ⦙  معلومـات فـايروس كـورونا. 💉  \n  فـي بـلد  - {} غـير مـوجودة ❌**".format(country),
+            await edit_delete(catevent, "**🝳 ⦙  معلومـات فـايروس كـورونا. 💉  \n  فـي بـلد  - {} غـير مـوجودة ❌**".format(country),
                 5,
             )
 @iqthon.on(admin_cmd(pattern=r"بحث(320)?(?:\s|$)([\s\S]*)"))
@@ -711,9 +711,9 @@ async def shazamcmd(event):
     mediatype = media_type(reply)
     if not reply or not mediatype or mediatype not in ["Voice", "Audio"]:
         return await edit_delete(
-            event, "**♛ ⦙ قم بالرد على الرسالة الصوتية لعكس البحث عن هذه الأغنية  ♻️**"
+            event, "**🝳 ⦙ قم بالرد على الرسالة الصوتية لعكس البحث عن هذه الأغنية  ♻️**"
         )
-    catevent = await edit_or_reply(event, "**♛ ⦙ جاري بحث معلومات المقطع الصوتي  📲**")
+    catevent = await edit_or_reply(event, "**🝳 ⦙ جاري بحث معلومات المقطع الصوتي  📲**")
     try:
         for attr in getattr(reply.document, "attributes", []):
             if isinstance(attr, types.DocumentAttributeFilename):
@@ -731,18 +731,18 @@ async def shazamcmd(event):
     except Exception as e:
         LOGS.error(e)
         return await edit_delete(
-            catevent, f"**♛ ⦙ هناك خطأ عند محاولة عكس الأغنية  ⚠️ :**\n__{str(e)}__"
+            catevent, f"**🝳 ⦙ هناك خطأ عند محاولة عكس الأغنية  ⚠️ :**\n__{str(e)}__"
         )
     image = track["images"]["background"]
     song = track["share"]["subject"]
     await event.client.send_file(
-        event.chat_id, image, caption=f"**♛ ⦙  الأغنية 🎧 :** `{song}`", reply_to=reply
+        event.chat_id, image, caption=f"**🝳 ⦙  الأغنية 🎧 :** `{song}`", reply_to=reply
     )
     await catevent.delete()
 @iqthon.on(admin_cmd(pattern=r"كوكل بحث ([\s\S]*)"))
 async def gsearch(q_event):
     "Google search command."
-    catevent = await edit_or_reply(q_event, "**♛ ⦙ جـاري البحـث ↯**")
+    catevent = await edit_or_reply(q_event, "**🝳 ⦙ جـاري البحـث ↯**")
     match = q_event.pattern_match.group(1)
     page = re.findall(r"-p\d+", match)
     lim = re.findall(r"-l\d+", match)
@@ -776,7 +776,7 @@ async def gsearch(q_event):
             try:
                 gresults = await ysearch.async_search(*search_args)
             except Exception as e:
-                return await edit_delete(catevent, f"**♛ ⦙ خطـأ ⚠️ :**\n`{str(e)}`", time=10)
+                return await edit_delete(catevent, f"**🝳 ⦙ خطـأ ⚠️ :**\n`{str(e)}`", time=10)
     msg = ""
     for i in range(lim):
         if i > len(gresults["links"]):
@@ -790,22 +790,22 @@ async def gsearch(q_event):
             break
     await edit_or_reply(
         catevent,
-        "**♛ ⦙ إستعـلام البحـث 🝰 :**\n`" + match + "`\n\n**♛ ⦙ النتائـج ⎙ :**\n" + msg,
+        "**🝳 ⦙ إستعـلام البحـث 🝰 :**\n`" + match + "`\n\n**🝳 ⦙ النتائـج ⎙ :**\n" + msg,
         link_preview=False,
         aslink=True,
-        linktext=f"**♛ ⦙ نتائـج البحـث عـن الإستعـلام ⎙ ** `{match}` :",
+        linktext=f"**🝳 ⦙ نتائـج البحـث عـن الإستعـلام ⎙ ** `{match}` :",
     )
     if BOTLOG:
         await q_event.client.send_message(
             BOTLOG_CHATID,
-            "**♛ ⦙ إستعـلام بحـث جـوجـل 🝰 **" + match + "**تم تنفيـذه بنجـاح ✓**",
+            "**🝳 ⦙ إستعـلام بحـث جـوجـل 🝰 **" + match + "**تم تنفيـذه بنجـاح ✓**",
         )
 @iqthon.on(admin_cmd(pattern=r"البحث العام(?: |$)(.*)"))
 async def _(event):
     start = datetime.now()
-    OUTPUT_STR = "**♛ ⦙ قم بالـرد على صـورة لإجـراء البحـث العڪـسي في گـوگـل ✦**"
+    OUTPUT_STR = "**🝳 ⦙ قم بالـرد على صـورة لإجـراء البحـث العڪـسي في گـوگـل ✦**"
     if event.reply_to_msg_id:
-        catevent = await edit_or_reply(event, "**♛ ⦙ وسائـط ما قبـل المعالجـة ␥**")
+        catevent = await edit_or_reply(event, "**🝳 ⦙ وسائـط ما قبـل المعالجـة ␥**")
         previous_message = await event.get_reply_message()
         previous_message_text = previous_message.message
         BASE_URL = "http://www.google.com"
@@ -833,7 +833,7 @@ async def _(event):
             request_url = SEARCH_URL.format(BASE_URL, previous_message_text)
             google_rs_response = requests.get(request_url, allow_redirects=False)
             the_location = google_rs_response.headers.get("Location")
-        await catevent.edit("**♛ ⦙ تم العثـور على نتيجـة بحـث جـوجـل ✓**")
+        await catevent.edit("**🝳 ⦙ تم العثـور على نتيجـة بحـث جـوجـل ✓**")
         headers = {"User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0"}
         response = requests.get(the_location, headers=headers)
         soup = BeautifulSoup(response.text, "html.parser")
@@ -847,14 +847,14 @@ async def _(event):
             img_size = img_size_div.find_all("div")
         except Exception:
             return await edit_delete(
-                catevent, "**♛ ⦙ غيـر قـادر على إيجـاد صـور مشابـهه !**"
+                catevent, "**🝳 ⦙ غيـر قـادر على إيجـاد صـور مشابـهه !**"
             )
         end = datetime.now()
         ms = (end - start).seconds
         OUTPUT_STR = """{img_size}
-<b>♛ ⦙ بحـث ممڪـن ذو صلـة 🜉  : </b> <a href="{prs_url}">{prs_text}</a> 
-<b>♛ ⦙ مزيـد من المعلومـات 🝰 : </b> إفتـح هـذا ␥ <a href="{the_location}">Link</a> 
-<i>♛ ⦙ تم الجلـب في {ms} ثانيـة ⏱</i>""".format(
+<b>🝳 ⦙ بحـث ممڪـن ذو صلـة 🜉  : </b> <a href="{prs_url}">{prs_text}</a> 
+<b>🝳 ⦙ مزيـد من المعلومـات 🝰 : </b> إفتـح هـذا ␥ <a href="{the_location}">Link</a> 
+<i>🝳 ⦙ تم الجلـب في {ms} ثانيـة ⏱</i>""".format(
             **locals()
         )
     else:
@@ -866,13 +866,13 @@ async def google_search(event):
     reply_to_id = await reply_id(event)
     if not input_str:
         return await edit_delete(
-            event, "**♛ ⦙ ما الذي يجـب أن أبحـث عنـه؟ يرجـىٰ إعطـاء معلومـات عن البحـث ⚠️**"
+            event, "**🝳 ⦙ ما الذي يجـب أن أبحـث عنـه؟ يرجـىٰ إعطـاء معلومـات عن البحـث ⚠️**"
         )
     input_str = deEmojify(input_str).strip()
     if len(input_str) > 195 or len(input_str) < 1:
         return await edit_delete(
             event,
-            "**♛ ⦙ لقـد تجـاوز إستعـلام البحـث 200 حـرف أو أن إستعـلام البحـث فـارغ ⚠️**",
+            "**🝳 ⦙ لقـد تجـاوز إستعـلام البحـث 200 حـرف أو أن إستعـلام البحـث فـارغ ⚠️**",
         )
     query = "#12" + input_str
     results = await event.client.inline_query("@StickerizerBot", query)
@@ -924,12 +924,12 @@ async def _(event):
     reply = await event.get_reply_message()
     if not reply:
         return await edit_delete(
-            event, "**♛ ⦙  يجـب عليـك الرد عـلى الملصق لتحويـله الـى صورة ⚠️**"
+            event, "**🝳 ⦙  يجـب عليـك الرد عـلى الملصق لتحويـله الـى صورة ⚠️**"
         )
     output = await _cattools.media_to_pic(event, reply)
     if output[1] is None:
         return await edit_delete(
-            output[0], "**♛ ⦙  غـير قـادر على تحويل الملصق إلى صورة من هـذا الـرد ⚠️**"
+            output[0], "**🝳 ⦙  غـير قـادر على تحويل الملصق إلى صورة من هـذا الـرد ⚠️**"
         )
     meme_file = convert_toimage(output[1])
     await event.client.send_file(
@@ -942,12 +942,12 @@ async def _(event):
     reply = await event.get_reply_message()
     if not reply:
         return await edit_delete(
-            event, "**♛ ⦙  يجـب عليـك الرد عـلى الصـورة لتحويـلها الـى مـلصق ⚠️**"
+            event, "**🝳 ⦙  يجـب عليـك الرد عـلى الصـورة لتحويـلها الـى مـلصق ⚠️**"
         )
     output = await _cattools.media_to_pic(event, reply)
     if output[1] is None:
         return await edit_delete(
-            output[0], "**♛ ⦙  غـير قـادر على استـخراج الـملصق من هـذا الـرد ⚠️**"
+            output[0], "**🝳 ⦙  غـير قـادر على استـخراج الـملصق من هـذا الـرد ⚠️**"
         )
     meme_file = convert_tosticker(output[1])
     await event.client.send_file(
@@ -957,14 +957,14 @@ async def _(event):
 @iqthon.on(admin_cmd(pattern="تحويل (صوت|بصمه)(?: |$)(.*)"))
 async def _(event):
     if not event.reply_to_msg_id:
-        await edit_or_reply(event, "**♛ ⦙  يـجب الـرد على اي مـلف اولا ⚠️**")
+        await edit_or_reply(event, "**🝳 ⦙  يـجب الـرد على اي مـلف اولا ⚠️**")
         return
     reply_message = await event.get_reply_message()
     if not reply_message.media:
-        await edit_or_reply(event, "**♛ ⦙  يـجب الـرد على اي مـلف اولا ⚠️**")
+        await edit_or_reply(event, "**🝳 ⦙  يـجب الـرد على اي مـلف اولا ⚠️**")
         return
     input_str = event.pattern_match.group(1)
-    event = await edit_or_reply(event, "**♛ ⦙  يتـم التـحويل انتـظر قليـلا ⏱**")
+    event = await edit_or_reply(event, "**🝳 ⦙  يتـم التـحويل انتـظر قليـلا ⏱**")
     try:
         start = datetime.now()
         c_time = time.time()
@@ -981,7 +981,7 @@ async def _(event):
         end = datetime.now()
         ms = (end - start).seconds
         await event.edit(
-            "**♛ ⦙  التحـميل الى `{}`  في {} من الثواني ⏱**".format(downloaded_file_name, ms)
+            "**🝳 ⦙  التحـميل الى `{}`  في {} من الثواني ⏱**".format(downloaded_file_name, ms)
         )
         new_required_file_name = ""
         new_required_file_caption = ""
@@ -1024,7 +1024,7 @@ async def _(event):
             voice_note = False
             supports_streaming = True
         else:
-            await event.edit("**♛ ⦙  غـير مدعوم ❕**")
+            await event.edit("**🝳 ⦙  غـير مدعوم ❕**")
             os.remove(downloaded_file_name)
             return
         process = await asyncio.create_subprocess_exec(
@@ -1057,7 +1057,7 @@ async def _(event):
     reply = await event.get_reply_message()
     mediatype = media_type(event)
     if mediatype and mediatype != "video":
-        return await edit_delete(event, "**♛ ⦙  يجـب عليك الـرد على فيديو اولا لتحـويله ⚠️**")
+        return await edit_delete(event, "**🝳 ⦙  يجـب عليك الـرد على فيديو اولا لتحـويله ⚠️**")
     args = event.pattern_match.group(1)
     if not args:
         args = 2.0
@@ -1066,12 +1066,12 @@ async def _(event):
             args = float(args)
         except ValueError:
             args = 2.0
-    catevent = await edit_or_reply(event, "**♛ ⦙  يتـم التحويل الى متـحركه انتـظر ⏱**")
+    catevent = await edit_or_reply(event, "**🝳 ⦙  يتـم التحويل الى متـحركه انتـظر ⏱**")
     inputfile = await reply.download_media()
     outputfile = os.path.join(Config.TEMP_DIR, "vidtogif.gif")
     result = await vid_to_gif(inputfile, outputfile, speed=args)
     if result is None:
-        return await edit_delete(event, "**♛ ⦙  عـذرا لا يمكـنني تحويل هذا الى متـحركة ⚠️**")
+        return await edit_delete(event, "**🝳 ⦙  عـذرا لا يمكـنني تحويل هذا الى متـحركة ⚠️**")
     jasme = await event.client.send_file(event.chat_id, result, reply_to=reply)
     await _catutils.unsavegif(event, jasme)
     await catevent.delete()
@@ -1083,13 +1083,13 @@ async def pic_gifcmd(event):  # sourcery no-metrics
     args = event.pattern_match.group(1)
     reply = await event.get_reply_message()
     if not reply:
-        return await edit_delete(event, "**♛ ⦙ قـم بالـرد على وسائـط مدعومـة !**")
+        return await edit_delete(event, "**🝳 ⦙ قـم بالـرد على وسائـط مدعومـة !**")
     media_type(reply)
-    catevent = await edit_or_reply(event, "**♛ ⦙ جـاري تحويل الملصق الى فيديو مرئي دائـري ⌯**")
+    catevent = await edit_or_reply(event, "**🝳 ⦙ جـاري تحويل الملصق الى فيديو مرئي دائـري ⌯**")
     output = await _cattools.media_to_pic(event, reply, noedits=True)
     if output[1] is None:
         return await edit_delete(
-            output[0], "**♛ ⦙ تعـذّر إستخـراج الصـورة من الرسالـة التي تـم الـرّد عليهـا ✕**"
+            output[0], "**🝳 ⦙ تعـذّر إستخـراج الصـورة من الرسالـة التي تـم الـرّد عليهـا ✕**"
         )
     meme_file = convert_toimage(output[1])
     image = Image.open(meme_file)
@@ -1098,7 +1098,7 @@ async def pic_gifcmd(event):  # sourcery no-metrics
     try:
         outframes = await spin_frames(image, w, h, outframes)
     except Exception as e:
-        return await edit_delete(output[0], f"**♛ ⦙ خطـأ ⚠️ :**\n__{str(e)}__")
+        return await edit_delete(output[0], f"**🝳 ⦙ خطـأ ⚠️ :**\n__{str(e)}__")
     output = io.BytesIO()
     output.name = "Output.gif"
     outframes[0].save(output, save_all=True, append_images=outframes[1:], duration=1)
@@ -1108,7 +1108,7 @@ async def pic_gifcmd(event):  # sourcery no-metrics
     final = os.path.join(Config.TEMP_DIR, "output.gif")
     output = await vid_to_gif("Output.gif", final)
     if output is None:
-        return await edit_delete(catevent, "**♛ ⦙ تعـذّر صنـع صـورة متحرڪـة دوارة ✕**")
+        return await edit_delete(catevent, "**🝳 ⦙ تعـذّر صنـع صـورة متحرڪـة دوارة ✕**")
     media_info = MediaInfo.parse(final)
     aspect_ratio = 1
     for track in media_info.tracks:
@@ -1164,17 +1164,17 @@ async def video_catfile(event):  # sourcery no-metrics
     args = event.pattern_match.group(1)
     catid = await reply_id(event)
     if not reply or not reply.media:
-        return await edit_delete(event, "**♛ ⦙ قـم بالـرد على وسائـط مدعومـة !**")
+        return await edit_delete(event, "**🝳 ⦙ قـم بالـرد على وسائـط مدعومـة !**")
     mediatype = media_type(reply)
     if mediatype == "Round Video":
         return await edit_delete(
             event,
-            "♛ ⦙ الوسائـط التي تم الـرد عليهـا هـي بالفعـل في شڪـل دائـري، أعـد التحـقق !",
+            "🝳 ⦙ الوسائـط التي تم الـرد عليهـا هـي بالفعـل في شڪـل دائـري، أعـد التحـقق !",
         )
     if mediatype not in ["Photo", "Audio", "Voice", "Gif", "Sticker", "Video"]:
-        return await edit_delete(event, "**♛ ⦙ لم يتـم العثـور على وسائـط مدعومـة !**")
+        return await edit_delete(event, "**🝳 ⦙ لم يتـم العثـور على وسائـط مدعومـة !**")
     flag = True
-    catevent = await edit_or_reply(event, "**♛ ⦙ جـاري التحويـل إلى شڪـل دائـري ⌯**")
+    catevent = await edit_or_reply(event, "**🝳 ⦙ جـاري التحويـل إلى شڪـل دائـري ⌯**")
     catfile = await reply.download_media(file="./temp/")
     if mediatype in ["Gif", "Video", "Sticker"]:
         if not catfile.endswith((".webp")):
@@ -1248,7 +1248,7 @@ async def video_catfile(event):  # sourcery no-metrics
             uploaded = await event.client.fast_upload_file(
                 file=ul,
                 progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
-                    progress(d, t, catevent, c_time, "**♛ ⦙ قـم بالـرد على وسائـط مدعومـة !**")
+                    progress(d, t, catevent, c_time, "**🝳 ⦙ قـم بالـرد على وسائـط مدعومـة !**")
                 ),
             )
             ul.close()
@@ -1308,7 +1308,7 @@ async def video_catfile(event):  # sourcery no-metrics
 async def get(event):
     name = event.text[5:]
     if name is None:
-        await edit_or_reply(event, "**♛ ⦙ قم بالـرد على الرسالـة لتحويلها الى ملف**")
+        await edit_or_reply(event, "**🝳 ⦙ قم بالـرد على الرسالـة لتحويلها الى ملف**")
         return
     m = await event.get_reply_message()
     if m.text:
@@ -1318,7 +1318,7 @@ async def get(event):
         await event.client.send_file(event.chat_id, name, force_document=True)
         os.remove(name)
     else:
-        await edit_or_reply(event, "**♛ ⦙ قم بالـرد على الرسالـة لتحويلها الى ملف**")
+        await edit_or_reply(event, "**🝳 ⦙ قم بالـرد على الرسالـة لتحويلها الى ملف**")
 @iqthon.on(admin_cmd(pattern="بورن(?:\s|$)([\s\S]*)"))
 async def catbot(event):
     input_str = event.pattern_match.group(1)
@@ -1326,26 +1326,26 @@ async def catbot(event):
     if " " in input_str:
         username, text = input_str.split(" ")
     else:
-        return await edit_or_reply(event, " **♛ ⦙   عذرا يجب الرد على الصوره التي تريد ستعملها ومن ثم ارسال الامر :**  `.بورن + معرف الشخص + الكتابه التي تريدها`")
+        return await edit_or_reply(event, " **🝳 ⦙   عذرا يجب الرد على الصوره التي تريد ستعملها ومن ثم ارسال الامر :**  `.بورن + معرف الشخص + الكتابه التي تريدها`")
     replied = await event.get_reply_message()
     catid = await reply_id(event)
     if not replied:
-        return await edit_or_reply(event, "**♛ ⦙  عذرا قم بالرد على الصوره **")
+        return await edit_or_reply(event, "**🝳 ⦙  عذرا قم بالرد على الصوره **")
     output = await _cattools.media_to_pic(event, replied)
     if output[1] is None:
-        return await edit_delete(output[0], "**♛ ⦙  تعذر استخراج الصورة من الرسالة التي تم الرد عليها **")
+        return await edit_delete(output[0], "**🝳 ⦙  تعذر استخراج الصورة من الرسالة التي تم الرد عليها **")
     download_location = convert_toimage(output[1])
     size = os.stat(download_location).st_size
     if size > 5242880:
         os.remove(download_location)
-        return await output[0].edit("**♛ ⦙  حجم الملف الذي تم الرد عليه غير مدعوم ، يجب أن يكون حجمه أقل من 5 ميغابايت**")
+        return await output[0].edit("**🝳 ⦙  حجم الملف الذي تم الرد عليه غير مدعوم ، يجب أن يكون حجمه أقل من 5 ميغابايت**")
 
-    await output[0].edit("**♛ ⦙  جاري صنع امر بورن هوب .. **")
+    await output[0].edit("**🝳 ⦙  جاري صنع امر بورن هوب .. **")
     try:
         response = upload_file(download_location)
     except exceptions.TelegraphException as exc:
         os.remove(download_location)
-        return await output[0].edit(f"**♛ ⦙  عذرا هناك خطأ : **\n`{str(exc)}`")
+        return await output[0].edit(f"**🝳 ⦙  عذرا هناك خطأ : **\n`{str(exc)}`")
     cat = f"https://telegra.ph{response[0]}"
     cat = await phcomment(cat, text, username)
     await output[0].delete()
@@ -1406,7 +1406,7 @@ async def get(event):
     mediatype = media_type(reply)
     if mediatype != "Document":
         return await edit_delete(
-            event, "**♛ ⦙ يبـدو أن هـذا الملـف غـير قابـل للڪتابـة،  يرجـى الـرد على ملـف قابـل للكتابـة !**"
+            event, "**🝳 ⦙ يبـدو أن هـذا الملـف غـير قابـل للڪتابـة،  يرجـى الـرد على ملـف قابـل للكتابـة !**"
         )
     file_loc = await reply.download_media()
     file_content = ""
@@ -1425,14 +1425,14 @@ async def get(event):
         except Exception as e:
             if os.path.exists(file_loc):
                 os.remove(file_loc)
-            return await edit_delete(event, f"**♛ ⦙ خطـأ ⚠️**\n__{str(e)}__")
+            return await edit_delete(event, f"**🝳 ⦙ خطـأ ⚠️**\n__{str(e)}__")
     await edit_or_reply(
         event,
         file_content,
         parse_mode=parse_pre,
         aslink=True,
         noformat=True,
-        linktext="**♛ ⦙ يسمـح تليڪرام فقـط بـ 4096 حرفًـا في الرسالـة الواحـدة، ولڪن الملـف الـذي قمـت بالـرد عليـه يحتـوي على أڪثـر مـن ذلـك بڪثيـر، لذلـك (( لصقها على رابط لصق )) غيرها انت)) !**",
+        linktext="**🝳 ⦙ يسمـح تليڪرام فقـط بـ 4096 حرفًـا في الرسالـة الواحـدة، ولڪن الملـف الـذي قمـت بالـرد عليـه يحتـوي على أڪثـر مـن ذلـك بڪثيـر، لذلـك (( لصقها على رابط لصق )) غيرها انت)) !**",
     )
     if os.path.exists(file_loc):
         os.remove(file_loc)
@@ -1442,14 +1442,14 @@ async def on_file_to_photo(event):
     try:
         image = target.media.document
     except AttributeError:
-        return await edit_delete(event, "**♛ ⦙ هـذه ليسـت صـورة !**")
+        return await edit_delete(event, "**🝳 ⦙ هـذه ليسـت صـورة !**")
     if not image.mime_type.startswith("image/"):
-        return await edit_delete(event, "**♛ ⦙ هـذه ليسـت صـورة !**")
+        return await edit_delete(event, "**🝳 ⦙ هـذه ليسـت صـورة !**")
     if image.mime_type == "image/webp":
-        return await edit_delete(event, "**♛ ⦙ لتحويـل الملصـق إلى صـورة إستخـدم الأمـر  ⩥ :**  `.تحويل ملف صوره`")
+        return await edit_delete(event, "**🝳 ⦙ لتحويـل الملصـق إلى صـورة إستخـدم الأمـر  ⩥ :**  `.تحويل ملف صوره`")
     if image.size > 10 * 1024 * 1024:
         return  # We'd get PhotoSaveFileInvalidError otherwise
-    catt = await edit_or_reply(event, "**♛ ⦙ جـاري التحويـل  ↯**")
+    catt = await edit_or_reply(event, "**🝳 ⦙ جـاري التحويـل  ↯**")
     file = await event.client.download_media(target, file=BytesIO())
     file.seek(0)
     img = await event.client.upload_file(file)
@@ -1478,31 +1478,31 @@ async def _(event):  # sourcery no-metrics
         if len(loc) > 2:
             return await edit_delete(
                 event,
-                "**♛ ⦙ بنـاء جملـة خاطـئ !**",
+                "**🝳 ⦙ بنـاء جملـة خاطـئ !**",
             )
         if len(loc) == 2:
             if 0 < loc[0] < 721:
                 quality = loc[0].strip()
             else:
-                return await edit_delete(event, "**♛ ⦙ إستخـدم جـودة النطـاق مـن 0 إلى 721 ✦**")
+                return await edit_delete(event, "**🝳 ⦙ إستخـدم جـودة النطـاق مـن 0 إلى 721 ✦**")
             if 0 < loc[1] < 20:
                 quality = loc[1].strip()
             else:
-                return await edit_delete(event, "**♛ ⦙ إستخـدم جـودة النطـاق مـن 0 إلى 20 ✦**")
+                return await edit_delete(event, "**🝳 ⦙ إستخـدم جـودة النطـاق مـن 0 إلى 20 ✦**")
         if len(loc) == 1:
             if 0 < loc[0] < 721:
                 quality = loc[0].strip()
             else:
-                return await edit_delete(event, "**♛ ⦙ إستخـدم جـودة النطـاق مـن 0 إلى 721 ✦**")
+                return await edit_delete(event, "**🝳 ⦙ إستخـدم جـودة النطـاق مـن 0 إلى 721 ✦**")
     catreply = await event.get_reply_message()
     cat_event = base64.b64decode("QUFBQUFGRV9vWjVYVE5fUnVaaEtOdw==")
     if not catreply or not catreply.media or not catreply.media.document:
-        return await edit_or_reply(event, "**♛ ⦙ هـذا ليـس ملصـق متحرك   !**")
+        return await edit_or_reply(event, "**🝳 ⦙ هـذا ليـس ملصـق متحرك   !**")
     if catreply.media.document.mime_type != "application/x-tgsticker":
-        return await edit_or_reply(event, "**♛ ⦙ هـذا ليـس ملصـق متحرك  !**")
+        return await edit_or_reply(event, "**🝳 ⦙ هـذا ليـس ملصـق متحرك  !**")
     catevent = await edit_or_reply(
         event,
-        "♛ ⦙ جـاري تحويـل هـذا الملصـق إلى صـورة متحرڪـة، قـد يستغـرق هـذا بضـع دقائـق ✦",
+        "🝳 ⦙ جـاري تحويـل هـذا الملصـق إلى صـورة متحرڪـة، قـد يستغـرق هـذا بضـع دقائـق ✦",
         parse_mode=_format.parse_pre,
     )
     try:
@@ -1530,19 +1530,19 @@ async def pic_gifcmd(event):  # sourcery no-metrics
     reply = await event.get_reply_message()
     mediatype = media_type(reply)
     if not reply or not mediatype or mediatype not in ["Photo", "Sticker"]:
-        return await edit_delete(event, "**♛ ⦙ قم بالـرد على صـورة أو ملصـق لجعلهـا صـورة متحرڪـة **")
+        return await edit_delete(event, "**🝳 ⦙ قم بالـرد على صـورة أو ملصـق لجعلهـا صـورة متحرڪـة **")
     if mediatype == "Sticker" and reply.document.mime_type == "application/i-tgsticker":
         return await edit_delete(
             event,
-            "**♛ ⦙ قم بالـرد على صـورة أو ملصـق لجعلهـا صـورة متحرڪـة، الملصقـات المتحرڪـة غيـر مدعومـة !**",
+            "**🝳 ⦙ قم بالـرد على صـورة أو ملصـق لجعلهـا صـورة متحرڪـة، الملصقـات المتحرڪـة غيـر مدعومـة !**",
         )
     args = event.pattern_match.group(1)
     args = "i" if not args else args.replace("-", "")
-    catevent = await edit_or_reply(event, "**♛ ⦙ جـاري صنـع صـورة متحرڪـة من الوسائـط التي قمـت بالـرد عليهـا ↯**")
+    catevent = await edit_or_reply(event, "**🝳 ⦙ جـاري صنـع صـورة متحرڪـة من الوسائـط التي قمـت بالـرد عليهـا ↯**")
     imag = await _cattools.media_to_pic(event, reply, noedits=True)
     if imag[1] is None:
         return await edit_delete(
-            imag[0], "**♛ ⦙ تعـذّر إستخـراج الصـورة من الرسالـة التي تـم الـرّد عليهـا ✕**"
+            imag[0], "**🝳 ⦙ تعـذّر إستخـراج الصـورة من الرسالـة التي تـم الـرّد عليهـا ✕**"
         )
     image = Image.open(imag[1])
     w, h = image.size
@@ -1561,7 +1561,7 @@ async def pic_gifcmd(event):  # sourcery no-metrics
         elif args == "i":
             outframes = await invert_frames(image, w, h, outframes)
     except Exception as e:
-        return await edit_delete(catevent, f"**♛ ⦙ خطـأ ⚠️**\n__{str(e)}__")
+        return await edit_delete(catevent, f"**🝳 ⦙ خطـأ ⚠️**\n__{str(e)}__")
     output = io.BytesIO()
     output.name = "Output.gif"
     outframes[0].save(output, save_all=True, append_images=outframes[1:], duration=0.7)
@@ -1572,7 +1572,7 @@ async def pic_gifcmd(event):  # sourcery no-metrics
     output = await vid_to_gif("Output.gif", final)
     if output is None:
         await edit_delete(
-            catevent, "**♛ ⦙ حـدث خطـأ مـا في الوسائـط، لا أستطيـع تحويلهـا إلى صـورة متحرڪـة !**"
+            catevent, "**🝳 ⦙ حـدث خطـأ مـا في الوسائـط، لا أستطيـع تحويلهـا إلى صـورة متحرڪـة !**"
         )
         for i in [final, "Output.gif", imag[1]]:
             if os.path.exists(i):
@@ -1612,16 +1612,16 @@ async def set_default_city(event):
     await edit_or_reply(event, f"تم وضع مدينتك ضمن الطقس المحدد : {cityname}, {fullc_n}.`")
 @iqthon.on(admin_cmd(pattern=r"(ت(لي)?ج(راف)?) ?(م|ك|ميديا|كتابه)(?:\s|$)([\s\S]*)"))
 async def _(event):
-    catevent = await edit_or_reply(event, "**♛ ⦙ جـاري المعالجـة ⌯**")
+    catevent = await edit_or_reply(event, "**🝳 ⦙ جـاري المعالجـة ⌯**")
     if BOTLOG:
         await event.client.send_message(
             BOTLOG_CHATID,
-            f"**♛ ⦙ تـمّ إنشـاء تليجـراف جديـد ✓ :** {auth_url} \n **للجلسـة الحاليـة، لا تقـم بإعطـاء هـذا الرابـط إلى أي أحـد، حتى وإن قـال بأنّـه موظـف لـدى تليڪـرام !**",
+            f"**🝳 ⦙ تـمّ إنشـاء تليجـراف جديـد ✓ :** {auth_url} \n **للجلسـة الحاليـة، لا تقـم بإعطـاء هـذا الرابـط إلى أي أحـد، حتى وإن قـال بأنّـه موظـف لـدى تليڪـرام !**",
         )
     optional_title = event.pattern_match.group(5)
     if not event.reply_to_msg_id:
         return await catevent.edit(
-            "**♛ ⦙ قـم بالـردّ على رسالـة للحصـول على رابـط صـورة تليجـراف دائـم ☍**",
+            "**🝳 ⦙ قـم بالـردّ على رسالـة للحصـول على رابـط صـورة تليجـراف دائـم ☍**",
         )
 
     start = datetime.now()
@@ -1631,21 +1631,21 @@ async def _(event):
         downloaded_file_name = await event.client.download_media(
             r_message, Config.TEMP_DIR
         )
-        await catevent.edit(f"**♛ ⦙ تـم التحميـل إلى**  {downloaded_file_name}`")
+        await catevent.edit(f"**🝳 ⦙ تـم التحميـل إلى**  {downloaded_file_name}`")
         if downloaded_file_name.endswith((".webp")):
             resize_image(downloaded_file_name)
         try:
             media_urls = upload_file(downloaded_file_name)
         except exceptions.TelegraphException as exc:
-            await catevent.edit(f"**♛ ⦙ حـدث خـطأ مـا ✕ : **\n`{str(exc)}`")
+            await catevent.edit(f"**🝳 ⦙ حـدث خـطأ مـا ✕ : **\n`{str(exc)}`")
             os.remove(downloaded_file_name)
         else:
             end = datetime.now()
             ms = (end - start).seconds
             os.remove(downloaded_file_name)
             await catevent.edit(
-                 f"**♛ ⦙  الرابـط ☍ : ** [Press here](https://telegra.ph{media_urls[0]})\
-                    \n**♛ ⦙ الوقـت المستغـرق ⏱  : ** `{ms} الثوانـي.`",
+                 f"**🝳 ⦙  الرابـط ☍ : ** [Press here](https://telegra.ph{media_urls[0]})\
+                    \n**🝳 ⦙ الوقـت المستغـرق ⏱  : ** `{ms} الثوانـي.`",
                 link_preview=True,
             )
     elif input_str in ["كتابه", "ك"]:
@@ -1680,13 +1680,13 @@ async def _(event):
         end = datetime.now()
         ms = (end - start).seconds
         cat = f"https://telegra.ph/{response['path']}"
-        await catevent.edit(f"**♛ ⦙  الرابـط ☍ : ** [Press here]({cat})\n**♛ ⦙ الوقـت المستغـرق ⏱  : ** `{ms} الثوانـي.`", link_preview=True)
+        await catevent.edit(f"**🝳 ⦙  الرابـط ☍ : ** [Press here]({cat})\n**🝳 ⦙ الوقـت المستغـرق ⏱  : ** `{ms} الثوانـي.`", link_preview=True)
 @iqthon.on(admin_cmd(pattern="تحويل فديو متحركه ?([0-9.]+)?$"))
 async def _(event):
     reply = await event.get_reply_message()
     mediatype = media_type(event)
     if mediatype and mediatype != "video":
-        return await edit_delete(event, "**♛ ⦙ حـدث خطـأ مـا في الوسائـط، لا أستطيـع تحويلهـا إلى صـورة متحرڪـة !**")
+        return await edit_delete(event, "**🝳 ⦙ حـدث خطـأ مـا في الوسائـط، لا أستطيـع تحويلهـا إلى صـورة متحرڪـة !**")
     args = event.pattern_match.group(1)
     if not args:
         args = 2.0
@@ -1695,12 +1695,12 @@ async def _(event):
             args = float(args)
         except ValueError:
             args = 2.0
-    catevent = await edit_or_reply(event, "**♛ ⦙ جـاري التحويـل إلى صـورة متحرڪة انتضر دقائق  ↯**")
+    catevent = await edit_or_reply(event, "**🝳 ⦙ جـاري التحويـل إلى صـورة متحرڪة انتضر دقائق  ↯**")
     inputfile = await reply.download_media()
     outputfile = os.path.join(Config.TEMP_DIR, "vidtogif.gif")
     result = await vid_to_gif(inputfile, outputfile, speed=args)
     if result is None:
-        return await edit_delete(event, "**♛ ⦙ غيـر قـادر على تحويلهـا إلى صـورة متحرڪة !**")
+        return await edit_delete(event, "**🝳 ⦙ غيـر قـادر على تحويلهـا إلى صـورة متحرڪة !**")
     sandy = await event.client.send_file(event.chat_id, result, reply_to=reply)
     await _catutils.unsavegif(event, sandy)
     await catevent.delete()
