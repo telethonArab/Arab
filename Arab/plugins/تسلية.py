@@ -7,6 +7,8 @@ import os
 import shlex
 import math
 import base64
+import shutil
+
 from bs4 import BeautifulSoup
 from ..helpers.utils import reply_id
 plugin_category = "@iqthon"
@@ -34,6 +36,9 @@ from ..helpers import fonts as emojify
 from Arab.helpers.functions import convert_toimage,    deEmojify,    phcomment,    threats,    trap,    trash
 from Arab.helpers.functions import convert_tosticker,    flip_image,    grayscale,    invert_colors,    mirror_file,    solarize
 from ..helpers.utils import reply_id, _catutils, parse_pre, yaml_format, install_pip, get_user_from_event, _format
+from telethon.errors.rpcerrorlist import MediaEmptyError
+from ..helpers.google_image_download import googleimagesdownload
+from ..helpers.utils import reply_id
 from . import deEmojify
 from typing import Optional, Tuple
 from PIL import Image, ImageDraw, ImageFont
@@ -171,6 +176,10 @@ async def _(event):
         await event.edit(animation_chars[i % 12])
 
 game_code = ["تيك توك اثنان", "تيك توك اربعه", "ربط أربعة", "حجر-ورقة-مقص", "قرعة", "روليت", "داما", "داما تجمع"]
+
+@iqthon.iq_cmd(pattern="رابط الحذف")
+async def _(kno):
+    await edit_or_reply (kno, "**رابـط الحـذف ↬** https://telegram.org/deactivate \n\n ** بـوت الحـذف  ↬** @LC6BOT ")
 
 @iqthon.on(admin_cmd(pattern="طوبه(?: |$)(.*)"))
 async def _(event):
