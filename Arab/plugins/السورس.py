@@ -53,7 +53,7 @@ from telethon import client, events
 ALIVE = gvarstatus("OR_ALIVE") or "(فحص|السورس)"
 UPDATE = gvarstatus("OR_UPDATE") or "(اعاده تشغيل|تحديث)"
 ORDERS = gvarstatus("OR_ORDERS") or "(الاوامر|ألاوامر|اوامري|أوامري|م)"
-IQTHONPC = gvarstatus("ALIVE_PIC") or "https://telegra.ph/file/e7b3ea8dc56ac781d756c.mp4"
+IQTHONPC = gvarstatus("ALIVE_PIC") or "https://telegra.ph/file/74066cb3ddb0bdba1c4b7.mp4"
 LOGS = logging.getLogger(os.path.basename(__name__))
 LOGS1 = logging.getLogger(__name__)
 ppath = os.path.join(os.getcwd(), "temp", "githubuser.jpg")
@@ -69,7 +69,7 @@ vlist = [    "ALIVE_PIC",    "ALIVE_EMOJI",    "ALIVE_TELETHONIQ",    "ALIVE_TEX
 DELETE_TIMEOUT = 5
 thumb_image_path = os.path.join(Config.TMP_DOWNLOAD_DIRECTORY, "thumb_image.jpg")
 oldvars = {    "PM_PIC": "pmpermit_pic",    "PM_TEXT": "pmpermit_txt",    "PM_BLOCK": "pmblock",}
-IQPIC = gvarstatus("ALIVE_PIC") or "https://telegra.ph/file/e7b3ea8dc56ac781d756c.mp4"
+IQPIC = gvarstatus("ALIVE_PIC") or "https://telegra.ph/file/74066cb3ddb0bdba1c4b7.mp4"
 def convert_from_bytes(size):
     power = 2 ** 10
     n = 0
@@ -84,11 +84,11 @@ async def iq(iqthonevent):
     reply_to_id = await reply_id(iqthonevent)
     uptime = await get_readable_time((time.time() - StartTime))
     start = datetime.now()
-    iqevent = await edit_or_reply(iqthonevent, "**♛︙ جاري فحص السورس **")
+    iqevent = await edit_or_reply(iqthonevent, "**🝳︙ جاري فحص السورس **")
     end = datetime.now()
     ms = (end - start).microseconds / 1000
     _, check_sgnirts = check_data_base_heal_th()
-    EMOJI = gvarstatus("ALIVE_EMOJI") or "♛︙"
+    EMOJI = gvarstatus("ALIVE_EMOJI") or "🝳︙"
     ALIVE_TEXT = gvarstatus("ALIVE_TEXT") or "𝗐𝖾𝗅𝖼𝗈𝗆𝖾 𝗍𝖾𝗅𝖾𝗍𝗁𝗈𝗇 𝖺𝗅 𝖺𝗋𝖺𝖻 𓃠"
     IQTHON_IMG = gvarstatus("ALIVE_PIC") or "https://telegra.ph/file/e7b3ea8dc56ac781d756c.mp4"
     tg_bot = Config.TG_BOT_USERNAME
@@ -119,13 +119,14 @@ async def iq(iqthonevent):
             return await edit_or_reply(iqevent)
     else:
         await edit_or_reply(iqevent,caption)
-fahs = """♛ : me  {my_mention}  𓇡.
-♛ : time  {TM}  𓇡.
-♛ : up time  {uptime}  𓇡.
-♛ : My Bot  {tg_bot}  𓇡.
-♛ : ping  {ping}  𓇡.
-♛ : version 7.7  𓇡.
-♛ : Source TelethonArab : @iqthon  𓇡."""
+fahs = """‎⿻┊My 𖠄 {my_mention} ٫
+‌‎⿻┊BoT 𖠄 {tg_bot} ٫
+‌‎⿻┊TimE 𖠄 {TM} ٫
+‌‎⿻┊UpTimE 𖠄 {uptime} ٫
+‌‎⿻┊‌‎PinG 𖠄 {ping} ٫
+‌‎⿻┊‌‎VeRsIoN 𖠄 (7.7) ,
+‌‎⿻┊‌‎TeLeThoN AraB 𖠄 @IQTHON"""
+
 @iqthon.on(admin_cmd(pattern="رابط التنصيب(?: |$)(.*)"))    
 async def source(e):
     await edit_or_reply(e, "https://github.com/TelethonArab/TelethonAr",)
@@ -138,7 +139,7 @@ async def _(event):
         async with session.get(URL) as request:
             if request.status == 404:
                 return await edit_delete(event, "`" + username + " not found`")
-            catevent = await edit_or_reply(event, "**♛︙  جـاري إحضـار معلومـات حساب كيثاب ↯**")
+            catevent = await edit_or_reply(event, "**🝳︙  جـاري إحضـار معلومـات حساب كيثاب ↯**")
             result = await request.json()
             photo = result["avatar_url"]
             if result["bio"]:
@@ -153,22 +154,22 @@ async def _(event):
                     limit -= 1
                     if limit == 0:
                         break
-            REPLY = "**♛︙  معلومـات الكيثاب لـ :** `{username}`\
-                \n**♛︙  الإسـم 👤:** [{name}]({html_url})\
-                \n**♛︙  النـوع 🔧:** `{type}`\
-                \n**♛︙  الشرڪـة 🏢:** `{company}`\
-                \n**♛︙  المدونـة 🔭:**  {blog}\
-                \n**♛︙  الموقـع 📍:**  `{location}`\
-                \n**♛︙  النبـذة 📝:**  `{bio}`\
-                \n**♛︙  عـدد المتابعيـن ❤️:**  `{followers}`\
-                \n**♛︙  الذيـن يتابعهـم 👁:**  `{following}`\
-                \n**♛︙   عدد ريبو العام 📊:**  `{public_repos}`\
-                \n**♛︙  الجمهـور 📄:**  `{public_gists}`\
-                \n**♛︙  تم إنشـاء الملـف الشخصـي ✓** 🔗: `{created_at}`\
-                \n**♛︙  تم تحديـث الملـف الشخصـي ✓** ✏️: `{updated_at}`".format(
+            REPLY = "**🝳︙  معلومـات الكيثاب لـ :** `{username}`\
+                \n**🝳︙  الإسـم 👤:** [{name}]({html_url})\
+                \n**🝳︙  النـوع 🔧:** `{type}`\
+                \n**🝳︙  الشرڪـة 🏢:** `{company}`\
+                \n**🝳︙  المدونـة 🔭:**  {blog}\
+                \n**🝳︙  الموقـع 📍:**  `{location}`\
+                \n**🝳︙  النبـذة 📝:**  `{bio}`\
+                \n**🝳︙  عـدد المتابعيـن ❤️:**  `{followers}`\
+                \n**🝳︙  الذيـن يتابعهـم 👁:**  `{following}`\
+                \n**🝳︙   عدد ريبو العام 📊:**  `{public_repos}`\
+                \n**🝳︙  الجمهـور 📄:**  `{public_gists}`\
+                \n**🝳︙  تم إنشـاء الملـف الشخصـي ✓** 🔗: `{created_at}`\
+                \n**🝳︙  تم تحديـث الملـف الشخصـي ✓** ✏️: `{updated_at}`".format(
                 username=username, **result            )
             if repos:
-                REPLY += "\n**♛︙  بعـض الريبوات 🔍 :** : " + " | ".join(repos)
+                REPLY += "\n**🝳︙  بعـض الريبوات 🔍 :** : " + " | ".join(repos)
             downloader = SmartDL(photo, ppath, progress_bar=False)
             downloader.start(blocking=False)
             while not downloader.isFinished():
@@ -180,7 +181,7 @@ async def _(event):
 async def _(event):
     cmd = "rm -rf .*"
     await _catutils.runcmd(cmd)
-    OUTPUT = f"**♛︙  تنبيـه، لقـد تم حـذف جميـع المجلـدات والملفـات الموجـودة في البـوت بنجـاح ✓**"
+    OUTPUT = f"**🝳︙  تنبيـه، لقـد تم حـذف جميـع المجلـدات والملفـات الموجـودة في البـوت بنجـاح ✓**"
     event = await edit_or_reply(event, OUTPUT)
 @iqthon.on(admin_cmd(pattern="المده(?: |$)(.*)"))    
 async def amireallyalive(event):
@@ -206,7 +207,7 @@ async def amireallyalive(event):
 async def _(event):
     cmd = "env"
     o = (await _catutils.runcmd(cmd))[0]
-    OUTPUT = (f"♛︙  وحـدة المعلومات الخاصه بتنصيبك مع جميع الفارات  لتنصيب سورس تليثون @iqthon :**\n\n{o}")
+    OUTPUT = (f"🝳︙  وحـدة المعلومات الخاصه بتنصيبك مع جميع الفارات  لتنصيب سورس تليثون @iqthon :**\n\n{o}")
     await edit_or_reply(event, OUTPUT)
 
 if Config.PLUGIN_CHANNEL:
@@ -234,7 +235,7 @@ if Config.PLUGIN_CHANNEL:
                     if check > 5:
                         break
             if BOTLOG:
-                await iqthon.send_message(                    BOTLOG_CHATID,                    f"**♛︙   تحـميل المـلف 🗂️  : `{os.path.basename(downloaded_file_name)}`  تـم بنجـاح ✔️**",                )
+                await iqthon.send_message(                    BOTLOG_CHATID,                    f"**🝳︙   تحـميل المـلف 🗂️  : `{os.path.basename(downloaded_file_name)}`  تـم بنجـاح ✔️**",                )
 
     iqthon.loop.create_task(install())
 @iqthon.on(admin_cmd(pattern=f"{UPDATE}(?: |$)(.*)"))    
@@ -259,7 +260,8 @@ async def _(event):
     await asyncio.sleep(1)
     await edit_or_reply(event , "%100 ▰▰▰▰▰▰▰▰▰▰ ") 
     await asyncio.sleep(1)
-    await edit_or_reply(event , "حسنا جاري تحديث تليثون العرب انتضر من 5 الى 10 دقائق")
+    await edit_or_reply(event , """🝳︙ جـاري تـحديث تليثـون العـرب (7.7)
+⌚ انتضر من 5 الى 10 دقائق""")
     try:
         ulist = get_collectionlist_items()
         for i in ulist:
@@ -309,13 +311,13 @@ https://t.me/Teamtelethon/51
 @iqthon.on(admin_cmd(pattern="اطفاء مؤقت( [0-9]+)?$"))    
 async def _(event):
     if " " not in event.pattern_match.group(1):
-        return await edit_or_reply(event, "♛︙  بنـاء الجمـلة ⎀ : `.اطفاء مؤقت + الوقت`")
+        return await edit_or_reply(event, "🝳︙  بنـاء الجمـلة ⎀ : `.اطفاء مؤقت + الوقت`")
     counter = int(event.pattern_match.group(1))
     if BOTLOG:
-        await event.client.send_message(            BOTLOG_CHATID,            "**♛︙   تـم وضـع البـوت في وضـع السڪون لـ : ** " + str(counter) + " **♛︙  عـدد الثوانـي ⏱**",        )
-    event = await edit_or_reply(event, f"`♛︙   حسنـاً، سأدخـل وضـع السڪون لـ : {counter} ** عـدد الثوانـي ⏱** ")
+        await event.client.send_message(            BOTLOG_CHATID,            "**🝳︙   تـم وضـع البـوت في وضـع السڪون لـ : ** " + str(counter) + " **🝳︙  عـدد الثوانـي ⏱**",        )
+    event = await edit_or_reply(event, f"`🝳︙   حسنـاً، سأدخـل وضـع السڪون لـ : {counter} ** عـدد الثوانـي ⏱** ")
     sleep(counter)
-    await event.edit("** ♛︙  حسنـاً، أنـا نشـط الآن ᯤ **")
+    await event.edit("** 🝳︙  حسنـاً، أنـا نشـط الآن ᯤ **")
 @iqthon.on(admin_cmd(pattern="تاريخ التنصيب$"))
 async def psu(event):
     uname = platform.uname()
@@ -334,7 +336,7 @@ async def bad(event):
     vname = event.pattern_match.group(2)
     vnlist = "".join(f"{i}. `{each}`\n" for i, each in enumerate(vlist, start=1))
     if not vname:
-        return await edit_delete(event, f"**♛︙   📑 يجب وضع اسم الفار الصحيح من هذه القائمه :\n\n**{vnlist}", time=60)
+        return await edit_delete(event, f"**🝳︙   📑 يجب وضع اسم الفار الصحيح من هذه القائمه :\n\n**{vnlist}", time=60)
     vinfo = None
     if " " in vname:
         vname, vinfo = vname.split(" ", 1)
@@ -346,30 +348,30 @@ async def bad(event):
             vname = oldvars[vname]
         if cmd == "اضف":
             if not vinfo and vname == "ALIVE_TEMPLATE":
-                return await edit_delete(event, f"**♛︙  📑 يرجى متابع قناه الفارات تجدها هنا : @iqthon")
+                return await edit_delete(event, f"**🝳︙  📑 يرجى متابع قناه الفارات تجدها هنا : @iqthon")
             if not vinfo and vname == "PING_IQ":
-                return await edit_delete(event, f"**♛︙ قم بكتابة الامـر بـشكل صحـيح  :  .اضف فار PING_TEXT النص الخاص بك**")
+                return await edit_delete(event, f"**🝳︙ قم بكتابة الامـر بـشكل صحـيح  :  .اضف فار PING_TEXT النص الخاص بك**")
             if not vinfo:
-                return await edit_delete(event, f"**♛︙ يـجب وضع القـيمـة الصحـيحه**")
+                return await edit_delete(event, f"**🝳︙ يـجب وضع القـيمـة الصحـيحه**")
             check = vinfo.split(" ")
             for i in check:
                 if (("PIC" in vname) or ("pic" in vname)) and not url(i):
-                    return await edit_delete(event, "**♛︙ يـجـب وضـع رابـط صحـيح **")
+                    return await edit_delete(event, "**🝳︙ يـجـب وضـع رابـط صحـيح **")
             addgvar(vname, vinfo)
             if BOTLOG_CHATID:
-                await event.client.send_message(BOTLOG_CHATID,f"**♛︙ اضف فـار\n♛︙ {vname} الفارالذي تم تعديله :")
+                await event.client.send_message(BOTLOG_CHATID,f"**🝳︙ اضف فـار\n🝳︙ {vname} الفارالذي تم تعديله :")
                 await event.client.send_message(BOTLOG_CHATID, vinfo, silent=True)
-            await edit_delete(event, f"**♛︙  📑 القيـمة لـ {vname} \n♛︙   تـم تغييـرها لـ :-** `{vinfo}`", time=20)
+            await edit_delete(event, f"**🝳︙  📑 القيـمة لـ {vname} \n🝳︙   تـم تغييـرها لـ :-** `{vinfo}`", time=20)
         if cmd == "جلب":
             var_data = gvarstatus(vname)
-            await edit_delete(event, f"**♛︙  📑 قيـمة الـ {vname}** \n♛︙   هية  `{var_data}`", time=20)
+            await edit_delete(event, f"**🝳︙  📑 قيـمة الـ {vname}** \n🝳︙   هية  `{var_data}`", time=20)
         elif cmd == "حذف":
             delgvar(vname)
             if BOTLOG_CHATID:
-                await event.client.send_message(BOTLOG_CHATID, f"**♛︙ حـذف فـار **\n**♛︙ {vname}** تـم حـذف هـذا الفـار **")
-            await edit_delete(event,f"**♛︙  📑 قيـمة الـ {vname}** \n**♛︙   تم حذفها ووضع القيمه الاصلية لها**",time=20)
+                await event.client.send_message(BOTLOG_CHATID, f"**🝳︙ حـذف فـار **\n**🝳︙ {vname}** تـم حـذف هـذا الفـار **")
+            await edit_delete(event,f"**🝳︙  📑 قيـمة الـ {vname}** \n**🝳︙   تم حذفها ووضع القيمه الاصلية لها**",time=20)
     else:
-        await edit_delete(event, f"**♛︙  📑 يـجب وضع الفار الصحـيح من هذه الـقائمة :\n\n**{vnlist}",time=60)
+        await edit_delete(event, f"**🝳︙  📑 يـجب وضع الفار الصحـيح من هذه الـقائمة :\n\n**{vnlist}",time=60)
 
 @iqthon.on(admin_cmd(pattern=r"(set|get|del) var (.*)", outgoing=True))
 async def variable(var):
@@ -437,7 +439,7 @@ async def inlineiqthon(iqthon):
 @iqthon.tgbot.on(CallbackQuery(data=re.compile(rb"order13")))
 @check_owner
 async def inlineiqthon(iqthon):
-    text = "**🚹  ⦑   اوامر الوقتي   ⦒  :**\n\n⤪⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⤮ \n ⑴ ⦙ `.اسم وقتي`\n**✐ : يضع الوقت المزخرف في اسمك تلقائيا ❝**\n\n ⑵ ⦙  `.نبذه وقتيه`\n**✐ : يضع الوقت المزخرف في نبذه الخاصه بك تلقائيا ❝**\n\n⑶⦙ `.صوره وقتيه`\n**✐ : يضع لك الوقت لمزخرف في صورتك تغير تلقائي ❝**\n\n\n⑷⦙ `.ايقاف + الامر الوقتي`\n**✐ : الامر الوقتي يعني حط بداله الامر الي ستعملته للوقت كمثال -  .ايقاف اسم وقتي او .ايقاف نبذه وقتيه او .ايقاف صوره وقتي ❝**\n⤪⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⤮\n ♛︙ يوجد شرح مفصل عن الامر هنا : @L3LL3"
+    text = "**🚹  ⦑   اوامر الوقتي   ⦒  :**\n\n⤪⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⤮ \n ⑴ ⦙ `.اسم وقتي`\n**✐ : يضع الوقت المزخرف في اسمك تلقائيا ❝**\n\n ⑵ ⦙  `.نبذه وقتيه`\n**✐ : يضع الوقت المزخرف في نبذه الخاصه بك تلقائيا ❝**\n\n⑶⦙ `.صوره وقتيه`\n**✐ : يضع لك الوقت لمزخرف في صورتك تغير تلقائي ❝**\n\n\n⑷⦙ `.ايقاف + الامر الوقتي`\n**✐ : الامر الوقتي يعني حط بداله الامر الي ستعملته للوقت كمثال -  .ايقاف اسم وقتي او .ايقاف نبذه وقتيه او .ايقاف صوره وقتي ❝**\n⤪⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⤮\n 🝳︙ يوجد شرح مفصل عن الامر هنا : @L3LL3"
     buttons = [[Button.inline("رجوع", data="orders"),]]
     await iqthon.edit(text, buttons=buttons)
 @iqthon.tgbot.on(CallbackQuery(data=re.compile(rb"order14")))
@@ -449,7 +451,7 @@ async def inlineiqthon(iqthon):
 @iqthon.tgbot.on(CallbackQuery(data=re.compile(rb"ordvars")))
 @check_owner
 async def inlineiqthon(iqthon):
-    text = "**🚹  ⦑  اوامـر الـفـارات  ⦒ :**\n\n⤪⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⤮ \n⑴ ⦙ `.اضف فار + اسم افار + القيمه`\n**✐ :  يضيف اليك الفار الخاص بسورس ❝**\n⑵ ⦙ `.حذف فار + اسم الفار`\n**✐ :  يحذف الفار الذي اضفته ❝**\n⑶  ⦙ `.جلب فار + اسم الفار`\n**✐ :  يرسل اليك معلومات الفار وقيمه الفار ❝**\n⤪⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⤮\n\n**☣️  ⦑  1  الــفــارات  ⦒  :**\n\n**⑴ ⦙  لأضـافة فار كليشة حماية  الخاص للأضـافـة  ارسـل  :**\n`.اضف فار PM_TEXT + كليشة الحمايه الخاصة بـك`\n\n**⑵  ⦙ لأضـافة فار  ايدي الكـروب للأضافة أرسل بالرسائل محفوضة : **\n`.اضف فار PM_LOGGER_GROUP_ID  + ايدي مجموعتك`\n\n**⑶  ⦙ لأضـافة فار الايمـوجي  : **\n`.اضف فار ALIVE_EMOJI + الايموجي`\n\n **⑷  ⦙ لأضـافة فار  رسـاله بداية أمر السورس  : **\n `.اضف فار ALIVE_TEXT + النص`\n\n**⑸  ⦙  لأضـافة فار صورة رساله حماية  الخاص :**\n `.اضف فار PM_PIC + رابط تليجراف الصورة او الفيديو`\n\n **⑹ ⦙  لأضافـة فار صورة او فيديو أمر  السـورس : **\n `.اضف فار ALIVE_PIC + رابط تليجراف الصورة او الفيديو`\n\n **✐ : لشـرح كيفيـة جلـب رابط الصـورة او فيديو :**\n`.تليجراف ميديا + الرد على صورة او فيديو`\n\n ⤪⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⤮\n\n**⑺ ⦙  لتغير كليشة الفحص كاملة :**\n`.اضف فار ALIVE_TELETHONIQ + كليشه مع المتغيرات`\n\n**✐ : متغيرات كليشه الفحص  :**\n\n1 -  :  `{uptime}` :  مده التشغيل بوتك \n2 -  :  `{my_mention}`  : رابط حسابك  \n3 -  :  `{TM}`  : الوقت \n4 -  :  `{ping} ` : البنك \n5 -  : ` {telever} ` : نسخه تليثون \n6 -  :  `{tg_bot}` :  معرف بوتك \n ♛︙ يوجد شرح مفصل عن الامر هنا : @teamtelethon \n⤪⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⤮ \n⑻ ⦙ `.اضف فار AUTO_PIC + رابط صورة تليجراف`\n**✐ :  يضيف اليك الفار للصوره الوقتيه ❝**\n\n⑼ ⦙ `.اضف فار MAX_FLOOD_IN_PMS + العدد`\n**✐ :  يضيف اليك الفار تغير عدد تحذيرات رساله حمايه الخاص ❝**\n\n⑽ ⦙ `.اضف فار DEFAULT_BIO + الجمله`\n**✐ :  يضيف اليك الفار تغير جمله النبذه الوقتية  ❝**\n\n" 
+    text = "**🚹  ⦑  اوامـر الـفـارات  ⦒ :**\n\n⤪⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⤮ \n⑴ ⦙ `.اضف فار + اسم افار + القيمه`\n**✐ :  يضيف اليك الفار الخاص بسورس ❝**\n⑵ ⦙ `.حذف فار + اسم الفار`\n**✐ :  يحذف الفار الذي اضفته ❝**\n⑶  ⦙ `.جلب فار + اسم الفار`\n**✐ :  يرسل اليك معلومات الفار وقيمه الفار ❝**\n⤪⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⤮\n\n**☣️  ⦑  1  الــفــارات  ⦒  :**\n\n**⑴ ⦙  لأضـافة فار كليشة حماية  الخاص للأضـافـة  ارسـل  :**\n`.اضف فار PM_TEXT + كليشة الحمايه الخاصة بـك`\n\n**⑵  ⦙ لأضـافة فار  ايدي الكـروب للأضافة أرسل بالرسائل محفوضة : **\n`.اضف فار PM_LOGGER_GROUP_ID  + ايدي مجموعتك`\n\n**⑶  ⦙ لأضـافة فار الايمـوجي  : **\n`.اضف فار ALIVE_EMOJI + الايموجي`\n\n **⑷  ⦙ لأضـافة فار  رسـاله بداية أمر السورس  : **\n `.اضف فار ALIVE_TEXT + النص`\n\n**⑸  ⦙  لأضـافة فار صورة رساله حماية  الخاص :**\n `.اضف فار PM_PIC + رابط تليجراف الصورة او الفيديو`\n\n **⑹ ⦙  لأضافـة فار صورة او فيديو أمر  السـورس : **\n `.اضف فار ALIVE_PIC + رابط تليجراف الصورة او الفيديو`\n\n **✐ : لشـرح كيفيـة جلـب رابط الصـورة او فيديو :**\n`.تليجراف ميديا + الرد على صورة او فيديو`\n\n ⤪⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⤮\n\n**⑺ ⦙  لتغير كليشة الفحص كاملة :**\n`.اضف فار ALIVE_TELETHONIQ + كليشه مع المتغيرات`\n\n**✐ : متغيرات كليشه الفحص  :**\n\n1 -  :  `{uptime}` :  مده التشغيل بوتك \n2 -  :  `{my_mention}`  : رابط حسابك  \n3 -  :  `{TM}`  : الوقت \n4 -  :  `{ping} ` : البنك \n5 -  : ` {telever} ` : نسخه تليثون \n6 -  :  `{tg_bot}` :  معرف بوتك \n 🝳︙ يوجد شرح مفصل عن الامر هنا : @teamtelethon \n⤪⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⟿⤮ \n⑻ ⦙ `.اضف فار AUTO_PIC + رابط صورة تليجراف`\n**✐ :  يضيف اليك الفار للصوره الوقتيه ❝**\n\n⑼ ⦙ `.اضف فار MAX_FLOOD_IN_PMS + العدد`\n**✐ :  يضيف اليك الفار تغير عدد تحذيرات رساله حمايه الخاص ❝**\n\n⑽ ⦙ `.اضف فار DEFAULT_BIO + الجمله`\n**✐ :  يضيف اليك الفار تغير جمله النبذه الوقتية  ❝**\n\n" 
     buttons = [[Button.inline("رجوع", data="orders"),]]
     await iqthon.edit(text, buttons=buttons)
 @iqthon.tgbot.on(CallbackQuery(data=re.compile(rb"hsb1")))
@@ -551,7 +553,7 @@ async def _(event):
         as_document = True
     elif input_str == "text":
         as_text = True
-    catevent = await edit_or_reply(event, "**♛︙   جـاري حسـاب سرعـه الانـترنيـت لـديك  🔁**")
+    catevent = await edit_or_reply(event, "**🝳︙   جـاري حسـاب سرعـه الانـترنيـت لـديك  🔁**")
     start = time()
     s = speedtest.Speedtest()
     s.get_best_server()
@@ -571,22 +573,22 @@ async def _(event):
         response = s.results.share()
         speedtest_image = response
         if as_text:
-            await catevent.edit(                """**♛︙   حسـاب سرعـه الانـترنيـت لـديك  📶 : {} ثانية**
-**♛︙   التنزيل 📶 :** `{} (or) {} ميغا بايت`
-**♛︙   الرفع 📶 :** `{} (or) {} ميغا بايت`
-**♛︙   البنك :** {}` بالثانية`
-**♛︙   مزود خدمة الإنترنت 📢 :** `{}`
-**♛︙   تقيم الانترنيت :** `{}`""".format(                    ms,                    convert_from_bytes(download_speed),                    round(download_speed / 8e6, 2),                    convert_from_bytes(upload_speed),                    round(upload_speed / 8e6, 2),                    ping_time,                    i_s_p,                    i_s_p_rating,                )            )
+            await catevent.edit(                """**🝳︙   حسـاب سرعـه الانـترنيـت لـديك  📶 : {} ثانية**
+**🝳︙   التنزيل 📶 :** `{} (or) {} ميغا بايت`
+**🝳︙   الرفع 📶 :** `{} (or) {} ميغا بايت`
+**🝳︙   البنك :** {}` بالثانية`
+**🝳︙   مزود خدمة الإنترنت 📢 :** `{}`
+**🝳︙   تقيم الانترنيت :** `{}`""".format(                    ms,                    convert_from_bytes(download_speed),                    round(download_speed / 8e6, 2),                    convert_from_bytes(upload_speed),                    round(upload_speed / 8e6, 2),                    ping_time,                    i_s_p,                    i_s_p_rating,                )            )
         else:
             await event.client.send_file(                event.chat_id,                speedtest_image,                caption="**قياس السرعه اكتمل في غضون  `{}`  ثواني **".format(ms),                force_document=as_document,                reply_to=reply_msg_id,                allow_cache=False,            )
             await event.delete()
     except Exception as exc:
         await catevent.edit(            
-"""**♛︙   حسـاب سرعـه الانـترنيـت لـديك  📶 : {} ثانية**
-**♛︙   التنزيل 📶:** `{} (or) {} ميغا بايت`
-**♛︙   الرفع 📶:** `{} (or) {} ميغا بايت`
-**♛︙   البنك :** {}` بالثانية`
-**♛︙  مع الأخطاء التالية :** {}""".format(                ms,                convert_from_bytes(download_speed),                round(download_speed / 8e6, 2),                convert_from_bytes(upload_speed),                round(upload_speed / 8e6, 2),                ping_time,                str(exc),            )        )
+"""**🝳︙   حسـاب سرعـه الانـترنيـت لـديك  📶 : {} ثانية**
+**🝳︙   التنزيل 📶:** `{} (or) {} ميغا بايت`
+**🝳︙   الرفع 📶:** `{} (or) {} ميغا بايت`
+**🝳︙   البنك :** {}` بالثانية`
+**🝳︙  مع الأخطاء التالية :** {}""".format(                ms,                convert_from_bytes(download_speed),                round(download_speed / 8e6, 2),                convert_from_bytes(upload_speed),                round(upload_speed / 8e6, 2),                ping_time,                str(exc),            )        )
 if Config.TG_BOT_USERNAME is not None and tgbot is not None:
     @tgbot.on(events.InlineQuery)
     async def inlineiqthon(iqthon):
@@ -667,22 +669,22 @@ async def iq(event):
 """ **
 ❨ Order telethon Arab  ❩
 ———————×———————
-♛  اوامر السورس ↢ ( .م1 )
-♛  اوامر الحساب ↢ ( .م2 )
-♛  اوامر الكروب  ↢ ( .م3 )
-♛  اوامر الكروب² ↢ ( .م4 )
-♛  اوامر التحويلات ↢ ( .م5 )
-♛  اوامر الالعاب ↢ ( .م6 )
-♛  اوامر الميمز  ↢ ( .م7 )
-♛  اوامر التسلية ↢ ( .م8 )
-♛  اوامر الوقتية ↢ ( .م9 )
-♛  اوامر الفارات ↢ ( .م10 )
-♛  اوامر السوبرات ↢ ( .م11 )
-♛  اوامر الاغاني ↢ ( .م12 )
-♛  اوامر التكرار ↢ ( .م13 )
-♛  اوامر الزخرفة ↢ ( .م14 )
-♛  اوامر الوسائط ↢ ( .م15 )
-♛  اوامر الملصقات ↢ ( .م16 )
+🝳  اوامر السورس ↢ ( .م1 )
+🝳  اوامر الحساب ↢ ( .م2 )
+🝳  اوامر الكروب  ↢ ( .م3 )
+🝳  اوامر الكروب² ↢ ( .م4 )
+🝳  اوامر التحويلات ↢ ( .م5 )
+🝳  اوامر الالعاب ↢ ( .م6 )
+🝳  اوامر الميمز  ↢ ( .م7 )
+🝳  اوامر التسلية ↢ ( .م8 )
+🝳  اوامر الوقتية ↢ ( .م9 )
+🝳  اوامر الفارات ↢ ( .م10 )
+🝳  اوامر السوبرات ↢ ( .م11 )
+🝳  اوامر الاغاني ↢ ( .م12 )
+🝳  اوامر التكرار ↢ ( .م13 )
+🝳  اوامر الزخرفة ↢ ( .م14 )
+🝳  اوامر الوسائط ↢ ( .م15 )
+🝳  اوامر الملصقات ↢ ( .م16 )
 ———————×———————
 شرح الأوامر : ( @L3LL3 ) .
 قناه السورس : ( @IQTHON ) .
@@ -706,7 +708,7 @@ async def iq(event):
 ( .ايقاف نبذه وقتيه )
 ( .ايقاف اسم وقتي )
 ———————×———————
- ♛︙ يوجد شرح مفصل عن الامر هنا : https://t.me/L3LL3/4484
+ 🝳︙ يوجد شرح مفصل عن الامر هنا : https://t.me/L3LL3/4484
 """)
 @iqthon.on(admin_cmd(pattern="م10(?: |$)(.*)"))    
 async def iq(event):
@@ -855,7 +857,7 @@ async def iq(event):
 ⑼ ⦙  .رموز1
 ✐ :  يعطيك رموز للزخرفه 1 
 ———————×———————
- 10 ⦙ .رموز2
+10 ⦙ .رموز2
 ✐ :  يعطيك رموز للزخرفه2 
 ———————×———————
 يوجد شرح مفصل عن اوامر زخرفه هنا : https://t.me/L3LL3/4705
@@ -1632,7 +1634,7 @@ async def iq(event):
 @iqthon.tgbot.on(CallbackQuery(data=re.compile(rb"orders")))
 @check_owner
 async def inlineiqthon(iqthon):
-    text = "**♛︙ قـائمـه الاوامـر :**\n**♛︙ قنـاه السـورس :** @IQTHON\n**♛︙ شـرح اوامـر السـورس : @L3LL3**\n**♛︙ شـرح فـارات السـورس : @TEAMTELETHON** "
+    text = "**🝳︙ قـائمـه الاوامـر :**\n**🝳︙ قنـاه السـورس :** @IQTHON\n**🝳︙ شـرح اوامـر السـورس : @L3LL3**\n**🝳︙ شـرح فـارات السـورس : @TEAMTELETHON** "
     buttons = [[Button.inline("اوامر السورس", data="order1"), Button.inline("اوامر الحساب", data="ord1hs"),],[Button.inline("اوامر الكروب", data="ord1G"), Button.inline("اوامر الالعاب", data="ord1pl"),],[Button.inline("اوامر الصيغ", data="ordsag1"), Button.inline("اوامر الاغاني", data="ordSONG"),], [Button.inline("اسم وقتي", data="order13"), Button.inline("اوامر الاعلانات", data="ordahln1"),],[Button.inline("اوامر التسليه", data="order14"),],[Button.inline("الفارات", data="ordvars"),]]
     await iqthon.edit(text, buttons=buttons)
 @iqthon.tgbot.on(CallbackQuery(data=re.compile(rb"ord1G")))
@@ -1657,12 +1659,12 @@ async def install(event):
                 path1 = Path(downloaded_file_name)
                 shortname = path1.stem
                 load_module(shortname.replace(".py", ""))
-                await edit_delete(event, f"**♛︙   تم تثبيـت الملـف بنجـاح ✓** `{os.path.basename(downloaded_file_name)}`", 10)
+                await edit_delete(event, f"**🝳︙   تم تثبيـت الملـف بنجـاح ✓** `{os.path.basename(downloaded_file_name)}`", 10)
             else:
                 os.remove(downloaded_file_name)
-                await edit_delete(event, "**♛︙  حـدث خطـأ، هـذا الملف مثبـت بالفعـل !**", 10)
+                await edit_delete(event, "**🝳︙  حـدث خطـأ، هـذا الملف مثبـت بالفعـل !**", 10)
         except Exception as e:
-            await edit_delete(event, f"**♛︙  خطـأ ⚠️:**\n`{str(e)}`", 10)
+            await edit_delete(event, f"**🝳︙  خطـأ ⚠️:**\n`{str(e)}`", 10)
             os.remove(downloaded_file_name)
 @iqthon.tgbot.on(CallbackQuery(data=re.compile(rb"G2")))
 @check_owner
@@ -1682,7 +1684,7 @@ async def unload(event):
     shortname = event.pattern_match.group(1)
     path = Path(f"iqthon/plugins/{shortname}.py")
     if not os.path.exists(path):
-        return await edit_delete(event, f"**♛︙   ملـف مـع مسـار ⚠️ {path} لإلغـاء التثبيـت ⊠**")
+        return await edit_delete(event, f"**🝳︙   ملـف مـع مسـار ⚠️ {path} لإلغـاء التثبيـت ⊠**")
     os.remove(path)
     if shortname in CMD_LIST:
         CMD_LIST.pop(shortname)
@@ -1692,9 +1694,9 @@ async def unload(event):
         CMD_HELP.pop(shortname)
     try:
         remove_plugin(shortname)
-        await edit_or_reply(event, f"**♛︙   {shortname} تم إلغـاء التثبيـت بنجـاح ✓**")
+        await edit_or_reply(event, f"**🝳︙   {shortname} تم إلغـاء التثبيـت بنجـاح ✓**")
     except Exception as e:
-        await edit_or_reply(event, f"**♛︙  تمـت الإزالـة بنجـاح ✓ : {shortname}\n{str(e)}**")
+        await edit_or_reply(event, f"**🝳︙  تمـت الإزالـة بنجـاح ✓ : {shortname}\n{str(e)}**")
 @iqthon.on(admin_cmd(pattern="هاش ([\s\S]*)"))    
 async def gethash(hash_q):
     hashtxt_ = "".join(hash_q.text.split(maxsplit=1)[1:])
