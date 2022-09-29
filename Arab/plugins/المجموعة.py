@@ -72,7 +72,7 @@ UNBAN_RIGHTS = ChatBannedRights(
     send_inline=None,
     embed_links=None,
 )
-LOGS = logging.getLogger(__name__)
+#LOGS = logging.getLogger(__name__)
 plugin_category = "utils"
 MUTE = gvarstatus("OR_MUTE") or "(ميوت|كتم)"
 TFLASH = gvarstatus("OR_TFLASH") or "(طرد الكل|تفليش)"
