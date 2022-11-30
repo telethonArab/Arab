@@ -44,3 +44,13 @@ Checker = start_bot()
 if Checker == False:
     print("كتمل تنصيب #1")
 
+if len(sys.argv) not in (1, 3, 4):
+    iqthon.disconnect()
+elif not Catcheck.sucess:
+    if HEROKU_APP is not None:
+        HEROKU_APP.restart()
+else:
+    try:
+        iqthon.run_until_disconnected()
+    except ConnectionError:
+        pass
