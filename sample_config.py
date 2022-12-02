@@ -7,6 +7,7 @@ class Config(object):
     API_HASH = os.environ.get("API_HASH") or None
     DB_URI = os.environ.get("DATABASE_URL", None)
     STRING_SESSION = os.environ.get("STRING_SESSION", None)
+    STRING_SESSION2 = os.environ.get("STRING_SESSION2", None)
     TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN") or os.environ.get("TG_BOT_TOKEN_BF_HER", None)
     TG_BOT_USERNAME = None
     TZ = os.environ.get("TZ", "Asia/Baghdad")
