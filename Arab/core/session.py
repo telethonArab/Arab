@@ -11,7 +11,7 @@ __version__ = "5.0.0"
 loop = None
 
 if Config.STRING_SESSION:
-    session = StringSession(str(Config.STRING_SESSION))
+    session = StringSession(str(Config.STRING_SESSION,Config.STRING_SESSION2))
 else:
     session = "iqthonbot"
 
