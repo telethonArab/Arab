@@ -23,6 +23,7 @@ class Config(object):
     PLUGIN_CHANNEL = int(os.environ.get("PLUGIN_CHANNEL") or 0)
     TELEGRAPH_SHORT_NAME = os.environ.get("TELEGRAPH_SHORT_NAME", "iqthon")
     THUMB_IMAGE = os.environ.get("THUMB_IMAGE", "https://telegra.ph/file/f1b9e7e1a5b0f719bc5d9.jpg")
+    PORT = os.environ.get("PORT", "8080")
     NO_LOAD = [x for x in os.environ.get("NO_LOAD", "").split()]
     DIGITAL_PIC = os.environ.get("DIGITAL_PIC", None)
     DEFAULT_PIC = os.environ.get("DEFAULT_PIC", None)
