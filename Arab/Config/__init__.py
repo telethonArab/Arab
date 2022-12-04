@@ -1,1 +1,1 @@
-from .iqthon_config import Config
+from sample_config import Config
