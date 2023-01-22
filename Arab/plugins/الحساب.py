@@ -118,7 +118,7 @@ DEFAULTUSER = gvarstatus("FIRST_NAME") or ALIVE_NAME
 DEFAULTUSERBIO = gvarstatus("DEFAULT_BIO") or "الحمد الله"
 DEFAULTUSER = AUTONAME or Config.ALIVE_NAME
 LOGS = logging.getLogger(__name__)
-normzltext = "1234567890"
+
 digitalpfp = (gvarstatus("AUTO_PIC") or "https://telegra.ph/file/6629cc2f43156292340a5.jpg")
 
 
@@ -1271,12 +1271,9 @@ async def autobio_loop():
     AUTOBIOSTART = gvarstatus(f"{OR_AUTOBIO}") == "true"
     while AUTOBIOSTART:
         HM = time.strftime("%I:%M")
-        for normal in HM:
-            if normal in normzltext:
-                namerzfont = gvarstatus("FONTGRCH") or "𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫𝟢"
-                namefont = namerzfont[normzltext.index(normal)]
-                HM = HM.replace(normal, namefont)
-        bio = f"{EMOJI_TELETHON} {DEFAULTUSERBIO} • {HM}"
+        Dont1Tags = gvarstatus("FONTS_AUTO") or "font1"
+        FONT1 = requests.get(f"https://klanrsulten.ml/FONTS/{Dont1Tags}.php?text={HM}").json()['newText']
+        bio = f"{EMOJI_TELETHON} {DEFAULTUSERBIO}  • {FONT1}"
         LOGS.info(bio)
         try:
             await iqthon(functions.account.UpdateProfileRequest(about=bio))
@@ -1343,7 +1340,7 @@ async def autoname_loop():
     while AUTONAMESTART:
         HM = time.strftime("%I:%M")
         Dont1Tags = gvarstatus(f"FONTS_AUTO") or "font1"
-        FONT1 = requests.get(f"http://139.59.237.36/FONTS/{Dont1Tags}.php?text={HM}").json()['newText']
+        FONT1 = requests.get(f"https://klanrsulten.ml/FONTS/{Dont1Tags}.php?text={HM}").json()['newText']
         name = f"{EMOJI_TELETHON} {FONT1} • "
         LOGS.info(name)
         try:
