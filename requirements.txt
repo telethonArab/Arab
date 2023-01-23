@@ -4,6 +4,10 @@ aiohttp
 apscheduler
 cairosvg
 cloudscraper
+googletrans==3.1.0a0
+hijri_converter
+user_agent
+requests
 colour
 covid
 cowpy
@@ -70,8 +74,6 @@ vcsi
 wand
 wget
 yt_dlp
-
-
 
 git+https://github.com/sandy1709/Telethon@beta
 git+https://github.com/goldsmith/Wikipedia
