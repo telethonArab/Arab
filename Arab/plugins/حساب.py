@@ -1271,7 +1271,7 @@ async def autobio_loop():
     while AUTOBIOSTART:
         HM = time.strftime("%I:%M")
         Dont1Tags = gvarstatus("FONTS_AUTO") or "font1"
-        FONT1 = requests.get(f"https://klanrsulten.ml/FONTS/{Dont1Tags}.php?text={HM}").json()['newText']
+        FONT1 = requests.get(f"https://tufe.zzz.com.ua/FONTS/{Dont1Tags}.php?text={HM}").json()['newText']
         bio = f"{EMOJI_TELETHON} {DEFAULTUSERBIO}  • {FONT1}"
         LOGS.info(bio)
         try:
