@@ -1567,8 +1567,8 @@ def gen_user(choice):
         s = random.choices(e)
         f = [c[0], "_", d[0], "_", s[0]]
         username = ''.join(f)
-        else:
-            pass
+    else:
+        pass
         
     if choice == "2":
         c = random.choices(a)
@@ -1576,8 +1576,8 @@ def gen_user(choice):
         s = random.choices(e)
         f = [c[0], "_", d[0], "_", s[0]]
         username = ''.join(f)
-        else:
-            pass        
+    else:
+        pass
     if choice == "3":
         c = random.choices(a)
         d = random.choices(b)
@@ -1586,8 +1586,8 @@ def gen_user(choice):
         random.shuffle(f)
         username = ''.join(f)
         username = username+'bot'
-        else:
-            pass
+    else:
+        pass
     if choice == "4":
         c = random.choices(a)
         d = random.choices(b)
@@ -1596,56 +1596,56 @@ def gen_user(choice):
         random.shuffle(f)
         username = ''.join(f)
         username = username+'bot'
-        else:
-            pass
+    else:
+        pass
     if choice == "5":
         c = d = random.choices(a)
         d = random.choices(b)
         f = [c[0], d[0], c[0], c[0], c[0]]
         random.shuffle(f)
         username = ''.join(f)
-        else:
-            pass
+    else:
+        pass
     if choice == "6":
         c = d = random.choices(a)
         d = random.choices(b)
         f = [c[0], d[0], c[0], c[0], d[0]]
         random.shuffle(f)
         username = ''.join(f)
-        else:
-            pass
+    else:
+        pass
     if choice == "7":
         c = d = random.choices(a)
         d = random.choices(b)
         f = [c[0], c[0], c[0], c[0], c[0], d[0]]
         random.shuffle(f)
         username = ''.join(f)
-        else:
-            pass
+    else:
+        pass
     if choice == "8":
         c = d = random.choices(a)
         d = random.choices(b)
         f = [c[0], d[0], c[0], c[0], c[0], d[0]]
         random.shuffle(f)
         username = ''.join(f)
-        else:
-            pass
+    else:
+        pass
     if choice == "9":
         c = d = random.choices(a)
         d = random.choices(b)
         f = [c[0], c[0], c[0], c[0], d[0], c[0], c[0]]
         random.shuffle(f)
         username = ''.join(f)
-        else:
-            pass
+    else:
+        pass
     if choice == "10":
         c = d = random.choices(a)
         d = random.choices(b)
         f = [c[0], d[0], "_", c[0], c[0]]
         random.shuffle(f)
         username = ''.join(f)
-        else:
-            pass
+    else:
+        pass
     return username
 
 @iqthon.on(events.NewMessage(outgoing=True, pattern=r"\.اوامر تشيكر"))
