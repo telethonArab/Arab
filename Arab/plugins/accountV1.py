@@ -1510,12 +1510,9 @@ b = '1234567890'
 e = 'qwertyuiopassdfghjklzxcvbnm1234567890'
 iqthonispay = ['yes']
 iqthonispay2 = ['yes']
-bannedchecker = []
 iqthonisclaim = ["off"]
 iqthonisauto = ["off"]
-with open("bannedchecker.txt", "r") as f:
-    f = f.read().split()
-    bannedchecker.append(f)
+
 que = Queue()
 
 iqthon_checker = '''
@@ -1570,28 +1567,12 @@ def gen_user(choice):
         s = random.choices(e)
         f = [c[0], "_", d[0], "_", s[0]]
         username = ''.join(f)
-        if username in bannedchecker[0]:
-            c = random.choices(a)
-            d = random.choices(b)
-            s = random.choices(e)
-            f = [c[0], "_", d[0], "_", s[0]]
-            username = ''.join(f)
-        else:
-            pass
     if choice == "2":
         c = random.choices(a)
         d = random.choices(a)
         s = random.choices(e)
         f = [c[0], "_", d[0], "_", s[0]]
         username = ''.join(f)
-        if username in bannedchecker[0]:
-            c = random.choices(a)
-            d = random.choices(b)
-            s = random.choices(e)
-            f = [c[0], "_", d[0], "_", s[0]]
-            username = ''.join(f)
-        else:
-            pass
     if choice == "3":
         c = random.choices(a)
         d = random.choices(b)
@@ -1600,16 +1581,7 @@ def gen_user(choice):
         random.shuffle(f)
         username = ''.join(f)
         username = username+'bot'
-        if username in bannedchecker[0]:
-            c = random.choices(a)
-            d = random.choices(b)
-            s = random.choices(e)
-            f = [c[0], s[0]]
-            random.shuffle(f)
-            username = ''.join(f)
-            username = username+'bot'
-        else:
-            pass
+
     if choice == "4":
         c = random.choices(a)
         d = random.choices(b)
@@ -1618,100 +1590,49 @@ def gen_user(choice):
         random.shuffle(f)
         username = ''.join(f)
         username = username+'bot'
-        if username in bannedchecker[0]:
-            c = random.choices(a)
-            d = random.choices(b)
-            s = random.choices(e)
-            f = [c[0], s[0], d[0]]
-            random.shuffle(f)
-            username = ''.join(f)
-            username = username+'bot'
-        else:
-            pass
+
     if choice == "5":
         c = d = random.choices(a)
         d = random.choices(b)
         f = [c[0], d[0], c[0], c[0], c[0]]
         random.shuffle(f)
         username = ''.join(f)
-        if username in bannedchecker[0]:
-            c = d = random.choices(a)
-            d = random.choices(b)
-            f = [c[0], d[0], c[0], c[0], c[0]]
-            random.shuffle(f)
-            username = ''.join(f)
-        else:
-            pass
+
     if choice == "6":
         c = d = random.choices(a)
         d = random.choices(b)
         f = [c[0], d[0], c[0], c[0], d[0]]
         random.shuffle(f)
         username = ''.join(f)
-        if username in bannedchecker[0]:
-            c = d = random.choices(a)
-            d = random.choices(b)
-            f = [c[0], d[0], c[0], c[0], d[0]]
-            random.shuffle(f)
-            username = ''.join(f)
-        else:
-            pass
+
     if choice == "7":
         c = d = random.choices(a)
         d = random.choices(b)
         f = [c[0], c[0], c[0], c[0], c[0], d[0]]
         random.shuffle(f)
         username = ''.join(f)
-        if username in bannedchecker[0]:
-            c = d = random.choices(a)
-            d = random.choices(b)
-            f = [c[0], c[0], c[0], c[0], c[0], d[0]]
-            random.shuffle(f)
-            username = ''.join(f)
-        else:
-            pass
+
     if choice == "8":
         c = d = random.choices(a)
         d = random.choices(b)
         f = [c[0], d[0], c[0], c[0], c[0], d[0]]
         random.shuffle(f)
         username = ''.join(f)
-        if username in bannedchecker[0]:
-            c = d = random.choices(a)
-            d = random.choices(b)
-            f = [c[0], d[0], c[0], c[0], c[0], d[0]]
-            random.shuffle(f)
-            username = ''.join(f)
-        else:
-            pass
+
     if choice == "9":
         c = d = random.choices(a)
         d = random.choices(b)
         f = [c[0], c[0], c[0], c[0], d[0], c[0], c[0]]
         random.shuffle(f)
         username = ''.join(f)
-        if username in bannedchecker[0]:
-            c = d = random.choices(a)
-            d = random.choices(b)
-            f = [c[0], c[0], c[0], c[0], d[0], c[0], c[0]]
-            random.shuffle(f)
-            username = ''.join(f)
-        else:
-            pass
+
     if choice == "10":
         c = d = random.choices(a)
         d = random.choices(b)
         f = [c[0], d[0], "_", c[0], c[0]]
         random.shuffle(f)
         username = ''.join(f)
-        if username in bannedchecker[0]:
-            c = d = random.choices(a)
-            d = random.choices(b)
-            f = [c[0], d[0], "_", c[0], c[0]]
-            random.shuffle(f)
-            username = ''.join(f)
-        else:
-            pass
+
     return username
 
 @iqthon.on(events.NewMessage(outgoing=True, pattern=r"\.اوامر تشيكر"))
@@ -1719,10 +1640,6 @@ async def _(event):
     if iqthonispay2[0] == "yes":
         await event.edit(iqthon_checker)
         
-@iqthon.on(events.NewMessage(outgoing=True, pattern=r"\.اليوزرات المبندة"))
-async def _(event):
-    if iqthonispay2[0] == "yes":
-        await iqthon.send_file(event.chat_id, 'bannedchecker.txt')
 
 
 @iqthon.on(events.NewMessage(outgoing=True, pattern=r"\.الانواع"))
@@ -1777,9 +1694,6 @@ async def _(event):
 - Hunting Hour ↣ {klinore2}
     ''')
                     break
-                except telethon.errors.rpcerrorlist.UsernameInvalidError:
-                    with open("bannedchecker.txt", "a") as f:
-                        f.write(f"\n{username}")
                 except Exception as eee:
                     await iqthon.send_message(event.chat_id, f'''خطأ مع {username}
     الخطأ :
