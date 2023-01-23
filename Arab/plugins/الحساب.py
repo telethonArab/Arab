@@ -1335,12 +1335,18 @@ async def fetch_info(replied_user, event):
 
 
 
+
 async def autoname_loop():
     AUTONAMESTART = gvarstatus(f"{OR_NAMEAUTO}") == "true"
     while AUTONAMESTART:
-        HM = time.strftime("%I:%M")
-        Dont1Tags = gvarstatus(f"FONTS_AUTO") or "font1"
-        FONT1 = requests.get(f"https://tufe.zzz.com.ua/FONTS/{Dont1Tags}.php?text={HM}").json()['newText']
+        FONT1 = time.strftime("%I:%M")
+        number = "0123456789"
+
+        for i in FONT1:
+            if i in number:
+                nfont = gvarstatus("FONTGRCH")  or "𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫𝟢"
+                fn = nfont[number.index(i)]
+                FONT1 = FONT1.replace(i, fn)
         name = f"{EMOJI_TELETHON} {FONT1} • "
         LOGS.info(name)
         try:
@@ -1350,6 +1356,9 @@ async def autoname_loop():
             await asyncio.sleep(ex.seconds)
         await asyncio.sleep(Config.CHANGE_TIME)
         AUTONAMESTART = gvarstatus(f"{OR_NAMEAUTO}") == "true"
+
+
+
 @iqthon.on(admin_cmd(pattern="كشف(?:\s|$)([\s\S]*)"))
 async def _(event):
     replied_user, error_i_a = await get_user_from_event(event)
