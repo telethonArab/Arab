@@ -346,12 +346,6 @@ async def bad(event):
     if vname in vlist:
         if vname in oldvars:
             vname = oldvars[vname]
-    if input_str == "اشتراك الخاص" or input_str == "اشتراك خاص":
-        addgvar("pchan", text)
-        var = "pchan"
-    if input_str == "اشتراك كروب" or input_str == "اشتراك الكروب":
-        addgvar("gchan", text)
-        var = "gchan"
         if cmd == "اضف":
             if not vinfo and vname == "ALIVE_TEMPLATE":
                 return await edit_delete(event, f"**🝳︙  📑 يرجى متابع قناه الفارات تجدها هنا : @iqthon")
