@@ -5,6 +5,10 @@ import telethon
 from telethon.sync import functions
 from user_agent import generate_user_agent
 from Arab import iqthon
+from user_agent import *
+from telethon import events
+from telethon.tl import functions
+
 a = "qwertyuiopassdfghjklzxcvbnm"
 b = "1234567890"
 e = "qwertyuiopassdfghjklzxcvbnm1234567890"
