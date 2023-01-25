@@ -1,2220 +1,1534 @@
 import asyncio
-import time
-import io
-import os
-import shutil
-import zipfile
-import base64
-import logging
 import random
 import glob
 import re
-from telegraph import upload_file
-from telethon import Button
+import shutil
+import urllib
+import base64
+import requests
+import time
+import shlex
+import math
+import os
+import html
+import io
+import sys
+import traceback
+import cv2
+import requests
+import threading
+from queue import Queue
+from telethon.sync import functions
+from user_agent import generate_user_agent
+from user_agent import *
+from threading import Thread
 from telethon import events
-from telethon.tl.types import ChannelParticipantsAdmins
-from telethon import client
-from telethon.tl.functions.messages import EditChatDefaultBannedRightsRequest
-from telethon.tl.functions.messages import ImportChatInviteRequest as Get
-from datetime import datetime
+from telethon.tl.functions.messages import GetHistoryRequest
+from telethon.tl.functions.channels import JoinChannelRequest
+from telethon.tl.functions.messages import ImportChatInviteRequest
 from asyncio import sleep
-from asyncio.exceptions import TimeoutError
-from telethon import functions, types
-from telethon import events
-from telethon.tl.functions.channels import EditBannedRequest, GetFullChannelRequest, GetParticipantsRequest, EditAdminRequest, EditPhotoRequest
+import telethon.password as pwd_mod
+from datetime import datetime
+from PIL import Image, ImageDraw, ImageFont
+from pySmartDL import SmartDL
+from telethon.events import CallbackQuery
+from telethon.tl.functions.account import UpdateNotifySettingsRequest
+from telethon.errors import FloodWaitError
+from telethon.tl import functions
+from urlextract import URLExtract
+from requests import get
+from typing import Optional, Tuple
 from telethon.tl.functions.users import GetFullUserRequest
-from telethon.tl.functions.messages import GetFullChatRequest, GetHistoryRequest, ExportChatInviteRequest
-from telethon.errors import ChannelInvalidError, ChannelPrivateError, ChannelPublicGroupNaError, BadRequestError, ChatAdminRequiredError, FloodWaitError, MessageNotModifiedError, UserAdminInvalidError
-from telethon.errors.rpcerrorlist import YouBlockedUserError, UserAdminInvalidError, UserIdInvalidError
-from telethon.tl.functions.channels import GetFullChannelRequest as getchat
-from telethon.tl.functions.phone import CreateGroupCallRequest as startvc
-from telethon.tl.functions.phone import DiscardGroupCallRequest as stopvc
-from telethon.tl.functions.phone import GetGroupCallRequest as getvc
-from telethon.tl.functions.phone import InviteToGroupCallRequest as invitetovc
-from telethon.errors import ImageProcessFailedError, PhotoCropSizeSmallError
-from telethon.tl.types import ChatAdminRights, InputChatPhotoEmpty, MessageMediaPhoto
-from telethon.tl.types import ChannelParticipantsKicked, ChannelParticipantAdmin, ChatBannedRights, ChannelParticipantCreator, ChannelParticipantsAdmins, ChannelParticipantsBots, MessageActionChannelMigrateFrom, UserStatusEmpty, UserStatusLastMonth, UserStatusLastWeek, UserStatusOffline, UserStatusOnline, UserStatusRecently
-from telethon.utils import get_display_name, get_input_location, get_extension
-from os import remove
-from math import sqrt
-from prettytable import PrettyTable
-from emoji import emojize
-from pathlib import Path
-from Arab import iqthon
+from telethon import events
+from telethon.utils import pack_bot_file_id, get_input_location
+from telethon.tl.custom import Dialog
+from telethon.tl.functions.messages import ImportChatInviteRequest
+from telethon.tl.functions.messages import ImportChatInviteRequest as Get
+from telethon.tl.types import Channel, Chat, User
+from telethon.errors.rpcerrorlist import UsernameOccupiedError
+from asyncio.exceptions import TimeoutError as AsyncTimeout
+from telethon.errors.rpcerrorlist import MessageTooLongError, YouBlockedUserError
+from telethon.tl.types import ChannelParticipantAdmin, ChannelParticipantsBots
+from telethon.tl.types import DocumentAttributeVideo as video
+from telethon.errors.rpcerrorlist import UserAlreadyParticipantError
+from telethon.tl.types import InputMessagesFilterMusic
+from telethon.tl.functions.messages import SaveDraftRequest
+from hachoir.metadata import extractMetadata
+from hachoir.parser import createParser
+from ..helpers.progress import humanbytes as hb
 from Arab.utils import admin_cmd, sudo_cmd, eor
-from ..core.logger import logging
-from ..core.managers import edit_delete, edit_or_reply
-from . import humanbytes
-from . import BOTLOG, BOTLOG_CHATID, admin_groups, get_user_from_event, extract_time
-from ..utils.tools import create_supergroup
-from ..helpers import reply_id, readable_time
-from ..helpers.utils import _format, get_user_from_event, reply_id
-from ..helpers import media_type
-from ..helpers.google_image_download import googleimagesdownload
-from ..helpers.tools import media_type
-from ..sql_helper.locks_sql import get_locks, is_locked, update_lock
-from ..utils import is_admin
-from . import progress
-from ..sql_helper import gban_sql_helper as gban_sql
-from ..sql_helper.mute_sql import is_muted, mute, unmute
-from ..sql_helper.autopost_sql import add_post, get_all_post, is_post, remove_post
-from ..sql_helper import no_log_pms_sql
-from ..sql_helper.globals import addgvar, gvarstatus
-BANNED_RIGHTS = ChatBannedRights(until_date=None, view_messages=True, send_messages=True, send_media=True, send_stickers=True, send_gifs=True, send_games=True, send_inline=True, embed_links=True)
-KLANR_RIGHTS = ChatBannedRights(until_date=None, view_messages=True, send_messages=True, send_media=True, send_stickers=True, send_gifs=True, send_games=True, send_inline=True, embed_links=True)
-UNBAN_RIGHTS = ChatBannedRights(
-    until_date=None,
-    send_messages=None,
-    send_media=None,
-    send_stickers=None,
-    send_gifs=None,
-    send_games=None,
-    send_inline=None,
-    embed_links=None,
-)
-#LOGS = logging.getLogger(__name__)
-plugin_category = "utils"
-MUTE = gvarstatus("OR_MUTE") or "(ميوت|كتم)"
-TFLASH = gvarstatus("OR_TFLASH") or "(طرد الكل|تفليش)"
-UNMUTE = gvarstatus("OR_UNMUTE") or "الغاء كتم"
-addition = gvarstatus("OR_ADD") or "اضافه"
-LEFT = gvarstatus("OR_LEFT") or "(مغادره|غادر)"
-REMOVEBAN = gvarstatus("OR_REMOVEBAN") or "مسح المحظورين"
-LINKK = gvarstatus("OR_LINK") or "(رابط|الرابط)"
-ADMINRAISE = gvarstatus("OR_ADMINRAISE") or "رفع مشرف"
-UNADMINRAISE = gvarstatus("OR_UNADMINRAISE") or "تنزيل مشرف"
-BANDD = gvarstatus("OR_BAND") or "حظر"
-UNBANDD = gvarstatus("OR_UNBAND") or "الغاء الحظر"
-TYPES = [
-    "Photo",
-    "Audio",
-    "Video",
-    "Document",
-    "Sticker",
-    "Gif",
-    "Voice",
-    "Round Video",
-]
-thumb_image_path = os.path.join(Config.TMP_DOWNLOAD_DIRECTORY, "thumb_image.jpg")
+from telethon.utils import get_display_name
+from telethon.tl.functions.account import UpdateUsernameRequest
+from telethon.tl.functions.channels import GetAdminedPublicChannelsRequest
+from telethon.tl.functions.photos import DeletePhotosRequest, GetUserPhotosRequest
+from ..helpers.utils import reply_id as rd
+from telethon.tl.types import Channel, Chat, InputPhoto, User
+from telethon.errors import ChatAdminRequiredError
+from ..sql_helper.GrChhelper import Auto_ChGR, deletAutoChGR, getGrChAuto
+from telethon.errors import FloodWaitError, ChannelInvalidError
 from Arab import iqthon
-try:
-    import pyminizip
-except Exception:
-    os.system("pip install pyminizip")
-    import pyminizip
-err = "قم بالرد على الملف"
-
-async def get_call(event):
-    mm = await event.client(getchat(event.chat_id))
-    xx = await event.client(getvc(mm.full_chat.call))
-    return xx.call
-
-def user_list(l, n):
-    for i in range(0, len(l), n):
-        yield l[i : i + n]
-
-def zipdir(dirName):
-    filePaths = []
-    for root, directories, files in os.walk(dirName):
-        for filename in files:
-            filePath = os.path.join(root, filename)
-            filePaths.append(filePath)
-    return filePaths
-
-class LOG_CHATS:
-    def __init__(self):
-        self.RECENT_USER = None
-        self.NEWPM = None
-        self.COUNT = 0
-LOG_CHATS_ = LOG_CHATS()
-
-PP_TOO_SMOL = "**🝳 ⦙  الصورة صغيرة جدًا  📸** ."
-PP_ERROR = "**🝳 ⦙  فشل أثناء معالجة الصورة  📵** ."
-NO_ADMIN = "**🝳 ⦙  أنا لست مشرف هنا ** ."
-NO_PERM = "**🝳 ⦙  ليس لدي أذونات كافية  🚮** ."
-CHAT_PP_CHANGED = "**🝳 ⦙  تغيّرت صورة الدردشة  🌅** ."
-INVALID_MEDIA = "**🝳 ⦙ ملحق غير صالح  📳** ."
-IMOGE_IQTHON = "🝳 ⦙  "
-NO_ADMIN = "**🝳 ⦙ عذرا لست ادمن هنا **"
-NO_PERM = "**🝳 ⦙ ليس لدي صلاحيات ادمن كافية! **"
-
-
-@iqthon.on(admin_cmd(pattern=r"المحظورين?(.*)"))
-async def gablist(event):
-    gbanned_users = gban_sql.get_all_gbanned()
-    GBANNED_LIST = "Current Gbanned Users\n"
-    if len(gbanned_users) > 0:
-        for a_user in gbanned_users:
-            if a_user.reason:
-                GBANNED_LIST += f"👉 [{a_user.chat_id}](tg://user?id={a_user.chat_id}) for {a_user.reason}\n"
-            else:
-                GBANNED_LIST += (
-                    f"👉 [{a_user.chat_id}](tg://user?id={a_user.chat_id}) Reason None\n"
-                )
-    else:
-        GBANNED_LIST = "لايوجد محضورين "
-    await edit_or_reply(event, GBANNED_LIST)
-@iqthon.on(admin_cmd(pattern="تشفير الملف ?(.*)"))
-async def pyZip(e):
-    if e.fwd_from:
-        return
-    reply = await e.get_reply_message()
-    if not (reply and reply.media):
-        return await eod(e, err)
-    pass_ = e.pattern_match.group(1)
-    eris = await edit_or_reply(e, "-->جاري التحميل ..<--")
-    dl_ = await e.client.download_media(reply)
-    await eris.edit("-->تم الاكتمال ..<--")
-    nem_ = reply.file.name
-    zip_ = f"{nem_}.zip" if nem_ else "iqthon_Zip.zip"
-    password = pass_ if pass_ else "iqthon"
-    cap_ = f"**اسم الملف :** - {zip_} \n"\
-    f"**الباسبورد لفك الملف :** - `{password}`"
-    
-    pyminizip.compress(
-        dl_, None, zip_, password, 5)
-    await eris.edit("-->جاري الرفع ..<--")
-    try:
-        await e.client.send_file(
-            e.chat_id, zip_, caption=cap_)
-        await eris.delete()
-    except Exception as ex:
-        return await eris.edit(f"#هناك خطا : {ex}")
-    finally:
-        os.remove(zip_)
-        os.remove(dl_)
-
-MUTE_RIGHTS = ChatBannedRights(until_date=None, send_messages=True)
-UNMUTE_RIGHTS = ChatBannedRights(until_date=None, send_messages=False)
-
-
-@iqthon.on(admin_cmd(pattern=f"{MUTE}(?:\s|$)([\s\S]*)"))
-async def muteiqthon(event):
-    if event.is_private:
-        replied_user = await event.client.get_entity(event.chat_id)
-        if is_muted(event.chat_id, event.chat_id):
-            return await event.edit(
-                "**- هـذا المسـتخـدم مڪتـوم . . سـابقـاً **"
-            )
-        if event.chat_id == iqthon.uid:
-            return await edit_delete(event, "**- لا تستطــع كتـم نفسـك**")
-        if event.chat_id == 1226408155:
-            return await edit_delete(event, "** دي . . لا يمڪنني كتـم مطـور السـورس  ╰**")
-        try:
-            mute(event.chat_id, event.chat_id)
-        except Exception as e:
-            await event.edit(f"**- خطـأ **\n`{e}`")
-        else:
-            await event.edit("** تم ڪتـم الـمستخـدم  . . بنجـاح 🔕**")
-        if BOTLOG:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                "#كتــم_الخــاص\n"
-                f"**- الشخـص  :** [{replied_user.first_name}](tg://user?id={event.chat_id})\n",
-            )
-    else:
-        chat = await event.get_chat()
-        admin = chat.admin_rights
-        creator = chat.creator
-        if not admin and not creator:
-            return await edit_or_reply(
-                event, "** أنـا لسـت مشـرف هنـا ؟!! .**"
-            )
-        user, reason = await get_user_from_event(event)
-        if not user:
-            return
-        if user.id == iqthon.uid:
-            return await edit_or_reply(event, "**- عــذراً .. لا استطيــع كتــم نفســي**")
-        if user.id == 1226408155:
-            return await edit_or_reply(event, "** دي . . لا يمڪنني كتـم مطـور السـورس  ╰**")
-        if is_muted(user.id, event.chat_id):
-            return await edit_or_reply(
-                event, "**عــذراً .. هـذا الشخـص مكتــوم سـابقــاً هنـا**"
-            )
-        result = await event.client.get_permissions(event.chat_id, user.id)
-        try:
-            if result.participant.banned_rights.send_messages:
-                return await edit_or_reply(
-                    event,
-                    "**عــذراً .. هـذا الشخـص مكتــوم سـابقــاً هنـا**",
-                )
-        except AttributeError:
-            pass
-        except Exception as e:
-            return await edit_or_reply(event, f"**- خطــأ : **`{e}`")
-        try:
-            mute(user.id, event.chat_id)
-        except UserAdminInvalidError:
-            if "admin_rights" in vars(chat) and vars(chat)["admin_rights"] is not None:
-                if chat.admin_rights.delete_messages is not True:
-                    return await edit_or_reply(
-                        event,
-                        "**- عــذراً .. ليـس لديـك صـلاحيـة حـذف الرسـائل هنـا**",
-                    )
-            elif "creator" not in vars(chat):
-                return await edit_or_reply(
-                    event, "**- عــذراً .. ليـس لديـك صـلاحيـة حـذف الرسـائل هنـا**"
-                )
-        except Exception as e:
-            return await edit_or_reply(event, f"**- خطــأ : **`{e}`")
-        if reason:
-            await event.client.send_file(
-                event.chat_id,
-                iqq,
-                caption=f"**- المستخـدم :** {_format.mentionuser(user.first_name ,user.id)}  \n**- تـم كتمـه بنجـاح ☑️**\n\n**- السـبب :** {reason}",
-            )
-            await event.delete()
-        else:
-            await event.client.send_file(
-                event.chat_id,
-                iqq,
-                caption=f"**- المستخـدم :** {_format.mentionuser(user.first_name ,user.id)}  \n**- تـم كتمـه بنجـاح ☑️**\n\n",
-            )
-            await event.delete()
-        if BOTLOG:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                "#الكــتم\n"
-                f"**الشخـص :** [{user.first_name}](tg://user?id={user.id})\n"
-                f"**الدردشـه :** {get_display_name(await event.get_chat())}(`{event.chat_id}`)",
-            )
-
-
-@iqthon.on(admin_cmd(pattern=f"{UNMUTE}(?:\s|$)([\s\S]*)"))
-async def unmuteiqthon(event):
-    if event.is_private:
-        replied_user = await event.client.get_entity(event.chat_id)
-        if not is_muted(event.chat_id, event.chat_id):
-            return await event.edit(
-                "**عــذراً .. هـذا الشخـص غيــر مكتــوم هنـا**"
-            )
-        try:
-            unmute(event.chat_id, event.chat_id)
-        except Exception as e:
-            await event.edit(f"**- خطــأ **\n`{e}`")
-        else:
-            await event.edit(
-                "**- تـم الغــاء كتــم الشخـص هنـا .. بنجــاح ✓**"
-            )
-        if BOTLOG:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                "#الغــاء_الكــتم\n"
-                f"**- الشخـص :** [{replied_user.first_name}](tg://user?id={event.chat_id})\n",
-            )
-    else:
-        user, _ = await get_user_from_event(event)
-        if not user:
-            return
-        try:
-            if is_muted(user.id, event.chat_id):
-                unmute(user.id, event.chat_id)
-            else:
-                result = await event.client.get_permissions(event.chat_id, user.id)
-                if result.participant.banned_rights.send_messages:
-                    await event.client(
-                        EditBannedRequest(event.chat_id, user.id, UNBAN_RIGHTS)
-                    )
-        except AttributeError:
-            return await edit_or_reply(
-                event,
-                "**- الشخـص غيـر مكـتـوم**",
-            )
-        except Exception as e:
-            return await edit_or_reply(event, f"**- خطــأ : **`{e}`")
-        await edit_or_reply(
-            event,
-            f"**- المستخـدم :** {_format.mentionuser(user.first_name ,user.id)} \n**- تـم الغـاء كتمـه بنجـاح ☑️**",
-        )
-        if BOTLOG:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                "#الغــاء_الكــتم\n"
-                f"**- الشخـص :** [{user.first_name}](tg://user?id={user.id})\n"
-                f"**- الدردشــه :** {get_display_name(await event.get_chat())}(`{event.chat_id}`)",
-            )
-
-
-@iqthon.iq_cmd(incoming=True)
-async def watcher(event):
-    if is_muted(event.sender_id, "كتم_مؤقت"):
-        await event.delete()
-
-@iqthon.on(admin_cmd(pattern=r"المشرفين(?: |$)(.*)"))
-async def _(event):
-    "لإظهـار قائمـة المشرفيـن  ✪"
-    mentions = "**🝳 ⦙   مشرفيـن هـذه المجموعـة  ✪**: \n"
-    reply_message = await reply_id(event)
-    input_str = event.pattern_match.group(1)
-    to_write_chat = await event.get_input_chat()
-    chat = None
-    if input_str:
-        mentions = f"**🝳 ⦙  مشرفيـن فـي → :** {input_str} **مـن المجموعـات ⌂ :** \n"
-        try:
-            chat = await event.client.get_entity(input_str)
-        except Exception as e:
-            return await edit_delete(event, str(e))
-    else:
-        chat = to_write_chat
-        if not event.is_group:
-            return await edit_or_reply(event, "**🝳 ⦙   هـذه ليسـت مجموعـة ✕**")
-    try:
-        async for x in event.client.iter_participants(
-            chat, filter=ChannelParticipantsAdmins
-        ):
-            if not x.deleted and isinstance(x.participant, ChannelParticipantCreator):
-                mentions += "\n - [{}](tg://user?id={}) `{}`".format(
-                    x.first_name, x.id, x.id
-                )
-        mentions += "\n"
-        async for x in event.client.iter_participants(
-            chat, filter=ChannelParticipantsAdmins
-        ):
-            if x.deleted:
-                mentions += "\n `{}`".format(x.id)
-            else:
-                if isinstance(x.participant, ChannelParticipantAdmin):
-                    mentions += "\n- [{}](tg://user?id={}) `{}`".format(
-                        x.first_name, x.id, x.id
-                    )
-    except Exception as e:
-        mentions += " " + str(e) + "\n"
-    await event.client.send_message(event.chat_id, mentions, reply_to=reply_message)
-    await event.delete()
-
-@iqthon.on(admin_cmd(pattern=r"البوتات?(.*)"))
-async def _(event):
-    mentions = "**🝳 ⦙  البـوتات في هذه الـمجموعة 🝰 : ** \n"
-    input_str = event.pattern_match.group(1)
-    if not input_str:
-        chat = await event.get_input_chat()
-    else:
-        mentions = "**🝳 ⦙  البوتـات في {} من المجموعات 🝰 : ** \n".format(input_str)
-        try:
-            chat = await event.client.get_entity(input_str)
-        except Exception as e:
-            return await edit_or_reply(event, str(e))
-    try:
-        async for x in event.client.iter_participants(
-            chat, filter=ChannelParticipantsBots
-        ):
-            if isinstance(x.participant, ChannelParticipantAdmin):
-                mentions += "\n - [{}](tg://user?id={}) `{}`".format(x.first_name, x.id, x.id)
-            else:
-                mentions += "\n [{}](tg://user?id={}) `{}`".format(
-                    x.first_name, x.id, x.id
-                )
-    except Exception as e:
-        mentions += " " + str(e) + "\n"
-    await edit_or_reply(event, mentions)
-
-
-@iqthon.on(admin_cmd(pattern=r"الأعضاء(?: |$)(.*)"))
-async def get_users(show):
-    mentions = "**مستخدمين هذه المجموعة**: \n"
-    await reply_id(show)
-    input_str = show.pattern_match.group(1)
-    if input_str:
-        mentions = "**🝳 ⦙  الأعضاء في {} من المجموعات 𖤍  :** \n".format(input_str)
-        try:
-            chat = await show.client.get_entity(input_str)
-        except Exception as e:
-            return await edit_delete(show, f"`{str(e)}`", 10)
-    else:
-        if not show.is_group:
-            return await edit_or_reply(show, "**🝳 ⦙  هـذه ليسـت مجموعـة ✕**")
-    catevent = await edit_or_reply(show, "**🝳 ⦙  جـاري سحـب قائمـة معرّفـات الأعضـاء 🝛**")
-    try:
-        if show.pattern_match.group(1):
-            async for user in show.client.iter_participants(chat.id):
-                if user.deleted:
-                    mentions += f"\n**🝳 ⦙  الحسـابات المحذوفـة ⌦** `{user.id}`"
-                else:
-                    mentions += (f"\n[{user.first_name}](tg://user?id={user.id}) `{user.id}`")
-        else:
-            async for user in show.client.iter_participants(show.chat_id):
-                if user.deleted:
-                    mentions += f"\n**🝳 ⦙  الحسـابات المحذوفـة ⌦** `{user.id}`"
-                else:
-                    mentions += (f"\n[{user.first_name}](tg://user?id={user.id}) `{user.id}`")
-    except Exception as e:
-        mentions += " " + str(e) + "\n"
-    await edit_or_reply(catevent, mentions)
-
-@iqthon.on(admin_cmd(pattern=r"معلومات(?: |$)(.*)"))
-async def info(event):
-    catevent = await edit_or_reply(event, "**🝳 ⦙  يتـمّ جلـب معلومـات الدردشـة، إنتظـر ⅏**")
-    chat = await get_chatinfo(event, catevent)
-    caption = await fetch_info(chat, event)
-    try:
-        await catevent.edit(caption, parse_mode="html")
-    except Exception as e:
-        if BOTLOG:
-            await event.client.send_message(BOTLOG_CHATID, f"**🝳 ⦙  هنـاك خطـأ في معلومـات الدردشـة ✕ : **\n`{str(e)}`")
-        await catevent.edit("**🝳 ⦙   حـدث خـطأ مـا، يرجـى التحقق من الأمـر ⎌**")
-async def get_chatinfo(event, catevent):
-    chat = event.pattern_match.group(1)
-    chat_info = None
-    if chat:
-        try:
-            chat = int(chat)
-        except ValueError:
-            pass
-    if not chat:
-        if event.reply_to_msg_id:
-            replied_msg = await event.get_reply_message()
-            if replied_msg.fwd_from and replied_msg.fwd_from.channel_id is not None:
-                chat = replied_msg.fwd_from.channel_id
-        else:
-            chat = event.chat_id
-    try:
-        chat_info = await event.client(GetFullChatRequest(chat))
-    except BaseException:
-        try:
-            chat_info = await event.client(GetFullChannelRequest(chat))
-        except ChannelInvalidError:
-            await catevent.edit("**🝳 ⦙  لـم يتـمّ العثـور على القنـاة/المجموعـة ✕**")
-            return None
-        except ChannelPrivateError:
-            await catevent.edit(
-                '**🝳 ⦙   هـذه مجموعـة أو قنـاة خاصـة أو لقد تمّ حظـري منه ⛞**'
-            )
-            return None
-        except ChannelPublicGroupNaError:
-            await catevent.edit("**🝳 ⦙  القنـاة أو المجموعـة الخارقـة غيـر موجـودة ✕**")
-            return None
-        except (TypeError, ValueError) as err:
-            await catevent.edit(str(err))
-            return None
-    return chat_info
-
-async def get_chatinfo(event):
-    chat = event.pattern_match.group(1)
-    chat_info = None
-    if chat:
-        try:
-            chat = int(chat)
-        except ValueError:
-            pass
-    if not chat:
-        if event.reply_to_msg_id:
-            replied_msg = await event.get_reply_message()
-            if replied_msg.fwd_from and replied_msg.fwd_from.channel_id is not None:
-                chat = replied_msg.fwd_from.channel_id
-        else:
-            chat = event.chat_id
-    try:
-        chat_info = await event.client(GetFullChatRequest(chat))
-    except:
-        try:
-            chat_info = await event.client(GetFullChannelRequest(chat))
-        except ChannelInvalidError:
-            await event.reply("**🝳 ⦙   لم يتم العثور على المجموعة او القناة**")
-            return None
-        except ChannelPrivateError:
-            await event.reply(
-                "**🝳 ⦙   لا يمكنني استخدام الامر من الكروبات او القنوات الخاصة**"
-            )
-            return None
-        except ChannelPublicGroupNaError:
-            await event.reply("**🝳 ⦙   لم يتم العثور على المجموعة او القناة**")
-            return None
-        except (TypeError, ValueError):
-            await event.reply("**🝳 ⦙   رابط الكروب غير صحيح**")
-            return None
-    return chat_info
-
-
-def make_mention(user):
-    if user.username:
-        return f"@{user.username}"
-    else:
-        return inline_mention(user)
-
-
+from Arab.core.logger import logging
+from ..Config import Config
+from ..core.managers import edit_delete, edit_or_reply
+from . import ALIVE_NAME, AUTONAME, BOTLOG, BOTLOG_CHATID, DEFAULT_BIO, get_user_from_event
+from ..helpers import get_user_from_event, reply_id
+from ..sql_helper.locks_sql import *
+from ..helpers.functions import deEmojify, hide_inlinebot, waifutxt
+from Arab.utils.decorators import register
+from ..helpers.utils import reply_id, _catutils, parse_pre, yaml_format, install_pip, get_user_from_event, _format
+from Arab.helpers.functions import convert_toimage,    deEmojify,    phcomment,    threats,    trap,    trash
+from Arab.helpers.functions import convert_tosticker,    flip_image,    grayscale,    invert_colors,    mirror_file,    solarize
+from ..sql_helper.global_list import add_to_list, get_collection_list, is_in_list, rm_from_list
+from ..sql_helper.globals import addgvar, delgvar, gvarstatus
+from ..sql_helper.locks_sql import *
+from telethon import TelegramClient, client, events
+from telethon.tl.functions.contacts import GetBlockedRequest, UnblockRequest
+from Arab import BOTLOG_CHATID
+from ..sql_helper.globals import addgvar, delgvar, gvarstatus
+from ..Config import Config
+from telethon import Button
+from telethon.tl.functions.messages import ExportChatInviteRequest
+from ..core.managers import edit_delete, edit_or_reply
+from PIL import Image, ImageDraw, ImageFont
+import PIL.ImageOps
+from . import AUTONAME, BOTLOG, BOTLOG_CHATID, DEFAULT_BIO, _catutils, edit_delete, iqthon, logging, spamwatch    
 def inline_mention(user):
     full_name = user_full_name(user) or "No Name"
-    return f"[{full_name}](tg://user?id={user.id})"
-
-
+    return f"{full_name}"
 def user_full_name(user):
-    names = [user.first_name, user.last_name]
+    names = [user.first_name]
     names = [i for i in list(names) if i]
-    full_name = " ".join(names)
-    return full_name
+    return " ".join(names)
+STAT_INDICATION = "**🝳 ⦙   جـاري جـمـع الإحصـائيـات ، انتـظـر 🔄**"
+CHANNELS_STR = "**🝳 ⦙   قائمة القنوات التي أنت فيها موجودة هنا\n\n"
+CHANNELS_ADMINSTR = "**🝳 ⦙  قائمة القنوات التي تديرها هنا **\n\n"
+CHANNELS_OWNERSTR = "**🝳 ⦙  قائمة القنوات التي تمتلك فيها هنا **\n\n"
+GROUPS_STR = "**🝳 ⦙  قائمة المجموعات التي أنت فيها موجود هنا **\n\n"
+GROUPS_ADMINSTR = "**🝳 ⦙  قائمة المجموعات التي تكون مسؤولاً فيها هنا **\n\n"
+GROUPS_OWNERSTR = "**🝳 ⦙  قائمة المجموعات التي تمتلك فيها هنا **\n\n"
+INVALID_MEDIA = "**🝳 ⦙  إمتداد هذه الصورة غير صالح  ❌**"
+PP_CHANGED = "**🝳 ⦙  تم تغير صورة حسابك بنجاح  ✅**"
+PP_TOO_SMOL = "**🝳 ⦙  هذه الصورة صغيرة جدًا قم بإختيار صورة أخرى  ⚠️**"
+PP_ERROR = "**🝳 ⦙  حدث خطأ أثناء معالجة الصورة  ⚠️**"
+BIO_SUCCESS = "**🝳 ⦙  تم تغيير بايو حسابك بنجاح  ✅**"
+
+iqthonfont = gvarstatus("DEFAULT_PIC") or "Arab/sql_helper/IQTHONIMOGE.ttf"
+FONT_FILE_TO_USE = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+autopic_path = os.path.join(os.getcwd(), "Arab", "original_pic.png")
+digitalpic_path = os.path.join(os.getcwd(), "Arab", "digital_pic.png")
+autophoto_path = os.path.join(os.getcwd(), "Arab", "photo_pfp.png")
+EMOJI_TELETHON = gvarstatus("ALIVE_EMOJI") or " "
+OR_FOTOAUTO = gvarstatus("OR_FOTOAUTO") or "صوره وقتية"
+plagiarism = gvarstatus("OR_PLAG") or "انتحال"
+unplagiarism = gvarstatus("OR_UNPLAG") or "الغاء الانتحال"
+idee = gvarstatus("OR_ID") or "اييديي"
+OR_NAMEAUTO = gvarstatus("OR_NAMEAUTO") or "اسم وقتي"
+OR_AUTOBIO = gvarstatus("OR_AUTOBIO") or "نبذه وقتيه"
+AUTOGRCH = ""
+FONTGRCH1 = "1234567890"
+FONTGRCH2 = gvarstatus("FONTGRCH") or "𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫𝟢"
+NAME_OK = "**🝳 ⦙  تم تغيير اسم حسابك بنجاح  ✅**"
+USERNAME_SUCCESS = "**🝳 ⦙  تم تغيير معرّف حسابك بنجاح  ✅**"
+USERNAME_TAKEN = "**🝳 ⦙  هذا المعرّف مستخدم  ❌**"
+plugin_category = "tools"
+DEFAULTUSER = gvarstatus("FIRST_NAME") or ALIVE_NAME
+DEFAULTUSERBIO = gvarstatus("DEFAULT_BIO") or "الحمد الله"
+DEFAULTUSER = AUTONAME or Config.ALIVE_NAME
+LOGS = logging.getLogger(__name__)
+
+digitalpfp = (gvarstatus("AUTO_PIC") or "https://telegra.ph/file/6629cc2f43156292340a5.jpg")
 
 
-async def fetch_info(chat, event):  # sourcery no-metrics
-    # chat.chats is a list so we use get_entity() to avoid IndexError
-    chat_obj_info = await event.client.get_entity(chat.full_chat.id)
-    broadcast = (
-        chat_obj_info.broadcast if hasattr(chat_obj_info, "broadcast") else False
-    )
-    chat_type = "Channel" if broadcast else "Group"
-    chat_title = chat_obj_info.title
-    warn_emoji = emojize(":warning:")
-    try:
-        msg_info = await event.client(
-            GetHistoryRequest(
-                peer=chat_obj_info.id,
-                offset_id=0,
-                offset_date=datetime(2010, 1, 1),
-                add_offset=-1,
-                limit=1,
-                max_id=0,
-                min_id=0,
-                hash=0,
-            )
-        )
-    except Exception as e:
-        msg_info = None
-        LOGS.error(f"Exception: {str(e)}")
-   
-    first_msg_valid = bool(
-        msg_info and msg_info.messages and msg_info.messages[0].id == 1
-    )
-
-    
-    creator_valid = bool(first_msg_valid and msg_info.users)
-    creator_id = msg_info.users[0].id if creator_valid else None
-    creator_firstname = (
-        msg_info.users[0].first_name
-        if creator_valid and msg_info.users[0].first_name is not None
-        else "Deleted Account"
-    )
-    creator_username = (
-        msg_info.users[0].username
-        if creator_valid and msg_info.users[0].username is not None
-        else None
-    )
-    created = msg_info.messages[0].date if first_msg_valid else None
-    former_title = (
-        msg_info.messages[0].action.title
-        if first_msg_valid
-        and isinstance(msg_info.messages[0].action, MessageActionChannelMigrateFrom)
-        and msg_info.messages[0].action.title != chat_title
-        else None
-    )
-    try:
-        dc_id, location = get_input_location(chat.full_chat.chat_photo)
-    except Exception:
-        dc_id = "Unknown"
-
-    # this is some spaghetti I need to change
-    description = chat.full_chat.about
-    members = (
-        chat.full_chat.participants_count
-        if hasattr(chat.full_chat, "participants_count")
-        else chat_obj_info.participants_count
-    )
-    admins = (
-        chat.full_chat.admins_count if hasattr(chat.full_chat, "admins_count") else None
-    )
-    banned_users = (
-        chat.full_chat.kicked_count if hasattr(chat.full_chat, "kicked_count") else None
-    )
-    restrcited_users = (
-        chat.full_chat.banned_count if hasattr(chat.full_chat, "banned_count") else None
-    )
-    members_online = (
-        chat.full_chat.online_count if hasattr(chat.full_chat, "online_count") else 0
-    )
-    group_stickers = (
-        chat.full_chat.stickerset.title
-        if hasattr(chat.full_chat, "stickerset") and chat.full_chat.stickerset
-        else None
-    )
-    messages_viewable = msg_info.count if msg_info else None
-    messages_sent = (
-        chat.full_chat.read_inbox_max_id
-        if hasattr(chat.full_chat, "read_inbox_max_id")
-        else None
-    )
-    messages_sent_alt = (
-        chat.full_chat.read_outbox_max_id
-        if hasattr(chat.full_chat, "read_outbox_max_id")
-        else None
-    )
-    exp_count = chat.full_chat.pts if hasattr(chat.full_chat, "pts") else None
-    username = chat_obj_info.username if hasattr(chat_obj_info, "username") else None
-    bots_list = chat.full_chat.bot_info  # this is a list
-    bots = 0
-    supergroup = (
-        "<b>Yes</b>"
-        if hasattr(chat_obj_info, "megagroup") and chat_obj_info.megagroup
-        else "No"
-    )
-    slowmode = (
-        "<b>مـفعل</b>"
-        if hasattr(chat_obj_info, "slowmode_enabled") and chat_obj_info.slowmode_enabled
-        else "غير مفـعل"
-    )
-    slowmode_time = (
-        chat.full_chat.slowmode_seconds
-        if hasattr(chat_obj_info, "slowmode_enabled") and chat_obj_info.slowmode_enabled
-        else None
-    )
-    restricted = (
-        "<b>نـعم</b>"
-        if hasattr(chat_obj_info, "restricted") and chat_obj_info.restricted
-        else "لا"
-    )
-    verified = (
-        "<b>مـوثق</b>"
-        if hasattr(chat_obj_info, "verified") and chat_obj_info.verified
-        else "غيـر موثق"
-    )
-    username = "@{}".format(username) if username else None
-    creator_username = "@{}".format(creator_username) if creator_username else None
-    # end of spaghetti block
-
-    if admins is None:
-        # use this alternative way if chat.full_chat.admins_count is None,
-        # works even without being an admin
-        try:
-            participants_admins = await event.client(
-                GetParticipantsRequest(
-                    channel=chat.full_chat.id,
-                    filter=ChannelParticipantsAdmins(),
-                    offset=0,
-                    limit=0,
-                    hash=0,
-                )
-            )
-            admins = participants_admins.count if participants_admins else None
-        except Exception as e:
-            LOGS.error(f"Exception:{str(e)}")
-    if bots_list:
-        for _ in bots_list:
-            bots += 1  
-
-    caption = "<b>🝳 ⦙  معلومـات الدردشـة  🝢 :</b>\n"
-    caption += f"🝳 ⦙  الآيـدي  : <code>{chat_obj_info.id}</code>\n"
-    if chat_title is not None:
-        caption += f"🝳 ⦙  إسـم المجموعـة  :{chat_title}\n"
-    if former_title is not None:  # Meant is the very first title
-        caption += f"🝳 ⦙  الإسم السابـق  : {former_title}\n"
-    if username is not None:
-        caption += f"🝳 ⦙  نـوع المجموعـة ⌂ : مجموعـة عامّـة  \n"
-        caption += f"🝳 ⦙  الرابـط  : \n {username}\n"
-    else:
-        caption += f"🝳 ⦙   نـوع المجموعـة ⌂ : مجموعـة عامّـة  \n"
-    if creator_username is not None:
-        caption += f"🝳 ⦙   المالـك  :  {creator_username}\n"
-    elif creator_valid:
-        caption += ('🝳 ⦙   المالـك  : <a href="tg://user?id={creator_id}">{creator_firstname}</a>\n')
-    if created is not None:
-        caption += f"🝳 ⦙  تاريـخ الإنشـاء  : \n <code>{created.date().strftime('%b %d, %Y')} - {created.time()}</code>\n"
-    else:
-        caption += f"🝳 ⦙  الإنتـاج  :   <code>{chat_obj_info.date.date().strftime('%b %d, %Y')} - {chat_obj_info.date.time()}</code> {warn_emoji}\n"
-    caption += f"🝳 ⦙  آيـدي قاعـدة البيانـات : {dc_id}\n"
-    if exp_count is not None:
-        chat_level = int((1 + sqrt(1 + 7 * exp_count / 14)) / 2)
-        caption += f"🝳 ⦙  الأعضـاء : <code>{chat_level}</code>\n"
-    if messages_viewable is not None:
-        caption += f"🝳 ⦙  الرسائـل التي يمڪن مشاهدتها : <code>{messages_viewable}</code>\n"
-    if messages_sent:
-        caption += f"🝳 ⦙  الرسائـل المرسلـة  :<code>{messages_sent}</code>\n"
-    elif messages_sent_alt:
-        caption += f"🝳 ⦙  الرسـائل المرسلة: <code>{messages_sent_alt}</code> {warn_emoji}\n"
-    if members is not None:
-        caption += f"🝳 ⦙  الأعضـاء : <code>{members}</code>\n"
-    if admins is not None:
-        caption += f"🝳 ⦙  المشرفيـن : <code>{admins}</code>\n"
-    if bots_list:
-        caption += f"🝳 ⦙  البـوتات : <code>{bots}</code>\n"
-    if members_online:
-        caption += f"🝳 ⦙  المتصليـن حـالياً : <code>{members_online}</code>\n"
-    if restrcited_users is not None:
-        caption += f"🝳 ⦙  الأعضـاء المقيّديـن : <code>{restrcited_users}</code>\n"
-    if banned_users is not None:
-        caption += f"🝳 ⦙  الأعضـاء المحظوريـن : <code>{banned_users}</code>"
-    if group_stickers is not None:
-        caption += f'{chat_type} 🝳 ⦙  الملصقـات : <a href="t.me/addstickers/{chat.full_chat.stickerset.short_name}">{group_stickers}</a>'
-    caption += "\n"
-    if not broadcast:
-        caption += f"🝳 ⦙  الوضـع البطيئ : {slowmode}"
-        if (
-            hasattr(chat_obj_info, "slowmode_enabled")
-            and chat_obj_info.slowmode_enabled):
-            caption += f", <code>{slowmode_time}s</code>\n"
-        else:
-            caption += "\n"
-        caption += f"🝳 ⦙  الـمجموعـة الخارقـة  : {supergroup}\n"
-    if hasattr(chat_obj_info, "restricted"):
-        caption += f"🝳 ⦙  المقيّـد : {restricted}"
-        if chat_obj_info.restricted:
-            caption += f"> : {chat_obj_info.restriction_reason[0].platform}\n"
-            caption += f"> 🝳 ⦙  السـبب  : {chat_obj_info.restriction_reason[0].reason}\n"
-            caption += f"> 🝳 ⦙  النّـص  : {chat_obj_info.restriction_reason[0].text}\n\n"
-        else:
-            caption += "\n"
-    if hasattr(chat_obj_info, "scam") and chat_obj_info.scam:
-        caption += "🝳 ⦙  السارقيـن : <b>Yes</b>\n"
-    if hasattr(chat_obj_info, "verified"):
-        caption += f"🝳 ⦙  الحسابـات الموثقـة   : {verified}\n"
-    if description:
-        caption += f"🝳 ⦙  الوصـف  : \n<code>{description}</code>\n"
-    return caption
-
-@iqthon.on(admin_cmd(pattern=f"{addition} ?(.*)"))
-async def iq(event):
-    sender = await event.get_sender()
-    me = await event.client.get_me()
-    if not sender.id == me.id:
-        kno = await event.reply("**🝳 ⦙   تتـم العـملية انتظـࢪ قليلا ..**")
-    else:
-        kno = await event.edit("**🝳 ⦙   تتـم العـملية انتظـࢪ قليلا ..**.")
-    IQTHON = await get_chatinfo(event)
-    chat = await event.get_chat()
-    if event.is_private:
-        return await kno.edit("**🝳 ⦙   لا يمكننـي اضافـة المـستخدمين هـنا**")
-    s = 0
-    f = 0
-    error = "None"
-
-    await kno.edit("**🝳 ⦙   حـالة الأضافة:**\n\n**🝳 ⦙   تتـم جـمع معـلومات الـمستخدمين 🔄 ...⏣**")
-    async for user in event.client.iter_participants(IQTHON.full_chat.id):
-        try:
-            if error.startswith("Too"):
-                return (
-                    await kno.edit(
-                        f"**🝳 ⦙   حـالة الأضـافة انتـهت مـع الأخـطاء**\n- (**ربـما هـنالك ضغـط عـلى الأمر حاول مجـدا لاحقـا **) \n**🝳 ⦙   الـخطأ ** : \n`{error}`\n\n🝳 ⦙   اضالـة `{s}` \n🝳 ⦙   خـطأ بأضافـة `{f}`"
-                    ),
-                )
-            await event.client(
-                functions.channels.InviteToChannelRequest(channel=chat, users=[user.id])
-            )
-            s = s + 1
-            await kno.edit(f"**🝳 ⦙   تتـم الأضـافة :**\n\n🝳 ⦙   اضـيف `{s}` \n🝳 ⦙    خـطأ بأضافـة `{f}` \n\n**🝳 ⦙   × اخـر خـطأ:** `{error}`")
-        except Exception as e:
-            error = str(e)
-            f = f + 1
-    return await kno.edit(f"**🝳 ⦙   اڪتـملت الأضافـة ✅** : \n\n🝳 ⦙   تـم بنجـاح اضافـة `{s}` \n🝳 ⦙   خـطأ بأضافـة `{f}`")
-    
-@iqthon.on(admin_cmd(pattern=f"{TFLASH}(.*)"))
-async def _(event):
-    result = await event.client(functions.channels.GetParticipantRequest(event.chat_id, event.client.uid))
-    if not result:
-        return await edit_or_reply(event, "**🝳 ⦙   ليس لديك صلاحيه حظر في هذا الدردشة**")
-    iqthonevent = await edit_or_reply(event, "**🝳 ⦙  جاري تفليش مجموعتك أنتظر قليلآ 🚮**")
-    admins = await event.client.get_participants(event.chat_id, filter=ChannelParticipantsAdmins)
-    admins_id = [i.id for i in admins]
-    total = 0
-    success = 0
-    async for user in event.client.iter_participants(event.chat_id):
-        total += 1
-        try:
-            if user.id not in admins_id:
-                await event.client(EditBannedRequest(event.chat_id, user.id, KLANR_RIGHTS))
-                success += 15
-                await sleep(0.2)  
-        except Exception as e:
-            LOGS.info(str(e))
-    await iqthonevent.edit(f"**🝳 ⦙   تم بنجاح تفليش مجموعتك من {total} الاعضاء 🚮**")
-    
-async def ban_user(chat_id, i, rights):
-    try:
-        await iqthon(functions.channels.EditBannedRequest(chat_id, i, rights))
-        return True, None
-    except Exception as exc:
-        return False, str(exc)
-
-
-@iqthon.on(admin_cmd(pattern=f"{LEFT}(.*)"))
-async def kickme(leave):
-    await leave.edit("**🝳 ⦙   جـاري مـغادرة المجـموعة مـع السـلامة  🚶‍♂️  ..**")
-    await leave.client.kick_participant(leave.chat_id, "me")
-
-@iqthon.on(admin_cmd(pattern=f"{REMOVEBAN}(.*)"))
-async def _(event):
-    catevent = await edit_or_reply(event, "**🝳 ⦙    إلغاء حظر جميع الحسابات المحظورة في هذه المجموعة 🆘**")
-    succ = 0
-    total = 0
-    flag = False
-    chat = await event.get_chat()
-    async for i in event.client.iter_participants(event.chat_id, filter=ChannelParticipantsKicked, aggressive=True):
-        total += 1
-        rights = ChatBannedRights(until_date=0, view_messages=False)
-        try:
-            await event.client(functions.channels.EditBannedRequest(event.chat_id, i, rights))
-        except FloodWaitError as e:
-            LOGS.warn(f"**🝳 ⦙   هناك ضغط كبير بالاستخدام يرجى الانتضار .. ‼️ بسبب  : {e.seconds} **")
-            await catevent.edit(f"**🝳 ⦙   {readable_time(e.seconds)} مطلـوب المـعاودة مـرة اخـرى للـمسح 🔁 **")
-            await sleep(e.seconds + 5)
-        except Exception as ex:
-            await catevent.edit(str(ex))
-        else:
-            succ += 1
-            if flag:
-                await sleep(2)
-            else:
-                await sleep(1)
-            try:
-                if succ % 10 == 0:
-                    await catevent.edit(f"**🝳 ⦙   جـاري مسـح المحـظورين ⭕️  : \n {succ} الحسـابات الـتي غيـر محظـورة لحـد الان.**")
-            except MessageNotModifiedError:
+async def digitalpicloop():
+    DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
+    i = 0
+    while DIGITALPICSTART:
+        if not os.path.exists(digitalpic_path):
+            digitalpfp = gvarstatus("AUTO_PIC")
+            downloader = SmartDL(digitalpfp, digitalpic_path, progress_bar=False)
+            downloader.start(blocking=False)
+            while not downloader.isFinished():
                 pass
-    await catevent.edit(f"**🝳 ⦙   تـم مسـح المحـظورين مـن أصـل 🆘 :**{succ}/{total} \n اسـم المجـموعـة 📄 : {chat.title}")
+        shutil.copy(digitalpic_path, autophoto_path)
+        Image.open(autophoto_path)
+        current_time = datetime.now().strftime("%I:%M")
+        img = Image.open(autophoto_path)
+        drawn_text = ImageDraw.Draw(img)
+        fnt = ImageFont.truetype(f"{iqthonfont}", 200)
+        drawn_text.text((300, 400), current_time, font=fnt, fill=(255, 255, 255))
+        img.save(autophoto_path)
+        file = await iqthon.upload_file(autophoto_path)
+        try:
+            if i > 0:
+                await iqthon(
+                    functions.photos.DeletePhotosRequest(
+                        await iqthon.get_profile_photos("me", limit=1)
+                    )
+                )
+            i += 1
+            await iqthon(functions.photos.UploadProfilePhotoRequest(file))
+            os.remove(autophoto_path)
+            await asyncio.sleep(60)
+        except BaseException:
+            return
+        DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
 
-@iqthon.on(admin_cmd(pattern=f"المحذوفين ?([\s\S]*)"))
-async def rm_deletedacc(show):
-    con = show.pattern_match.group(1).lower()
-    del_u = 0
-    del_status = "**🝳 ⦙  لا توجـد حـسابات محذوفـة في هـذه المجموعـة !**"
-    if con != "تنظيف":
-        event = await edit_or_reply(show, "**🝳 ⦙  جـاري البحـث عـن الحسابـات المحذوفـة ⌯**")
-        async for user in show.client.iter_participants(show.chat_id):
-            if user.deleted:
-                del_u += 1
-                await sleep(0.5)
-        if del_u > 0:
-            del_status = f"**🝳 ⦙  لقد وجـدت  {del_u}  من  حسابـات محذوفـة في هـذه المجموعـة لحذفهـم إستخـدم الأمـر  ⩥ :  `.المحذوفين تنظيف`"
-        await event.edit(del_status)
-        return
-    chat = await show.get_chat()
-    admin = chat.admin_rights
-    creator = chat.creator
-    if not admin and not creator:
-        await edit_delete(show, "🝳 ⦙  أنـا لسـت مشـرفـاً هنـا !", 5)
-        return
-    event = await edit_or_reply(show, "**🝳 ⦙  جـاري حـذف الحسـابات المحذوفـة ⌯**")
-    del_u = 0
-    del_a = 0
-    async for user in show.client.iter_participants(show.chat_id):
-        if user.deleted:
-            try:
-                await show.client.kick_participant(show.chat_id, user.id)
-                await sleep(0.5)
-                del_u += 1
-            except ChatAdminRequiredError:
-                await edit_delete(event, "**🝳 ⦙    ليس لدي صلاحيات الحظر هنا**", 5)
-                return
-            except UserAdminInvalidError:
-                del_a += 1
-    if del_u > 0:
-        del_status = f"**🝳 ⦙  تـم حـذف  {del_u}  الحسـابات المحذوفـة ✓**"
-    if del_a > 0:
-        del_status = f"**🝳 ⦙  تـم حـذف {del_u} الحسـابات المحذوفـة، ولڪـن لـم يتـم حذف الحسـابات المحذوفـة للمشرفيـن !**"
-    await edit_delete(event, del_status, 5)
-    if BOTLOG:
-        await show.client.send_message(
-            BOTLOG_CHATID,
-            f"**🝳 ⦙  تنظيف :**\
-            \n🝳 ⦙   {del_status}\
-            \n*🝳 ⦙  المحادثـة ⌂** {show.chat.title}(`{show.chat_id}`)",
-        )
 
-@iqthon.on(admin_cmd(pattern=r"احصائيات الاعضاء ?([\s\S]*)"))
-async def _(event):  # sourcery no-metrics
-    input_str = event.pattern_match.group(1)
-    if input_str:
-        chat = await event.get_chat()
-        if not chat.admin_rights and not chat.creator:
-            await edit_or_reply(event, "**🝳 ⦙   انت لست مشرف هنا**")
-            return False
-    p = 0
-    b = 0
-    c = 0
-    d = 0
-    e = []
-    m = 0
-    n = 0
-    y = 0
-    w = 0
-    o = 0
-    q = 0
-    r = 0
-    et = await edit_or_reply(event, "**🝳 ⦙   جـاري البحـث عـن قوائـم المشارڪيـن ⌯**")
-    async for i in event.client.iter_participants(event.chat_id):
-        p += 1
-        rights = ChatBannedRights(until_date=None, view_messages=True)
-        if isinstance(i.status, UserStatusEmpty):
-            y += 1
-            if "y" in input_str:
-                status, e = await ban_user(event.chat_id, i, rights)
-                if status:
-                    c += 1
-                else:
-                    await et.edit("**🝳 ⦙  أحتـاج إلى صلاحيـات المشـرف لإجـراء هـذا الأمـر !**")
-                    e.append(str(e))
-                    break
-        if isinstance(i.status, UserStatusLastMonth):
-            m += 1
-            if "m" in input_str:
-                status, e = await ban_user(event.chat_id, i, rights)
-                if status:
-                    c += 1
-                else:
-                    await et.edit("**🝳 ⦙  أحتـاج إلى صلاحيـات المشـرف لإجـراء هـذا الأمـر !**")
-                    e.append(str(e))
-                    break
-        if isinstance(i.status, UserStatusLastWeek):
-            w += 1
-            if "w" in input_str:
-                status, e = await ban_user(event.chat_id, i, rights)
-                if status:
-                    c += 1
-                else:
-                    await et.edit("**🝳 ⦙  أحتـاج إلى صلاحيـات المشـرف لإجـراء هـذا الأمـر !**")
-                    e.append(str(e))
-                    break
-        if isinstance(i.status, UserStatusOffline):
-            o += 1
-            if "o" in input_str:
-                status, e = await ban_user(event.chat_id, i, rights)
-                if not status:
-                    await et.edit("**🝳 ⦙  أحتـاج إلى صلاحيـات المشـرف لإجـراء هـذا الأمـر !**")
-                    e.append(str(e))
-                    break
-                else:
-                    c += 1
-        if isinstance(i.status, UserStatusOnline):
-            q += 1
-            if "q" in input_str:
-                status, e = await ban_user(event.chat_id, i, rights)
-                if not status:
-                    await et.edit("**🝳 ⦙  أحتـاج إلى صلاحيـات المشـرف لإجـراء هـذا الأمـر !**")
-                    e.append(str(e))
-                    break
-                else:
-                    c += 1
-        if isinstance(i.status, UserStatusRecently):
-            r += 1
-            if "r" in input_str:
-                status, e = await ban_user(event.chat_id, i, rights)
-                if status:
-                    c += 1
-                else:
-                    await et.edit("**🝳 ⦙  أحتـاج إلى صلاحيـات المشـرف لإجـراء هـذا الأمـر !**")
-                    e.append(str(e))
-                    break
-        if i.bot:
-            b += 1
-            if "b" in input_str:
-                status, e = await ban_user(event.chat_id, i, rights)
-                if not status:
-                    await et.edit("**🝳 ⦙   احتاج الى صلاحيات المشرفين للقيام بهذا الامر **")
-                    e.append(str(e))
-                    break
-                else:
-                    c += 1
-        elif i.deleted:
-            d += 1
-            if "d" in input_str:
-                status, e = await ban_user(event.chat_id, i, rights)
-                if status:
-                    c += 1
-                else:
-                    await et.edit("**🝳 ⦙  أحتـاج إلى صلاحيـات المشـرف لإجـراء هـذا الأمـر !**")
-                    e.append(str(e))
-        elif i.status is None:
-            n += 1
-    if input_str:
-        required_string = """**🝳 ⦙   الـمطرودين {} / {} الأعـضاء
-🝳 ⦙   الحـسابـات المـحذوفة: {}
-🝳 ⦙   حـالة المستـخدم الفـارغه: {}
-🝳 ⦙   اخر ظهور منذ شـهر: {}
-🝳 ⦙   اخر ظـهور منـذ اسبوع: {}
-🝳 ⦙   غير متصل: {}
-🝳 ⦙   المستخدمين النشطون: {}
-🝳 ⦙   اخر ظهور قبل قليل: {}
-🝳 ⦙   البوتات: {}
-🝳 ⦙   مـلاحظة: {}**"""
-        await et.edit(required_string.format(c, p, d, y, m, w, o, q, r, b, n))
-        await sleep(5)
-    await et.edit(
-"""**🝳 ⦙   : {} مـجموع المـستخدمين
-🝳 ⦙   الحـسابـات المـحذوفة: {}
-🝳 ⦙   حـالة المستـخدم الفـارغه: {}
-🝳 ⦙   اخر ظهور منذ شـهر: {}
-🝳 ⦙   اخر ظـهور منـذ اسبوع: {}
-🝳 ⦙   غير متصل: {}
-🝳 ⦙   المستخدمين النشطون: {}
-🝳 ⦙   اخر ظهور قبل قليل: {}
-🝳 ⦙   البوتات: {}
-🝳 ⦙   مـلاحظة: {} **""".format(            p, d, y, m, w, o, q, r, b, n        )    )    
 
-def weird_division(n, d):
-    return n / d if d else 0
-@iqthon.iq_cmd(incoming=True)
-async def _(event):
-    if event.is_private:
+
+
+async def runcmd(cmd: str) -> Tuple[str, str, int, int]:
+    args = shlex.split(cmd)
+    process = await asyncio.create_subprocess_exec(        *args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE    )
+    stdout, stderr = await process.communicate()
+    return (        stdout.decode("utf-8", "replace").strip(),        stderr.decode("utf-8", "replace").strip(),        process.returncode,        process.pid,    )    
+async def add_frame(imagefile, endname, x, color):
+    image = Image.open(imagefile)
+    inverted_image = PIL.ImageOps.expand(image, border=x, fill=color)
+    inverted_image.save(endname)
+async def crop(imagefile, endname, x):
+    image = Image.open(imagefile)
+    inverted_image = PIL.ImageOps.crop(image, border=x)
+    inverted_image.save(endname)
+@iqthon.on(admin_cmd(pattern="احصائيات حسابي(?: |$)(.*)"))
+async def stats(event):  
+    cat = await edit_or_reply(event, STAT_INDICATION)
+    start_time = time.time()
+    private_chats = 0
+    bots = 0
+    groups = 0
+    broadcast_channels = 0
+    admin_in_groups = 0
+    creator_in_groups = 0
+    admin_in_broadcast_channels = 0
+    creator_in_channels = 0
+    unread_mentions = 0
+    unread = 0
+    dialog: Dialog
+    async for dialog in event.client.iter_dialogs():
+        entity = dialog.entity
+        if isinstance(entity, Channel) and entity.broadcast:
+            broadcast_channels += 1
+            if entity.creator or entity.admin_rights:
+                admin_in_broadcast_channels += 1
+            if entity.creator:
+                creator_in_channels += 1
+        elif (
+            isinstance(entity, Channel)
+            and entity.megagroup
+            or not isinstance(entity, Channel)
+            and not isinstance(entity, User)
+            and isinstance(entity, Chat)
+        ):
+            groups += 1
+            if entity.creator or entity.admin_rights:
+                admin_in_groups += 1
+            if entity.creator:
+                creator_in_groups += 1
+        elif not isinstance(entity, Channel) and isinstance(entity, User):
+            private_chats += 1
+            if entity.bot:
+                bots += 1
+        unread_mentions += dialog.unread_mentions_count
+        unread += dialog.unread_count
+    stop_time = time.time() - start_time
+    full_name = inline_mention(await event.client.get_me())
+    response = f"📌 **• ⚜️ |  احصائيات حسـابك العـامة لـ {full_name} 📊** \n"
+    response += f"**🝳 ⦙  الدردشات الخاصة 🏷️  :** {private_chats} \n"
+    response += f"**🝳 ⦙   الاشـخاص 🚹 : {private_chats - bots}` \n"
+    response += f"**🝳 ⦙   الـبوتـات 🤖 : {bots}` **\n"
+    response += f"**🝳 ⦙   عـدد المجـموعـات 🚻 :** `{groups}` \n"
+    response += f"**🝳 ⦙   عـدد القنـوات  🚻 :** `{broadcast_channels}` \n"
+    response += f"**🝳 ⦙   عـدد المجـموعات التـي تكـون فيها ادمـن  🛂 :** `{admin_in_groups}` \n"
+    response += f"**🝳 ⦙   عـدد المجموعات التـي أنـشأتـها  🛃** : `{creator_in_groups}` \n"
+    response += f"**🝳 ⦙   عـدد القنوات التـي تكـون فيها ادمـن 📶 : `{admin_in_broadcast_channels}` **\n"
+    response += f"**🝳 ⦙   حقوق المسؤول في القنوات  🛂 : `{admin_in_broadcast_channels - creator_in_channels}` **\n"
+    response += f"**عـدد المحـادثـات الغيـر مقـروء 📄 :** {unread} \n"
+    response += f"**عـدد الـتاكـات الغيـر مقـروء 📌 :** {unread_mentions} \n"
+    response += f"**🝳 ⦙   استغرق الأمر  🔍  :** `{stop_time:.02f}` ثانيه \n"
+    await cat.edit(response)
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص1$"))
+async def iqvois(vois):
+    if vois.fwd_from:
         return
-    chat_id = str(event.chat_id).replace("-100", "")
-    channels_set  = get_all_post(chat_id)
-    if channels_set == []:
+    Ti = await rd(vois)
+    if iqvois1:
+        await vois.client.send_file(vois.chat_id, iqvois1, reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص2$"))
+async def iqvois(vois):
+    if vois.fwd_from:
         return
-    for chat in channels_set:
-        if event.media:
-            await event.client.send_file(int(chat), event.media, caption=event.text)
-        elif not event.media:
-            await bot.send_message(int(chat), event.message)
-@iqthon.on(admin_cmd(pattern="تقيد(?:\s|$)([\s\S]*)",))
-async def endmute(event):
-    user, reason = await get_user_from_event(event)
-    if not user:
+    Ti = await rd(vois)
+    if iqvois2:
+        await vois.client.send_file(vois.chat_id, iqvois2, reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص3$"))
+async def iqvois(vois):
+    if vois.fwd_from:
         return
-    catevent = await edit_or_reply(event, "جاري تقيد الشخص ...")
-    try:
-        await event.client.kick_participant(event.chat_id, user.id)
-    except Exception as e:
-        return await catevent.edit(NO_PERM + f"\n{e}")
-    if reason:
-        await catevent.edit(            f"تم تقيد الشخص : [{user.first_name}](tg://user?id={user.id}) "        )
+    Ti = await rd(vois)
+    if iqvois3:
+        await vois.client.send_file(vois.chat_id, iqvois3, reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="اطار ?(.*)"))
+async def memes(mafia):
+    reply = await mafia.get_reply_message()
+    if not (reply and (reply.media)):
+        await edit_or_reply(mafia, "الرد على الوسائط المدعومة")
+        return
+    mafiainput = mafia.pattern_match.group(1)
+    if not mafiainput:
+        mafiainput = 50
+    if ";" in str(mafiainput):
+        mafiainput, colr = mafiainput.split(";", 1)
     else:
-        await catevent.edit(f"تم تقيد الشخص : [{user.first_name}](tg://user?id={user.id}) ")
-    if BOTLOG:
-        await event.client.send_message(            BOTLOG_CHATID,            "#التقيد\n"            f"الشخص : [{user.first_name}](tg://user?id={user.id})\n"            f"المحادثه : {get_display_name(await event.get_chat())}(`{event.chat_id}`)\n",        )
-@iqthon.iq_cmd(pattern="اكتم(?:\s|$)([\s\S]*)",)
-async def tmuter(event):  # sourcery no-metrics
-    catevent = await edit_or_reply(event, "**🝳 ⦙ جاري كتمه مؤقتا ....**")
-    user, reason = await get_user_from_event(event, catevent)
-    if not user:
+        colr = 0
+    mafiainput = int(mafiainput)
+    colr = int(colr)
+    mafiaid = mafia.reply_to_msg_id
+    if not os.path.isdir("./temp/"):
+        os.mkdir("./temp/")
+    mafia = await edit_or_reply(mafia, "تحليل هذه الوسائط")
+    from telethon.tl.functions.messages import ImportChatInviteRequest as Get
+
+    await asyncio.sleep(2)
+    mafiasticker = await reply.download_media(file="./temp/")
+    if not mafiasticker.endswith((".mp4", ".webp", ".tgs", ".png", ".jpg", ".mov")):
+        os.remove(mafiasticker)
+        await edit_or_reply(mafia, "الوسائط المدعومة غير موجودة")
         return
-    if not reason:
-        return await catevent.edit("**🝳 ⦙ رجاء طريقه كتابه الامر خاطئه قم بروئيه قناه شروحات الاوامر : @l3ll3**")
-    reason = reason.split(" ", 1)
-    hmm = len(reason)
-    cattime = reason[0].strip()
-    reason = "".join(reason[1:]) if hmm > 1 else None
-    ctime = await extract_time(catevent, cattime)
-    if not ctime:
-        return
-    if user.id == event.client.uid:
-        return await catevent.edit("عذرا لايمكنني كتم نفسي")
+    import base64
+
+    kraken = None
+    if mafiasticker.endswith(".tgs"):
+        await mafia.edit(            "تحليل هذه الوسائط!"        )
+        mafiafile = os.path.join("./temp/", "meme.png")
+        mafiacmd = (            f"lottie_convert.py --frame 0 -if lottie -of png {mafiasticker} {mafiafile}"        )
+        stdout, stderr = (await runcmd(mafiacmd))[:2]
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            LOGS.info(stdout + stderr)
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith(".webp"):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐!"        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        os.rename(mafiasticker, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            return
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith((".mp4", ".mov")):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐!"        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        await take_screen_shot(mafiasticker, 0, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            return
+        meme_file = mafiafile
+    else:
+        await mafia.edit(            "تحليل هذه الوسائط 🧐"        )
+        meme_file = mafiasticker
     try:
-        await catevent.client(            EditBannedRequest(                event.chat_id,                user.id,                ChatBannedRights(until_date=ctime, send_messages=True),            )        )
-        if reason:
-            await catevent.edit(
-                f"{_format.mentionuser(user.first_name ,user.id)} في مكتوم مؤقتا  :\n {get_display_name(await event.get_chat())}\n"
-                f"**كتم مؤقت ل : **{cattime}\n"
-                f"**السبب : **__{reason}__"
-            )
-            if BOTLOG:
-                await event.client.send_message(
-                    BOTLOG_CHATID,
-                    "#كتم مؤقت\n"
-                    f"**الشخص : **[{user.first_name}](tg://user?id={user.id})\n"
-                    f"**المحادثه : **{get_display_name(await event.get_chat())}(`{event.chat_id}`)\n"
-                    f"**كتم مؤقت ل : **`{cattime}`\n"
-                    f"**السبب : **`{reason}``",
-                )
-        else:
-            await catevent.edit(
-                f"{_format.mentionuser(user.first_name ,user.id)} في مكتوم مؤقتا  :\n  {get_display_name(await event.get_chat())}\n"
-                f"كتم مؤقت ل : {cattime}\n"
-            )
-            if BOTLOG:
-                await event.client.send_message(
-                    BOTLOG_CHATID,
-                    "#كتم مؤقت\n"
-                    f"**الشخص : **[{user.first_name}](tg://user?id={user.id})\n"
-                    f"**المحادثه : **{get_display_name(await event.get_chat())}(`{event.chat_id}`)\n"
-                    f"**كتم مؤقت ل : **`{cattime}`",
-                )
-        # Announce to logging group
-    except UserIdInvalidError:
-        return await catevent.edit("🝳 ⦙  أنك لست مسؤولاً  فتأكد ان لديك صلاحيه حذف الرسائل")
-    except UserAdminInvalidError:
-        return await catevent.edit(
-            "🝳 ⦙  أنك لست مسؤولاً  فتأكد ان لديك صلاحيه حذف الرسائل"
-        )
+        san = base64.b64decode("QUFBQUFGRV9vWjVYVE5fUnVaaEtOdw==")
+        san = Get(san)
+        await mafia.client(san)
+    except BaseException:
+        pass
+    meme_file = convert_toimage(meme_file)
+    outputfile = "framed.webp" if kraken else "framed.jpg"
+    try:
+        await add_frame(meme_file, outputfile, mafiainput, colr)
     except Exception as e:
-        return await catevent.edit(f"`{e}`")
+        return await mafia.edit(f"`{e}`")
+    try:
+        await mafia.client.send_file(            mafia.chat_id, outputfile, force_document=False, reply_to=mafiaid        )
+    except Exception as e:
+        return await mafia.edit(f"`{e}`")
+    await mafia.delete()
+    os.remove(outputfile)
+    for files in (mafiasticker, meme_file):
+        if files and os.path.exists(files):
+            os.remove(files)
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص4$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois4:
+        await vois.client.send_file(vois.chat_id, iqvois4, reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="قلب الصوره$"))
+async def memes(mafia):
+    reply = await mafia.get_reply_message()
+    if not (reply and (reply.media)):
+        await edit_or_reply(mafia, "الرد على الوسائط المدعومة")
+        return
+    mafiaid = mafia.reply_to_msg_id
+    if not os.path.isdir("./temp/"):
+        os.mkdir("./temp/")
+    mafia = await edit_or_reply(mafia, "إحضار بيانات الوسائط")
+    from telethon.tl.functions.messages import ImportChatInviteRequest as Get
+
+    await asyncio.sleep(2)
+    mafiasticker = await reply.download_media(file="./temp/")
+    if not mafiasticker.endswith((".mp4", ".webp", ".tgs", ".png", ".jpg", ".mov")):
+        os.remove(mafiasticker)
+        await edit_or_reply(mafia, "الوسائط المدعومة غير موجودة")
+        return
+    import base64
+
+    kraken = None
+    if mafiasticker.endswith(".tgs"):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐"        )
+        mafiafile = os.path.join("./temp/", "meme.png")
+        mafiacmd = (            f"lottie_convert.py --frame 0 -if lottie -of png {mafiasticker} {mafiafile}"        )
+        stdout, stderr = (await runcmd(mafiacmd))[:2]
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            LOGS.info(stdout + stderr)
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith(".webp"):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐"        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        os.rename(mafiasticker, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("`Template not found... `")
+            return
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith((".mp4", ".mov")):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐"        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        await take_screen_shot(mafiasticker, 0, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            return
+        meme_file = mafiafile
+        kraken = True
+    else:
+        await mafia.edit(            "تحليل هذه الوسائط 🧐"        )
+        meme_file = mafiasticker
+    try:
+        san = base64.b64decode("QUFBQUFGRV9vWjVYVE5fUnVaaEtOdw==")
+        san = Get(san)
+        await mafia.client(san)
+    except BaseException:
+        pass
+    meme_file = convert_toimage(meme_file)
+    outputfile = "flip_image.webp" if kraken else "flip_image.jpg"
+    await flip_image(meme_file, outputfile)
+    await mafia.client.send_file(        mafia.chat_id, outputfile, force_document=False, reply_to=mafiaid    )
+    await mafia.delete()
+    os.remove(outputfile)
+    for files in (mafiasticker, meme_file):
+        if files and os.path.exists(files):
+            os.remove(files)
 
 
-@iqthon.on(admin_cmd(pattern=r"احظر(?:\s|$)([\s\S]*)",))
-async def tban(event):  # sourcery no-metrics
-    catevent = await edit_or_reply(event, "**🝳 ⦙ جاري حظر الشخص مؤقتا .... **")
-    user, reason = await get_user_from_event(event, catevent)
-    if not user:
+@iqthon.on(admin_cmd(outgoing=True, pattern="فلتر رصاصي$"))
+async def memes(mafia):
+    reply = await mafia.get_reply_message()
+    if not (reply and (reply.media)):
+        await edit_or_reply(mafia, "الرد على الوسائط المدعومة")
         return
-    if not reason:
-        return await catevent.edit("🝳 ⦙ رجاء طريقه كتابه الامر خاطئه قم بروئيه قناه شروحات الاوامر : @l3ll3")
-    reason = reason.split(" ", 1)
-    hmm = len(reason)
-    cattime = reason[0].strip()
-    reason = "".join(reason[1:]) if hmm > 1 else None
-    ctime = await extract_time(catevent, cattime)
-    if not ctime:
+    mafiaid = mafia.reply_to_msg_id
+    if not os.path.isdir("./temp/"):
+        os.mkdir("./temp/")
+    mafia = await edit_or_reply(mafia, "إحضار بيانات الوسائط")
+    from telethon.tl.functions.messages import ImportChatInviteRequest as Get
+
+    await asyncio.sleep(2)
+    mafiasticker = await reply.download_media(file="./temp/")
+    if not mafiasticker.endswith((".mp4", ".webp", ".tgs", ".png", ".jpg", ".mov")):
+        os.remove(mafiasticker)
+        await edit_or_reply(mafia, "الوسائط المدعومة غير موجودة")
         return
-    if user.id == event.client.uid:
-        return await catevent.edit("🝳 ⦙ عذرا لايمكنني حظر نفسي")
-    await catevent.edit("!")
+    import base64
+
+    kraken = None
+    if mafiasticker.endswith(".tgs"):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐"        )
+        mafiafile = os.path.join("./temp/", "meme.png")
+        mafiacmd = (            f"lottie_convert.py --frame 0 -if lottie -of png {mafiasticker} {mafiafile}"        )
+        stdout, stderr = (await runcmd(mafiacmd))[:2]
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            LOGS.info(stdout + stderr)
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith(".webp"):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐!"        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        os.rename(mafiasticker, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            return
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith((".mp4", ".mov")):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐!"        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        await take_screen_shot(mafiasticker, 0, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            return
+        meme_file = mafiafile
+        kraken = True
+    else:
+        await mafia.edit(            "تحليل هذه الوسائط 🧐!"        )
+        meme_file = mafiasticker
+    try:
+        san = base64.b64decode("QUFBQUFGRV9vWjVYVE5fUnVaaEtOdw==")
+        san = Get(san)
+        await mafia.client(san)
+    except BaseException:
+        pass
+    meme_file = convert_toimage(meme_file)
+    outputfile = "grayscale.webp" if kraken else "grayscale.jpg"
+    await grayscale(meme_file, outputfile)
+    await mafia.client.send_file(        mafia.chat_id, outputfile, force_document=False, reply_to=mafiaid    )
+    await mafia.delete()
+    os.remove(outputfile)
+    for files in (mafiasticker, meme_file):
+        if files and os.path.exists(files):
+            os.remove(files)
+@iqthon.on(events.NewMessage(outgoing=True, pattern='.فك المحظورين'))
+async def UnBlockList(event):
+
+    # GET BLOCKED USERS LIST
+    list = await iqthon(GetBlockedRequest(offset=0, limit=1000000))
+
+    if len(list.blocked) == 0 :
+        order_reply = await event.edit(f'[ ! ] **لم تقم بحظر أي شخص أصلا**')
+    else :
+
+        unblocked_count = 1
+        for user in list.blocked :
+
+            # UNBLOCK > USER OR BOT
+            UnBlock = await iqthon(UnblockRequest(id=int(user.peer_id.user_id)))
+            unblocked_count += 1
+
+            order_reply = await event.edit(f'[ ~ ] **جاري .فك المحظورين من حسابك** {round((unblocked_count * 100) / len(list.blocked), 2)}%')
+
+
+        unblocked_count = 1
+        order_reply = await event.edit(f'[ ! ] **تم .فك المحظورين من حسابك يرجى الأنتظار دقائق في حالة تبقى عدد قليل من المحظورين ويرجى الأنتباة هذا الأمر يسبب تعليق في حسابك في حالة أكثرت في أستعمال الأمر ** : {len(list.blocked)}\n\n[ + ] **فك المحظورين أكتمل.**')
+c = requests.session()
+milerbot = '@t06bot'
+iqklanr = ['yes']
+@iqthon.on(admin_cmd(outgoing=True, pattern="زوم ?(.*)"))
+async def memes(mafia):
+    reply = await mafia.get_reply_message()
+    if not (reply and (reply.media)):
+        await edit_or_reply(mafia, "الرد على الوسائط المدعومة")
+        return
+    mafiainput = mafia.pattern_match.group(1)
+    mafiainput = 50 if not mafiainput else int(mafiainput)
+    mafiaid = mafia.reply_to_msg_id
+    if not os.path.isdir("./temp/"):
+        os.mkdir("./temp/")
+    mafia = await edit_or_reply(mafia, "تحليل هذه الوسائط")
+    from telethon.tl.functions.messages import ImportChatInviteRequest as Get
+
+    await asyncio.sleep(2)
+    mafiasticker = await reply.download_media(file="./temp/")
+    if not mafiasticker.endswith((".mp4", ".webp", ".tgs", ".png", ".jpg", ".mov")):
+        os.remove(mafiasticker)
+        await edit_or_reply(mafia, "القالب غير موجود")
+        return
+    import base64
+
+    kraken = None
+    if mafiasticker.endswith(".tgs"):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐"        )
+        mafiafile = os.path.join("./temp/", "meme.png")
+        mafiacmd = (            f"lottie_convert.py --frame 0 -if lottie -of png {mafiasticker} {mafiafile}"        )
+        stdout, stderr = (await runcmd(mafiacmd))[:2]
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            LOGS.info(stdout + stderr)
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith(".webp"):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐"        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        os.rename(mafiasticker, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            return
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith((".mp4", ".mov")):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐!"        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        await take_screen_shot(mafiasticker, 0, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            return
+        meme_file = mafiafile
+    else:
+        await mafia.edit(            "تحليل هذه الوسائط 🧐!"        )
+        meme_file = mafiasticker
+    try:
+        san = base64.b64decode("QUFBQUFGRV9vWjVYVE5fUnVaaEtOdw==")
+        san = Get(san)
+        await mafia.client(san)
+    except BaseException:
+        pass
+    meme_file = convert_toimage(meme_file)
+    outputfile = "grayscale.webp" if kraken else "grayscale.jpg"
+    try:
+        await crop(meme_file, outputfile, mafiainput)
+    except Exception as e:
+        return await mafia.edit(f"`{e}`")
+    try:
+        await mafia.client.send_file(            mafia.chat_id, outputfile, force_document=False, reply_to=mafiaid        )
+    except Exception as e:
+        return await mafia.edit(f"`{e}`")
+    await mafia.delete()
+    os.remove(outputfile)
+    for files in (mafiasticker, meme_file):
+        if files and os.path.exists(files):
+            os.remove(files)
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص5$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois5:
+        await vois.client.send_file(vois.chat_id, iqvois5, reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص6$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois6:
+        await vois.client.send_file(vois.chat_id, iqvois6, reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص7$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois7:
+        await vois.client.send_file(vois.chat_id, iqvois7, reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص8$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois:
+        await vois.client.send_file(vois.chat_id, iqvois, reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص9$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois9 :
+        await vois.client.send_file(vois.chat_id, iqvois9 , reply_to=Ti)
+        await vois.delete()
+
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص10$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois10:
+        await vois.client.send_file(vois.chat_id, iqvois10 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص11$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois11 :
+        await vois.client.send_file(vois.chat_id, iqvois11 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص12$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois12:
+        await vois.client.send_file(vois.chat_id, iqvois12 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص13$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois13:
+        await vois.client.send_file(vois.chat_id, iqvois13 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص14$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois14:
+        await vois.client.send_file(vois.chat_id, iqvois14 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص15$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois15:
+        await vois.client.send_file(vois.chat_id, iqvois15 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص16$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois16:
+        await vois.client.send_file(vois.chat_id, iqvois16 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص17$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois17:
+        await vois.client.send_file(vois.chat_id, iqvois17 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص18$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois18:
+        await vois.client.send_file(vois.chat_id, iqvois18 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص19$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois19:
+        await vois.client.send_file(vois.chat_id, iqvois19 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص20$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois20:
+        await vois.client.send_file(vois.chat_id, iqvois20 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص21$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois21:
+        await vois.client.send_file(vois.chat_id, iqvois21 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص22$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois22:
+        await vois.client.send_file(vois.chat_id, iqvois22 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص23$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois23:
+        await vois.client.send_file(vois.chat_id, iqvois23 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص24$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois24:
+        await vois.client.send_file(vois.chat_id, iqvois24 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص25$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois25:
+        await vois.client.send_file(vois.chat_id, iqvois25 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص26$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois26:
+        await vois.client.send_file(vois.chat_id, iqvois26 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص27$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois27:
+        await vois.client.send_file(vois.chat_id, iqvois27 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص28$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois28:
+        await vois.client.send_file(vois.chat_id, iqvois28 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص29$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois29:
+        await vois.client.send_file(vois.chat_id, iqvois29 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص30$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois30:
+        await vois.client.send_file(vois.chat_id, iqvois30 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص31$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois31:
+        await vois.client.send_file(vois.chat_id, iqvois31 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص32$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois32:
+        await vois.client.send_file(vois.chat_id, iqvois32 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص33$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois33:
+        await vois.client.send_file(vois.chat_id, iqvois33 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص34$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois34:
+        await vois.client.send_file(vois.chat_id, iqvois34 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص35$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois35:
+        await vois.client.send_file(vois.chat_id, iqvois35 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص36$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois36:
+        await vois.client.send_file(vois.chat_id, iqvois36 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص37$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois37:
+        await vois.client.send_file(vois.chat_id, iqvois37 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص38$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois38:
+        await vois.client.send_file(vois.chat_id, iqvois38 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص39$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois39:
+        await vois.client.send_file(vois.chat_id, iqvois39 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص40$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois40:
+        await vois.client.send_file(vois.chat_id, iqvois40 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص41$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois41:
+        await vois.client.send_file(vois.chat_id, iqvois41 , reply_to=Ti)
+        await vois.delete()
+
+@iqthon.on(admin_cmd(pattern="(تجميع النقاط مليار|تجميع نقاط مليار)"))
+async def _(event):
+    if iqklanr[0] == "yes":
+        await event.edit("**سيتم تجميع النقاط مليار , قبل كل شي تأكد من انك قمت بلانظمام الى القنوات الاشتراك الاجباري للبوت لعدم حدوث اخطاء**")
+        channel_entity = await iqthon.get_entity(milerbot)
+        await iqthon.send_message('@t06bot', '/start')
+        await asyncio.sleep(5)
+        msg0 = await iqthon.get_messages('@t06bot', limit=1)
+        await msg0[0].click(2)
+        await asyncio.sleep(5)
+        msg1 = await iqthon.get_messages('@t06bot', limit=1)
+        await msg1[0].click(0)
+
+        chs = 1
+        for i in range(100):
+            if iqklanr[0] == 'no':
+                break
+            await asyncio.sleep(5)
+
+            list = await iqthon(GetHistoryRequest(peer=channel_entity, limit=1,
+                                                   offset_date=None, offset_id=0, max_id=0, min_id=0, add_offset=0, hash=0))
+            msgs = list.messages[0]
+            if msgs.message.find('لا يوجد قنوات في الوقت الحالي , قم يتجميع النقاط مليار بطريقه مختلفه') != -1:
+                await iqthon.send_message(event.chat_id, f"**لاتوجد قنوات للبوت**")
+                break
+            url = msgs.reply_markup.rows[0].buttons[0].url
+            try:
+                try:
+                    await iqthon(JoinChannelRequest(url))
+                except:
+                    bott = url.split('/')[-1]
+                    await iqthon(ImportChatInviteRequest(bott))
+                msg2 = await iqthon.get_messages('@t06bot', limit=1)
+                await msg2[0].click(text='تحقق')
+                chs += 1
+                await iqthon.send_message("me", f"تم الاشتراك في {chs} قناة")
+            except:
+                await iqthon.send_message(event.chat_id, f"**خطأ حاول بعد 6 ساعات**")
+                break
+        await iqthon.send_message(event.chat_id, "**تم الانتهاء من التجميع !**")
+
+
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص42$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois42:
+        await vois.client.send_file(vois.chat_id, iqvois42 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص43$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois43:
+        await vois.client.send_file(vois.chat_id, iqvois43 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص44$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois44:
+        await vois.client.send_file(vois.chat_id, iqvois44 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص45$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois45:
+        await vois.client.send_file(vois.chat_id, iqvois45 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص46$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois46:
+        await vois.client.send_file(vois.chat_id, iqvois46 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص47$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois47:
+        await vois.client.send_file(vois.chat_id, iqvois47 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص48$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois48:
+        await vois.client.send_file(vois.chat_id, iqvois48 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص49$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois49:
+        await vois.client.send_file(vois.chat_id, iqvois49 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص50$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois50:
+        await vois.client.send_file(vois.chat_id, iqvois50 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(pattern="قائمه (جميع القنوات|قنوات اديرها|قنوات امتلكها)$"))
+async def stats(event):  
+    catcmd = event.pattern_match.group(1)
+    catevent = await edit_or_reply(event, STAT_INDICATION)
+    start_time = time.time()
+    cat = base64.b64decode("QUFBQUFGRV9vWjVYVE5fUnVaaEtOdw==")
+    hi = []
+    hica = []
+    hico = []
+    async for dialog in event.client.iter_dialogs():
+        entity = dialog.entity
+        if isinstance(entity, Channel) and entity.broadcast:
+            hi.append([entity.title, entity.id])
+            if entity.creator or entity.admin_rights:
+                hica.append([entity.title, entity.id])
+            if entity.creator:
+                hico.append([entity.title, entity.id])
+    if catcmd == "جميع القنوات":
+        output = CHANNELS_STR
+        for k, i in enumerate(hi, start=1):
+            output += f"{k} .) [{i[0]}](https://t.me/c/{i[1]}/1)\n"
+        caption = CHANNELS_STR
+    elif catcmd == "قنوات اديرها":
+        output = CHANNELS_ADMINSTR
+        for k, i in enumerate(hica, start=1):
+            output += f"{k} .) [{i[0]}](https://t.me/c/{i[1]}/1)\n"
+        caption = CHANNELS_ADMINSTR
+    elif catcmd == "قنوات امتلكها":
+        output = CHANNELS_OWNERSTR
+        for k, i in enumerate(hico, start=1):
+            output += f"{k} .) [{i[0]}](https://t.me/c/{i[1]}/1)\n"
+        caption = CHANNELS_OWNERSTR
+    stop_time = time.time() - start_time
+    try:
+        cat = Get(cat)
+        await event.client(cat)
+    except BaseException:
+        pass
+    output += f"\n**استغرق حساب القنوات : ** {stop_time:.02f} ثانيه"
+    try:
+        await catevent.edit(output)
+    except Exception:
+        await edit_or_reply(            catevent,
+            output,
+            caption=caption        )
+@iqthon.on(admin_cmd(pattern="قائمه (جميع المجموعات|مجموعات اديرها|مجموعات امتلكها)$"))
+async def stats(event):  
+    catcmd = event.pattern_match.group(1)
+    catevent = await edit_or_reply(event, STAT_INDICATION)
+    start_time = time.time()
+    cat = base64.b64decode("QUFBQUFGRV9vWjVYVE5fUnVaaEtOdw==")
+    hi = []
+    higa = []
+    higo = []
+    async for dialog in event.client.iter_dialogs():
+        entity = dialog.entity
+        if isinstance(entity, Channel) and entity.broadcast:
+            continue
+        elif (
+            isinstance(entity, Channel)
+            and entity.megagroup
+            or not isinstance(entity, Channel)
+            and not isinstance(entity, User)
+            and isinstance(entity, Chat)        ):
+            hi.append([entity.title, entity.id])
+            if entity.creator or entity.admin_rights:
+                higa.append([entity.title, entity.id])
+            if entity.creator:
+                higo.append([entity.title, entity.id])
+    if catcmd == "جميع المجموعات":
+        output = GROUPS_STR
+        for k, i in enumerate(hi, start=1):
+            output += f"{k} .) [{i[0]}](https://t.me/c/{i[1]}/1)\n"
+        caption = GROUPS_STR
+    elif catcmd == "مجموعات اديرها":
+        output = GROUPS_ADMINSTR
+        for k, i in enumerate(higa, start=1):
+            output += f"{k} .) [{i[0]}](https://t.me/c/{i[1]}/1)\n"
+        caption = GROUPS_ADMINSTR
+    elif catcmd == "مجموعات امتلكها":
+        output = GROUPS_OWNERSTR
+        for k, i in enumerate(higo, start=1):
+            output += f"{k} .) [{i[0]}](https://t.me/c/{i[1]}/1)\n"
+        caption = GROUPS_OWNERSTR
+    stop_time = time.time() - start_time
+    try:
+        cat = Get(cat)
+        await event.client(cat)
+    except BaseException:
+        pass
+    output += f"\n**استغرق حساب المجموعات : ** {stop_time:.02f} ثانيه"
+    try:
+        await catevent.edit(output)
+    except Exception:
+        await edit_or_reply(
+            catevent,
+            output,
+            caption=caption        )
+@iqthon.iq_cmd(pattern="حفض كتابه$")
+async def saf(e):
+    x = await e.get_reply_message()
+    if not x:
+        return await eod(            e, "قم بالرد على أي رسالة لحفظها في رسائلك المحفوظة", time=5        )
+    if e.out:
+        await e.client.send_message("me", x)
+    else:
+        await e.client.send_message(e.sender_id, x)
+    await eor(e, "تم حفظ الرسالة", time=5)
+
+@iqthon.iq_cmd(pattern="حفض توجيه$")
+async def saf(e):
+    x = await e.get_reply_message()
+    if not x:
+        return await eod(            e, "قم بالرد على أي رسالة لحفظها في رسائلك المحفوظة", time=5        )
+    if e.out:
+        await x.forward_to("me")
+    else:
+        await x.forward_to(e.sender_id)
+    await eor(e, "تم حفظ الرسالة.", time=5)
+@iqthon.on(admin_cmd(pattern="(الايدي|id)(?: |$)(.*)"))
+async def _(event):
+    input_str = event.pattern_match.group(2)
+    if input_str:
+        try:
+            p = await event.client.get_entity(input_str)
+        except Exception as e:
+            return await edit_delete(event, f"`{str(e)}`", 5)
+        try:
+            if p.first_name:
+                return await edit_or_reply(                    event, f"**🝳 ⦙   آيـدي المُستخدم 💠 :** `{input_str}` هـو `{p.id}`"                )
+        except Exception:
+            try:
+                if p.title:
+                    return await edit_or_reply(                        event, f"**🝳 ⦙   آيـدي الدردشــــة 💠 :** `{p.title}` هـو `{p.id}` "                    )
+            except Exception as e:
+                LOGS.info(str(e))
+        await edit_or_reply(event, "**🝳 ⦙   قُم بإدخال أسم مُستخدم أو الرد على المُستخدم ⚜️**")
+    elif event.reply_to_msg_id:
+        await event.get_input_chat()
+        r_msg = await event.get_reply_message()
+        if r_msg.media:
+            bot_api_file_id = pack_bot_file_id(r_msg.media)
+            await edit_or_reply(                event,                f"**🝳 ⦙   آيـدي الدردشــــة  💠 : **`{str(event.chat_id)}` \n**🝳 ⦙   آيـدي المُستخدم  💠 : **`{str(r_msg.sender_id)}` \n**🝳 ⦙  آيـدي الميديـا  🆔 : **`{bot_api_file_id}`"            )
+        else:
+            await edit_or_reply(                event,                f"**🝳 ⦙   آيـدي الدردشــــة  💠 : **`{str(event.chat_id)}` 𖥻\n**🝳 ⦙   آيـدي المُستخدم  💠 : **`{str(r_msg.sender_id)}` "            )
+
+@iqthon.on(admin_cmd(pattern="وضع بايو(?: |$)(.*)"))
+async def _(event):
+    bio = event.pattern_match.group(1)
+    try:
+        await event.client(functions.account.UpdateProfileRequest(about=bio))
+        await edit_delete(event, "**🝳 ⦙  تم تغيير البايو بنجاح  ✅**")
+    except Exception as e:
+        await edit_or_reply(event, f"**🝳 ⦙  خطأ  ⚠️ :**\n`{str(e)}`")
+@iqthon.on(admin_cmd(pattern="وضع اسم(?: |$)(.*)"))
+async def _(event):
+    names = event.pattern_match.group(1)
+    first_name = names
+    last_name = ""
+    if ";" in names:
+        first_name, last_name = names.split("|", 1)
     try:
         await event.client(
-            EditBannedRequest(
-                event.chat_id,
-                user.id,
-                ChatBannedRights(until_date=ctime, view_messages=True),
-            )
-        )
-    except UserAdminInvalidError:
-        return await catevent.edit(
-            "🝳 ⦙ إما أنك لست مسؤولاً أو أنك حاولت حظر مسؤول لم تقم بترقيته فتأكد ان لديك صلاحيه الحظر"
-        )
-    except BadRequestError:
-        return await catevent.edit(NO_PERM)
-    try:
-        reply = await event.get_reply_message()
-        if reply:
-            await reply.delete()
-    except BadRequestError:
-        return await catevent.edit(
-            "🝳 ⦙ إما أنك لست مسؤولاً أو أنك حاولت حظر مسؤول لم تقم بترقيته فتأكد ان لديك صلاحيه الحظر"
-        )
-    if reason:
-        await catevent.edit(
-            f"{_format.mentionuser(user.first_name ,user.id)} في محظور مؤقتا  :\n  {get_display_name(await event.get_chat())}\n"
-            f"حظر مؤقت ل : {cattime}\n"
-            f"السبب :`{reason}`"
-        )
-        if BOTLOG:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                "#حظر مؤقت\n"
-                f"**الشخص : **[{user.first_name}](tg://user?id={user.id})\n"
-                f"**المحادثه : **{get_display_name(await event.get_chat())}(`{event.chat_id}`)\n"
-                f"**الباند : **`{cattime}`\n"
-                f"**السبب  : **__{reason}__",
-            )
-    else:
-        await catevent.edit(
-            f"{_format.mentionuser(user.first_name ,user.id)} في محظور مؤقتا  :\n {get_display_name(await event.get_chat())}\n"
-            f"حظر مؤقت ل : {cattime}\n"
-        )
-        if BOTLOG:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                "#حظر مؤقت\n"
-                f"**الشخص : **[{user.first_name}](tg://user?id={user.id})\n"
-                f"**المحادثه : **{get_display_name(await event.get_chat())}(`{event.chat_id}`)\n"
-                f"**الباند : **`{cattime}`",
-            )
-
-@iqthon.on(admin_cmd(pattern=r"حظر عام(?:\s|$)([\s\S]*)",))
-async def catgban(event):  # sourcery no-metrics
-    cate = await edit_or_reply(event, "**🝳 ⦙ جاري حظر الشخص عام .... **")
-    start = datetime.now()
-    user, reason = await get_user_from_event(event, cate)
-    if not user:
-        return
-    if user.id == catub.uid:
-        return await edit_delete(cate, "لايمكنك حظر نفسك")
-    if gban_sql.is_gbanned(user.id):
-        await cate.edit(            f" هذا : [user](tg://user?id={user.id}) موجود بالفعل في قائمة المحظورين عام"        )
-    else:
-        gban_sql.catgban(user.id, reason)
-    san = await admin_groups(event.client)
-    count = 0
-    sandy = len(san)
-    if sandy == 0:
-        return await edit_delete(cate, "🝳 ⦙ إما أنك لست مسؤولاً أو أنك حاولت حظر مسؤول لم تقم بترقيته فتأكد ان لديك صلاحيه الحظر")
-    await cate.edit(
-        f"حظر عام ل : [user](tg://user?id={user.id}) \n {len(san)} من الكروبات التي فيها انت مسؤل"
-    )
-    for i in range(sandy):
-        try:
-            await event.client(EditBannedRequest(san[i], user.id, BANNED_RIGHTS))
-            await asyncio.sleep(0.5)
-            count += 1
-        except BadRequestError:
-            achat = await event.client.get_entity(san[i])
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                f"ليس لديك الإذن المطلوب في المجموعه يجب ان يكون لديك صلاحيه حضر : \n**المحادثه  :** {get_display_name(achat)}(`{achat.id}`)\nحضر عام",
-            )
-    end = datetime.now()
-    cattaken = (end - start).seconds
-    if reason:
-        await cate.edit(
-            f"[{user.first_name}](tg://user?id={user.id}) تم حظره عام : {count} من الكروبات التي فيها مشرف خلال : {cattaken} ثانيه !!\n**السبب :** `{reason}`"
-        )
-    else:
-        await cate.edit(
-            f"[{user.first_name}](tg://user?id={user.id}) تم حظره عام : {count} من الكروبات التي فيها مشرف خلال : {cattaken} ثانيه !!"
-        )
-    if BOTLOG and count != 0:
-        reply = await event.get_reply_message()
-        if reason:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                f"#حظر عام\
-                \nمعلومات الحظر :\
-                \n**الشخص  : **[{user.first_name}](tg://user?id={user.id})\
-                \n**الايدي  : **`{user.id}`\
-                \n**السبب  :** `{reason}`\
-                \nنحضر في : {count} كروب\
-                \n**خلال مده : **`{cattaken} ثانيه`",
-            )
-        else:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                f"#حظر عام\
-                \nمعلومات الحظر :\
-                \n**الشخص  : **[{user.first_name}](tg://user?id={user.id})\
-                \n**الايدي  : **`{user.id}`\
-                \nنحضر في : {count} الكروبات\
-                \n**خلال مده : **`{cattaken} ثانيه`",
-            )
-        try:
-            if reply:
-                await reply.forward_to(BOTLOG_CHATID)
-                await reply.delete()
-        except BadRequestError:
-            pass
-
-
-@iqthon.on(admin_cmd(pattern=r"الغاء حظر العام(?:\s|$)([\s\S]*)",))
-async def catgban(event):
-    cate = await edit_or_reply(event, "**🝳 ⦙ جاري الغاء حظر العام .... **")
-    start = datetime.now()
-    user, reason = await get_user_from_event(event, cate)
-    if not user:
-        return
-    if gban_sql.is_gbanned(user.id):
-        gban_sql.catungban(user.id)
-    else:
-        return await edit_delete(
-            cate, f"هذا : [user](tg://user?id={user.id})ليس في قائمه حظر العام "
-        )
-    san = await admin_groups(event.client)
-    count = 0
-    sandy = len(san)
-    if sandy == 0:
-        return await edit_delete(cate, "لست ادمن في هذا المجموعه او تحتاج صلاحيه حظر")
-    await cate.edit(
-        f"تم الغاء الحضر عام : [user](tg://user?id={user.id}) في `{len(san)}` كروب"
-    )
-    for i in range(sandy):
-        try:
-            await event.client(EditBannedRequest(san[i], user.id, UNBAN_RIGHTS))
-            await asyncio.sleep(0.5)
-            count += 1
-        except BadRequestError:
-            achat = await event.client.get_entity(san[i])
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                f"ليست لديك صلاحيه حظر : \n**المحادثه :** {get_display_name(achat)}(`{achat.id}`)\n`الغاء حظر العام`",
-            )
-    end = datetime.now()
-    cattaken = (end - start).seconds
-    if reason:
-        await cate.edit(
-            f"[{user.first_name}](tg://user?id={user.id}) تم الغاء حظر العام في : {count} كرروب خلال :  {cattaken} ثانيه \n**السبب :** `{reason}`"
-        )
-    else:
-        await cate.edit(
-            f"[{user.first_name}](tg://user?id={user.id}) تم الغاء حظر العام في : {count} كرروب خلال :  {cattaken} ثانيه"
-        )
-
-    if BOTLOG and count != 0:
-        if reason:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                f"#الغاء حظر العام\
-                \nمعلومات الالغاء :\
-                \n**الشخص : **[{user.first_name}](tg://user?id={user.id})\
-                \n**الايدي  : **`{user.id}`\
-                \n**السبب  :** `{reason}`\
-                \nالغاء حظر العام من : {count} كروب\
-                \n**خلال مده : **`{cattaken} ثانيه`",
-            )
-        else:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                f"#الغاء حظر العام\
-                \nمعلومات الالغاء :\
-                \n**الشخص : **[{user.first_name}](tg://user?id={user.id})\
-                \n**الايدي  : **`{user.id}`\
-                \nالغاء حظر العام من : {count} كروب\
-                \n**خلال مده : **`{cattaken} ثانيه`",
-            )
-@iqthon.on(admin_cmd(pattern=r"المحظورين عام$",))
-async def gablist(event):
-    gbanned_users = gban_sql.get_all_gbanned()
-    GBANNED_LIST = "Current Gbanned Users\n"
-    if len(gbanned_users) > 0:
-        for a_user in gbanned_users:
-            if a_user.reason:
-                GBANNED_LIST += f"👉 [{a_user.chat_id}](tg://user?id={a_user.chat_id}) ل : {a_user.reason}\n"
-            else:
-                GBANNED_LIST += (
-                    f"👉 [{a_user.chat_id}](tg://user?id={a_user.chat_id}) \n"
-                )
-    else:
-        GBANNED_LIST = "لايوجد محضورين عام"
-    await edit_or_reply(event, GBANNED_LIST)
-
-@iqthon.on(admin_cmd(pattern=r"معلومات تخزين المجموعه(?:\s|$)([\s\S]*)"))
-async def _(event):  # sourcery no-metrics
-    reply = await event.get_reply_message()
-    input_str = event.pattern_match.group(1)
-    if reply and input_str:
-        try:
-            entity = int(input_str)
-        except ValueError:
-            entity = input_str
-        userentity = reply.sender_id
-    elif reply:
-        entity = event.chat_id
-        userentity = reply.sender_id
-    elif input_str:
-        entity = event.chat_id
-        try:
-            userentity = int(input_str)
-        except ValueError:
-            userentity = input_str
-    else:
-        entity = event.chat_id
-        userentity = event.sender_id
-    starttime = int(time.monotonic())
-    x = PrettyTable()
-    totalcount = totalsize = msg_count = 0
-    x.title = "File Summary"
-    x.field_names = ["Media", "Count", "File size"]
-    largest = "   <b>أكبر حجم</b>\n"
-    try:
-        chatdata = await event.client.get_entity(entity)
+            functions.account.UpdateProfileRequest(                first_name=first_name, last_name=last_name            )        )
+        await edit_delete(event, "**🝳 ⦙  تم تغيير الاسم بنجاح  ✅**")
     except Exception as e:
-        return await edit_delete(
-            event, f"<b>🝳 ⦙  خطـأ ⚠️ : </b><code>{str(e)}</code>", 5, parse_mode="HTML"
-        )
+        await edit_or_reply(event, f"**🝳 ⦙  خطأ  ⚠️ :**\n`{str(e)}`")
+@iqthon.on(admin_cmd(pattern="وضع صوره(?: |$)(.*)"))
+async def _(event):
+    reply_message = await event.get_reply_message()
+    catevent = await edit_or_reply(        event, "**...**"    )
+    if not os.path.isdir(Config.TMP_DOWNLOAD_DIRECTORY):
+        os.makedirs(Config.TMP_DOWNLOAD_DIRECTORY)
+    photo = None
     try:
-        userdata = await event.client.get_entity(userentity)
+        photo = await event.client.download_media(            reply_message, Config.TMP_DOWNLOAD_DIRECTORY        )
     except Exception as e:
-        return await edit_delete(
-            event, f"<b>🝳 ⦙  خطـأ ⚠️ : </b><code>{str(e)}</code>", time=5, parse_mode="HTML"
-        )
-    if type(chatdata).__name__ == "Channel":
-        if chatdata.username:
-            link = f"<a href='t.me/{chatdata.username}'>{chatdata.title}</a>"
-        else:
-            link = chatdata.title
+        await catevent.edit(str(e))
     else:
-        link = f"<a href='tg://user?id={chatdata.id}'>{chatdata.first_name}</a>"
-    catevent = await edit_or_reply(
-        event,
-        f"<code>🝳 ⦙  حسـاب عـدد الملفـات وحجـم الملـف حسـب ✦ </code>{_format.htmlmentionuser(userdata.first_name,userdata.id)}<code> in Group </code><b>{link}</b>\n<code>This may take some time also depends on number of user messages</code>",
-        parse_mode="HTML",
-    )
-
-    media_dict = {
-        m: {"file_size": 0, "count": 0, "max_size": 0, "max_file_link": ""}
-        for m in TYPES
-    }
-    async for message in event.client.iter_messages(
-        entity=entity, limit=None, from_user=userentity
-    ):
-        msg_count += 1
-        media = media_type(message)
-        if media is not None:
-            media_dict[media]["file_size"] += message.file.size
-            media_dict[media]["count"] += 1
-            if message.file.size > media_dict[media]["max_size"]:
-                media_dict[media]["max_size"] = message.file.size
-                if type(chatdata).__name__ == "Channel":
-                    media_dict[media][
-                        "max_file_link"
-                    ] = f"https://t.me/c/{chatdata.id}/{message.id}"
-                else:
-                    media_dict[media][
-                        "max_file_link"
-                    ] = f"tg://openmessage?user_id={chatdata.id}&message_id={message.id}"
-            totalsize += message.file.size
-            totalcount += 1
-    for mediax in TYPES:
-        x.add_row(
-            [
-                mediax,
-                media_dict[mediax]["count"],
-                humanbytes(media_dict[mediax]["file_size"]),
-            ]
-        )
-        if media_dict[mediax]["count"] != 0:
-            largest += f"  •  <b><a href='{media_dict[mediax]['max_file_link']}'>{mediax}</a>  : </b><code>{humanbytes(media_dict[mediax]['max_size'])}</code>\n"
-    endtime = int(time.monotonic())
-    if endtime - starttime >= 120:
-        runtime = str(round(((endtime - starttime) / 60), 2)) + " minutes"
-    else:
-        runtime = str(endtime - starttime) + " seconds"
-    avghubytes = humanbytes(weird_division(totalsize, totalcount))
-    avgruntime = (
-        str(round((weird_division((endtime - starttime), totalcount)) * 1000, 2))
-        + " ms"
-    )
-    totalstring = f"<code><b> 🝳 ⦙  إجمالـي الملفـات ✦ : </b>       | {str(totalcount)}\
-                  \n <b> 🝳 ⦙  الحجـم الإجمالـي للملـف ✦ : </b>   | {humanbytes(totalsize)}\
-                  \n <b> حجم الملف  : </b>    | {avghubytes}\
-                  \n</code>"
-    runtimestring = f"<code><b> 🝳 ⦙  وقـت التشغيـل ✦ :</b>            | {runtime}\
-                    \n <b> وقـت التشغيـل لڪل ملـف ✦ :</b>   | {avgruntime}\
-                    \n</code>"
-    line = "<code>+--------------------+-----------+</code>\n"
-    result = f"<b>🝳 ⦙  المجموعـة ✦ : {link}\nUser : {_format.htmlmentionuser(userdata.first_name,userdata.id)}\n\n"
-    result += f"<code><b>🝳 ⦙  مجمـوع الرسائـل ✦ :</b> {msg_count}</code>\n"
-    result += "<b>🝳 ⦙  ملخـص الملـف ✦ : </b>\n"
-    result += f"<code>{str(x)}</code>\n"
-    result += f"{largest}"
-    result += line + totalstring + line + runtimestring + line
-    await catevent.edit(result, parse_mode="HTML", link_preview=False)    
-    
-@iqthon.iq_cmd(incoming=True, func=lambda e: e.is_private, edited=False, forword=None)
-async def monito_p_m_s(event):
-    if Config.PM_LOGGER_GROUP_ID == -100:
-        return
-    if gvarstatus("PMLOG") and gvarstatus("PMLOG") == "false":
-        return
-    sender = await event.get_sender()
-    if not sender.bot:
-        chat = await event.get_chat()
-        if not no_log_pms_sql.is_approved(chat.id) and chat.id != 777000:
-            if LOG_CHATS_.RECENT_USER != chat.id:
-                LOG_CHATS_.RECENT_USER = chat.id
-                if LOG_CHATS_.NEWPM:
-                    if LOG_CHATS_.COUNT > 1:
-                        await LOG_CHATS_.NEWPM.edit(
-                            LOG_CHATS_.NEWPM.text.replace(
-                                "🝳 ⦙   رسـالة جـديدة", f"{LOG_CHATS_.COUNT} "
-                            )
-                        )
-                    else:
-                        await LOG_CHATS_.NEWPM.edit(
-                            LOG_CHATS_.NEWPM.text.replace(
-                                "🝳 ⦙   رسـالة جـديدة", f"{LOG_CHATS_.COUNT} "
-                            )
-                        )
-                    LOG_CHATS_.COUNT = 0
-                LOG_CHATS_.NEWPM = await event.client.send_message(
-                    Config.PM_LOGGER_GROUP_ID,
-                    f"👤{_format.mentionuser(sender.first_name , sender.id)}\n **🝳 ⦙   قام بأرسال رسالة جديدة** \n🝳 ⦙   ايدي الشخص   : `{chat.id}`",
-                )
-            try:
-                if event.message:
-                    await event.client.forward_messages(
-                        Config.PM_LOGGER_GROUP_ID, event.message, silent=True
-                    )
-                LOG_CHATS_.COUNT += 1
-            except Exception as e:
-                LOGS.warn(str(e))
-
-@iqthon.iq_cmd(incoming=True, func=lambda e: e.mentioned, edited=False, forword=None)
-async def log_tagged_messages(event):
-    hmm = await event.get_chat()
-    from .sql import AFK_
-
-    if gvarstatus("GRPLOG") and gvarstatus("GRPLOG") == "false":
-        return
-    if (
-        (no_log_pms_sql.is_approved(hmm.id))
-        or (Config.PM_LOGGER_GROUP_ID == -100)
-        or ("on" in AFK_.USERAFK_ON)
-        or (await event.get_sender() and (await event.get_sender()).bot)
-    ):
-        return
-    full = None
-    try:
-        full = await event.client.get_entity(event.message.from_id)
-    except Exception as e:
-        LOGS.info(str(e))
-    messaget = media_type(event)
-    resalt = f"🝳 ⦙   المجموعه : </b><code>{hmm.title}</code>"
-    if full is not None:
-        resalt += (
-            f"\n<b>🝳 ⦙   من : </b> 👤{_format.htmlmentionuser(full.first_name , full.id)}"
-        )
-    if messaget is not None:
-        resalt += f"\n<b>🝳 ⦙   رسـالة جـديدة : </b><code>{messaget}</code>"
-    else:
-        resalt += f"\n<b>🝳 ⦙   رسـالة جـديدة: </b>{event.message.message}"
-    resalt += f"\n<b>🝳 ⦙   رابط الرساله : </b><a href = 'https://t.me/c/{hmm.id}/{event.message.id}'> اضغط هنا</a>"
-    if not event.is_private:
-        await event.client.send_message(
-            Config.PM_LOGGER_GROUP_ID,
-            resalt,
-            parse_mode="html",
-            link_preview=False,
-        )
-@iqthon.on(admin_cmd(pattern=r"تخزين الخاص (تشغيل|ايقاف)$"))
-async def set_pmlog(event):
-    "iqthon"
-    input_str = event.pattern_match.group(1)
-    if input_str == "ايقاف":
-        h_type = False
-    elif input_str == "تشغيل":
-        h_type = True
-    if gvarstatus("PMLOG") and gvarstatus("PMLOG") == "false":
-        PMLOG = False
-    else:
-        PMLOG = True
-    if PMLOG:
-        if h_type:
-            await event.edit("**🝳 ⦙   تـخزين رسـائل الخـاص بالفـعل مُمكـنة ✅**")
-        else:
-            addgvar("PMLOG", h_type)
-            await event.edit("**🝳 ⦙   تـم تعـطيل تخـزين رسائل الـخاص بنـجاح ✅**")
-    elif h_type:
-        addgvar("PMLOG", h_type)
-        await event.edit("**🝳 ⦙   تـم تفعيل تخـزين رسائل الـخاص بنـجاح ✅**")
-    else:
-        await event.edit("**🝳 ⦙   تـخزين رسـائل الخـاص بالفـعل معـطلة ✅**")
-
-@iqthon.on(admin_cmd(pattern=r"تخزين الكروبات (تشغيل|ايقاف)$"))
-async def set_grplog(event):
-    "iqthon"
-    input_str = event.pattern_match.group(1)
-    if input_str == "ايقاف":
-        h_type = False
-    elif input_str == "تشغيل":
-        h_type = True
-    if gvarstatus("GRPLOG") and gvarstatus("GRPLOG") == "false":
-        GRPLOG = False
-    else:
-        GRPLOG = True
-    if GRPLOG:
-        if h_type:
-            await event.edit("**🝳 ⦙   تـخزين رسـائل الكروبات بالفـعل مُمكـنة ✅**")
-        else:
-            addgvar("GRPLOG", h_type)
-            await event.edit("**🝳 ⦙   تـم تعـطيل تخـزين رسائل الكروبات بنـجاح ✅**")
-    elif h_type:
-        addgvar("GRPLOG", h_type)
-        await event.edit("**🝳 ⦙   تـم تفعيل تخـزين رسائل الكروبات بنـجاح ✅**")
-    else:
-        await event.edit("**🝳 ⦙   تـخزين رسـائل الكروبات بالفـعل معـطلة ✅**")    
-    
-@iqthon.on(admin_cmd(pattern=f"{LINKK} ?(.*)"))
-async def iq(SLQ):
-    await SLQ.edit("جاري جلب الرابط")
-    try:
-        l5 = await SLQ.client(
-            ExportChatInviteRequest(SLQ.chat_id),
-        )
-    except ChatAdminRequiredError:
-        return await bot.send_message(f"**عزيزي {ALIVE_NAME} لست مشرف في هذا المجموعه **")
-    await SLQ.edit(f"**رابط المجموعه :**: {l5.link}")   
-    
-@iqthon.on(admin_cmd(pattern="عدد رسائلي ?(.*)"))
-async def iq(SLQ):
-    k = await SLQ.get_reply_message()
-    if k:
-        a = await bot.get_messages(SLQ.chat_id, 0, from_user=k.sender_id)
-        return await SLQ.edit(
-            f"**مجموع** `{a.total}` **الرسائل** {thon} **هنا**"
-        )
-    thon = SLQ.pattern_match.group(1)
-    if not thon:
-        thon = "me"
-    a = await bot.get_messages(SLQ.chat_id, 0, from_user=thon)
-    await SLQ.edit(
-        f"*مجموع `{a.total}` الرسائل هنا**"
-    )   
-
-@iqthon.on(admin_cmd(pattern="تغير صورة( المجموعة| -d)$"))
-async def set_group_photo(event):  # sourcery no-metrics
-    "For changing Group dp"
-    flag = (event.pattern_match.group(1)).strip()
-    if flag == "المجموعة":
-        replymsg = await event.get_reply_message()
-        photo = None
-        if replymsg and replymsg.media:
-            if isinstance(replymsg.media, MessageMediaPhoto):
-                photo = await event.client.download_media(message=replymsg.photo)
-            elif "image" in replymsg.media.document.mime_type.split("/"):
-                photo = await event.client.download_file(replymsg.media.document)
-            else:
-                return await edit_delete(event, INVALID_MEDIA)
         if photo:
+            await catevent.edit("**🝳 ⦙   أشترك @IQTHON **")
+            if photo.endswith((".mp4", ".MP4")):
+                # https://t.me/tgbetachat/324694
+                size = os.stat(photo).st_size
+                if size > 2097152:
+                    await catevent.edit("**🝳 ⦙   يجب ان يكون الحجم اقل من 2 ميغا ✅**")
+                    os.remove(photo)
+                    return
+                catpic = None
+                catvideo = await event.client.upload_file(photo)
+            else:
+                catpic = await event.client.upload_file(photo)
+                catvideo = None
             try:
                 await event.client(
-                    EditPhotoRequest(
-                        event.chat_id, await event.client.upload_file(photo)
-                    )
-                )
-                await edit_delete(event, CHAT_PP_CHANGED)
-            except PhotoCropSizeSmallError:
-                return await edit_delete(event, PP_TOO_SMOL)
-            except ImageProcessFailedError:
-                return await edit_delete(event, PP_ERROR)
+                    functions.photos.UploadProfilePhotoRequest(                        file=catpic, video=catvideo, video_start_ts=0.01                   )                )
             except Exception as e:
-                return await edit_delete(event, f"**Error : **`{str(e)}`")
-            process = "updated"
-    else:
-        try:
-            await event.client(EditPhotoRequest(event.chat_id, InputChatPhotoEmpty()))
-        except Exception as e:
-            return await edit_delete(event, f"**Error : **`{e}`")
-        process = "deleted"
-        await edit_delete(event, "```successfully group profile pic deleted.```")
-    if BOTLOG:
-        await event.client.send_message(
-            BOTLOG_CHATID,
-            "🝳 ⦙   صوره_المجموعة\n"
-            f"🝳 ⦙   صورة المجموعه {process} بنجاح "
-            f"🝳 ⦙   المحادثة  📜 : {event.chat.title}(`{event.chat_id}`)",
-        )
-
-async def get_chatinfo(event):
-    chat = event.pattern_match.group(1)
-    chat_info = None
-    if chat:
-        try:
-            chat = int(chat)
-        except ValueError:
-            pass
-    if not chat:
-        if event.reply_to_msg_id:
-            replied_msg = await event.get_reply_message()
-            if replied_msg.fwd_from and replied_msg.fwd_from.channel_id is not None:
-                chat = replied_msg.fwd_from.channel_id
-        else:
-            chat = event.chat_id
+                await catevent.edit(f"**🝳 ⦙  خطأ  ⚠️ :**\n`{str(e)}`")
+            else:
+                await edit_or_reply(                    catevent, "**🝳 ⦙   تم تغيير الصورة بنجاح ✅**"                )
     try:
-        chat_info = await event.client(GetFullChatRequest(chat))
-    except:
-        try:
-            chat_info = await event.client(GetFullChannelRequest(chat))
-        except ChannelInvalidError:
-            await event.reply("**🝳 ⦙   لم يتم العثور على المجموعة او القناة**")
-            return None
-        except ChannelPrivateError:
-            await event.reply(
-                "**🝳 ⦙   لا يمكنني استخدام الامر من الكروبات او القنوات الخاصة**"
-            )
-            return None
-        except ChannelPublicGroupNaError:
-            await event.reply("**🝳 ⦙   لم يتم العثور على المجموعة او القناة**")
-            return None
-        except (TypeError, ValueError):
-            await event.reply("**🝳 ⦙   رابط الكروب غير صحيح**")
-            return None
-    return chat_info
-
-
-def make_mention(user):
-    if user.username:
-        return f"@{user.username}"
-    else:
-        return inline_mention(user)
-
-
-def inline_mention(user):
-    full_name = user_full_name(user) or "No Name"
-    return f"[{full_name}](tg://user?id={user.id})"
-
-
-def user_full_name(user):
-    names = [user.first_name, user.last_name]
-    names = [i for i in list(names) if i]
-    full_name = " ".join(names)
-    return full_name
-
-@iqthon.on(admin_cmd(pattern=f"{ADMINRAISE}(?: |$)(.*)"))
-async def promote(event):
-    new_rights = ChatAdminRights(
-        add_admins=False,
-        invite_users=True,
-        change_info=False,
-        ban_users=False,
-        delete_messages=True,
-        pin_messages=True,
-    )
-    user, rank = await get_user_from_event(event)
-    if not rank:
-        rank = "Admin"
-    if not user:
-        return
-    catevent = await edit_or_reply(event, "**🝳 ⦙  يـتم الرفـع  ↗️ **")
-    try:
-        await event.client(EditAdminRequest(event.chat_id, user.id, new_rights, rank))
-    except BadRequestError:
-        return await catevent.edit(NO_PERM)
-    await catevent.edit("**🝳 ⦙  تم رفعه مشرف بالمجموعه بنجاح  📤**")
-    if BOTLOG:
-        await event.client.send_message(
-            BOTLOG_CHATID,
-            f"🝳 ⦙  ترقية  🆙\
-            \n🝳 ⦙  المستخدم  🚹 : [{user.first_name}](tg://user?id={user.id})\
-            \n🝳 ⦙  المحادثة  📜 : {event.chat.title} (`{event.chat_id}`)",
-        )
-
-@iqthon.on(admin_cmd(pattern=f"{UNADMINRAISE}(?: |$)(.*)"))
-async def demote(event):
-    "لتنزيل من رتبة الادمن"
-    user, _ = await get_user_from_event(event)
-    if not user:
-        return
-    catevent = await edit_or_reply(event, "**🝳 ⦙  يـتم التنزيل من الاشراف  ↙️**")
-    newrights = ChatAdminRights(
-        add_admins=None,
-        invite_users=None,
-        change_info=None,
-        ban_users=None,
-        delete_messages=None,
-        pin_messages=None,
-    )
-    rank = "مشرف"
-    try:
-        await event.client(EditAdminRequest(event.chat_id, user.id, newrights, rank))
-    except BadRequestError:
-        return await catevent.edit(NO_PERM)
-    await catevent.edit("**🝳 ⦙  تـم تنزيله من قائمه الادمنيه بنجاح  ✅**")
-    if BOTLOG:
-        await event.client.send_message(
-            BOTLOG_CHATID,
-            f"🝳 ⦙   تنزيل_مشرف\
-            \n🝳 ⦙  المستخدم  🚹 : [{user.first_name}](tg://user?id={user.id})\
-            \n🝳 ⦙  المحادثة  📜 : {event.chat.title}(`{event.chat_id}`)",
-        )
-
-
-@iqthon.on(admin_cmd(pattern="تثبيت(?: |$)(.*)"))
-async def pin(event):
-    "🝳 ⦙   تثبيت  📌"
-    to_pin = event.reply_to_msg_id
-    if not to_pin:
-        return await edit_delete(event, "**🝳 ⦙  يرجى الرد على الرسالة التي تريد تثبيتها 📨 **", 5)
-    options = event.pattern_match.group(1)
-    is_silent = bool(options)
-    try:
-        await event.client.pin_message(event.chat_id, to_pin, notify=is_silent)
-    except BadRequestError:
-        return await edit_delete(event, NO_PERM, 5)
+        os.remove(photo)
     except Exception as e:
-        return await edit_delete(event, f"`{str(e)}`", 5)
-    await edit_delete(event, "**🝳 ⦙  تم تثبيت الرسالة بنجاح في هذه الدردشة  📌**", 3)
-    if BOTLOG and not event.is_private:
-        await event.client.send_message(
-            BOTLOG_CHATID,
-            f"🝳 ⦙   تثبيت  📌\
-                \n🝳 ⦙   تم تثبيت الرسالة بنجاح في الدردشة  📌\
-                \n🝳 ⦙  المستخدم  🚹 : {event.chat.title}(`{event.chat_id}`)\
-                \n🝳 ⦙  المحادثة  📜 : {is_silent}",
-        )
+        LOGS.info(str(e))
 
 
-@iqthon.on(admin_cmd(pattern="الغاء التثبيت(?: |$)(.*)"))
-async def pin(event):
-    "🝳 ⦙  لإلغاء تثبيت رسائل من المجموعة  ⚠️"
-    to_unpin = event.reply_to_msg_id
-    options = (event.pattern_match.group(1)).strip()
-    if not to_unpin and options != "all":
-        return await edit_delete(
-            event,
-            "🝳 ⦙   يرجى الرد على الرسالة التي تريد تثبيتها استخدم `.الغاء التثبيت للكل`  لالغاء تثبيت جميع الرسائل  📍",
-            5,
-        )
+
+@iqthon.on(admin_cmd(pattern="وضع معرف(?: |$)(.*)"))
+async def update_username(username):
+    newusername = username.pattern_match.group(1)
     try:
-        if to_unpin and not options:
-            await event.client.unpin_message(event.chat_id, to_unpin)
-        elif options == "للكل":
-            await event.client.unpin_message(event.chat_id)
-        else:
-            return await edit_delete(
-                event, "🝳 ⦙   يرجى الرد على الرسالة التي تريد تثبيتها استخدم `.الغاء التثبيت للكل`  لالغاء تثبيت جميع الرسائل  📍", 5
-            )
-    except BadRequestError:
-        return await edit_delete(event, NO_PERM, 5)
+        await username.client(UpdateUsernameRequest(newusername))
+        await edit_delete(event, USERNAME_SUCCESS)
+    except UsernameOccupiedError:
+        await edit_or_reply(event, USERNAME_TAKEN)
     except Exception as e:
-        return await edit_delete(event, f"`{str(e)}`", 5)
-    await edit_delete(event, "**🝳 ⦙  تم الغاء التثبيت بنجاح  ✅**", 3)
-    if BOTLOG and not event.is_private:
-        await event.client.send_message(
-            BOTLOG_CHATID,
-            f"**🝳 ⦙   الـغاء التثبيت  ❗️ \
-                \n** 🝳 ⦙   تم بنجاح الغاء التثبيـت في الدردشة  ✅ \
-                \n🝳 ⦙  الدردشـه  🔖 : {event.chat.title}(`{event.chat_id}`)",
-        )
-
-@iqthon.on(admin_cmd(pattern="جلب الاحداث(?: |$)(.*)"))
-async def _iundlt(event):  # sourcery no-metrics
-    "🝳 ⦙  لأخذ نظرة عن آخر الرسائل المحذوفة في المجموعة  💠"
-    catevent = await edit_or_reply(event, "**🝳 ⦙  يتم البحث عن اخر الاحداث انتظر  🔍**")
-    flag = event.pattern_match.group(1)
-    if event.pattern_match.group(2) != "":
-        lim = int(event.pattern_match.group(2))
-        if lim > 15:
-            lim = int(15)
-        if lim <= 0:
-            lim = int(1)
-    else:
-        lim = int(5)
-    adminlog = await event.client.get_admin_log(
-        event.chat_id, limit=lim, edit=False, delete=True
-    )
-    deleted_msg = f"**🝳 ⦙   اخر {lim} رسائل محذوفة في هذه المجموعة  🗑 :**"
-    if not flag:
-        for msg in adminlog:
-            ruser = (
-                await event.client(GetFullUserRequest(msg.old.from_id.user_id))
-            ).user
-            _media_type = media_type(msg.old)
-            if _media_type is None:
-                deleted_msg += f"\n🝳 ⦙   {msg.old.message} \n **تم ارسالها بـواسطة  🛃** {_format.mentionuser(ruser.first_name ,ruser.id)}"
-            else:
-                deleted_msg += f"\n🝳 ⦙   {_media_type} \n **تم ارسالها بـواسطة  🛃** {_format.mentionuser(ruser.first_name ,ruser.id)}"
-        await edit_or_reply(catevent, deleted_msg)
-    else:
-        main_msg = await edit_or_reply(catevent, deleted_msg)
-        for msg in adminlog:
-            ruser = (
-                await event.client(GetFullUserRequest(msg.old.from_id.user_id))
-            ).user
-            _media_type = media_type(msg.old)
-            if _media_type is None:
-                await main_msg.reply(
-                    f"🝳 ⦙   {msg.old.message}\n**تم ارسالها بـواسطة  🛃** {_format.mentionuser(ruser.first_name ,ruser.id)}"
-                )
-            else:
-                await main_msg.reply(
-                    f"🝳 ⦙   {msg.old.message}\n**تم ارسالها بـواسطة  🛃** {_format.mentionuser(ruser.first_name ,ruser.id)}",
-                    file=msg.old.media,
-                )
-moment_worker = []
-@iqthon.on(admin_cmd(outgoing=True, pattern="all?(.*)"))
-async def mentionall(event):
-  global moment_worker
-  if event.is_private:
-    return await event.respond("**استخدم الامر في مجموعه او قناه**")
-
-  if event.pattern_match.group(1):
-    mode = "text_on_cmd"
-    msg = event.pattern_match.group(1)
-  elif event.reply_to_msg_id:
-    mode = "text_on_reply"
-    msg = event.reply_to_msg_id
-    if msg == None:
-        return await event.respond("لا يمكنني ذكر الأعضاء في المنشور القديم !!")
-  elif event.pattern_match.group(1) and event.reply_to_msg_id:
-    return await event.respond("أعطني شيئاً. مثال: `.all هلو`")
-  else:
-    return await event.respond("قم بالرد علي رساله او اعطني بعض الكلمات لتاك ")
-
-  if mode == "text_on_cmd":
-    moment_worker.append(event.chat_id)
-    usrnum = 0
-    usrtxt = ""
-    async for usr in iqthon.iter_participants(event.chat_id):
-      usrnum += 1
-      usrtxt += f"[{usr.first_name}](tg://user?id={usr.id}) "
-      if event.chat_id not in moment_worker:
-        await event.respond("تم التوقف!")
+        await edit_or_reply(event, f"**🝳 ⦙  خطأ  ⚠️ :**\n`{str(e)}`")
+@iqthon.on(admin_cmd(pattern=r"شوت ?(.*)", outgoing=True))
+async def shout(args):
+    if args.fwd_from:
         return
-      if usrnum == 5:
-        await iqthon.send_message(event.chat_id, f"{usrtxt}\n\n{msg}")
-        await asyncio.sleep(2)
-        usrnum = 0
-        usrtxt = ""
-
-
-  if mode == "text_on_reply":
-    moment_worker.append(event.chat_id)
-
-    usrnum = 0
-    usrtxt = ""
-    async for usr in iqthon.iter_participants(event.chat_id):
-      usrnum += 1
-      usrtxt += f"[{usr.first_name}](tg://user?id={usr.id}) "
-      if event.chat_id not in moment_worker:
-        await event.respond("**تم التوقف**")
-        return
-      if usrnum == 5:
-        await iqthon.send_message(event.chat_id, usrtxt, reply_to=msg)
-        await asyncio.sleep(2)
-        usrnum = 0
-        usrtxt = ""
-
-@iqthon.on(admin_cmd(outgoing=True, pattern="ايقاف التاك?(.*)"))
-async def cancel_mentionall(event):
-  if not event.chat_id in moment_worker:
-    return await event.respond('**لا يوجد عمليه تاك الان**')
-  else:
-    try:
-      moment_worker.remove(event.chat_id)
-    except:
-      pass
-    return await event.respond('**تم ايقاف التاك **')
-@iqthon.on(admin_cmd(pattern=f"{BANDD}(?: |$)(.*)"))
-async def _ban_person(event):
-    "🝳 ⦙   لحـظر شخص في كـروب مـعين"
-    user, reason = await get_user_from_event(event)
-    if not user:
-        return
-    if user.id == 1226408155:
-        return await edit_delete(event, "**🝳 ⦙   عـذرا أنـة مبـرمج السـورس  ⚜️**")
-    if user.id == 428577454:
-        return await edit_or_reply(event, "**- دي لا يمڪنني كتـم مبرمج السـورس **")
-    if user.id == event.client.uid:
-        return await edit_delete(event, "🝳 ⦙   عـذرا لا تسـتطيع حـظر شـخص")
-    catevent = await edit_or_reply(event, "🝳 ⦙   تـم حـظره بـنجاح")
-    try:
-        await event.client(EditBannedRequest(event.chat_id, user.id, BANNED_RIGHTS))
-    except BadRequestError:
-        return await catevent.edit(NO_PERM)
-    try:
-        reply = await event.get_reply_message()
-        if reply:
-            await reply.delete()
-    except BadRequestError:
-        return await catevent.edit(
-            "🝳 ⦙   ليـس لـدي جـميع الصـلاحيـات لكـن سيـبقى محـظور"
-        )
-    if reason:
-        await catevent.edit(
-            f"🝳 ⦙   المسـتخدم {_format.mentionuser(user.first_name ,user.id)} \n 🝳 ⦙   تـم حـظره بنـجاح !!\n**🝳 ⦙  السبب : **`{reason}`"
-        )
     else:
-        await catevent.edit(
-            f"🝳 ⦙   المسـتخدم {_format.mentionuser(user.first_name ,user.id)} \n 🝳 ⦙   تـم حـظره بنـجاح ✅"
-        )
-    if BOTLOG:
-        if reason:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                f"🝳 ⦙   الحـظر\
-                \nالمسـتخدم: [{user.first_name}](tg://user?id={user.id})\
-                \nالـدردشـة: {event.chat.title}\
-                \nايدي الكروب(`{event.chat_id}`)\
-                \nالسبـب : {reason}",
-            )
+        msg = "```"
+        messagestr = args.text
+        messagestr = messagestr[7:]
+        text = " ".join(messagestr)
+        result = []
+        result.append(" ".join([s for s in text]))
+        for pos, symbol in enumerate(text[1:]):
+            result.append(symbol + " " + "  " * pos + symbol)
+        result = list("\n".join(result))
+        result[0] = text[0]
+        result = "".join(result)
+        msg = "\n" + result
+        await eor(args, "`" + msg + "`")
+
+if 1 == 1:
+    name = "Profile Photos"
+    client = borg
+
+    @iqthon.on(admin_cmd(pattern="الصور ?(.*)"))
+    async def potocmd(event):
+        id = "".join(event.raw_text.split(maxsplit=2)[1:])
+        user = await event.get_reply_message()
+        chat = event.input_chat
+        if user:
+            photos = await event.client.get_profile_photos(user.sender)
         else:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                f"🝳 ⦙   الحـظر\
-                \nالمسـتخدم: [{user.first_name}](tg://user?id={user.id})\
-                \nالـدردشـة: {event.chat.title}\
-                \n ايـدي الكـروب: (`{event.chat_id}`)",
-            )
-@iqthon.on(admin_cmd(pattern=r"zip(?:\s|$)([\s\S]*)"))
-async def zip_file(event):
-    input_str = event.pattern_match.group(1)
-    if not input_str:
-        return await edit_delete(event, "`Provide file path to zip`")
-    start = datetime.now()
-    if not os.path.exists(Path(input_str)):
-        return await edit_or_reply(
-            event,
-            f"There is no such directory or file with the name `{input_str}` check again",
-        )
-    if os.path.isfile(Path(input_str)):
-        return await edit_delete(event, "`File compressing is not implemented yet`")
-    mone = await edit_or_reply(event, "`Zipping in progress....`")
-    filePaths = zipdir(input_str)
-    filepath = os.path.join(
-        Config.TMP_DOWNLOAD_DIRECTORY, os.path.basename(Path(input_str))
-    )
-    zip_file = zipfile.ZipFile(filepath + ".zip", "w")
-    with zip_file:
-        for file in filePaths:
-            zip_file.write(file)
-    end = datetime.now()
-    ms = (end - start).seconds
-    await mone.edit(f"Zipped the path `{input_str}` into `{filepath+'.zip'}` in __{ms}__ Seconds")
-@iqthon.on(admin_cmd(pattern=r"unzip(?:\s|$)([\s\S]*)"))
-async def zip_file(event):  # sourcery no-metrics
-    input_str = event.pattern_match.group(1)
-    if input_str:
-        path = Path(input_str)
-        if os.path.exists(path):
-            start = datetime.now()
-            if not zipfile.is_zipfile(path):
-                return await edit_delete(
-                    event, f"`The Given path {str(path)} is not zip file to unpack`"
-                )
-            mone = await edit_or_reply(event, "`Unpacking....`")
-            destination = os.path.join(
-                Config.TMP_DOWNLOAD_DIRECTORY,
-                os.path.splitext(os.path.basename(path))[0],
-            )
-            with zipfile.ZipFile(path, "r") as zip_ref:
-                zip_ref.extractall(destination)
-            end = datetime.now()
-            ms = (end - start).seconds
-            await mone.edit(
-                f"unzipped and stored to `{destination}` \n**Time Taken :** `{ms} seconds`"
-            )
+            photos = await event.client.get_profile_photos(chat)
+        if id.strip() == "":
+            try:
+                await event.client.send_file(event.chat_id, photos)
+            except a:
+                photo = await event.client.download_profile_photo(chat)
+                await borg.send_file(event.chat_id, photo)
         else:
-            await edit_delete(event, f"I can't find that path `{input_str}`", 10)
-    elif event.reply_to_msg_id:
-        start = datetime.now()
-        reply = await event.get_reply_message()
-        ext = get_extension(reply.document)
-        if ext != ".zip":
-            return await edit_delete(
-                event,
-                "`The replied file is not a zip file recheck the replied message`",
-            )
-        mone = await edit_or_reply(event, "`Unpacking....`")
-        for attr in getattr(reply.document, "attributes", []):
-            if isinstance(attr, types.DocumentAttributeFilename):
-                filename = attr.file_name
-        filename = os.path.join(Config.TMP_DOWNLOAD_DIRECTORY, filename)
-        c_time = time.time()
-        try:
-            dl = io.FileIO(filename, "a")
-            await event.client.fast_download_file(
-                location=reply.document,
-                out=dl,
-                progress_callback=lambda d, t: asyncio.get_event_loop().create_task(
-                    progress(d, t, mone, c_time, "trying to download")
-                ),
-            )
-            dl.close()
-        except Exception as e:
-            return await edit_delete(mone, f"**Error:**\n__{str(e)}__")
-        await mone.edit("`Download finished Unpacking now`")
-        destination = os.path.join(
-            Config.TMP_DOWNLOAD_DIRECTORY,
-            os.path.splitext(os.path.basename(filename))[0],
-        )
-        with zipfile.ZipFile(filename, "r") as zip_ref:
-            zip_ref.extractall(destination)
-        end = datetime.now()
-        ms = (end - start).seconds
-        await mone.edit(
-            f"unzipped and stored to `{destination}` \n**Time Taken :** `{ms} seconds`"
-        )
-        os.remove(filename)
-    else:
-        await edit_delete(mone, "`Either reply to the zipfile or provide path of zip file along with command`",)
-@iqthon.on(admin_cmd(pattern="معرفه(?: |$)(.*)"))
-async def useridgetter(target):
-    message = await target.get_reply_message()
-    if message:
-        if not message.forward:
-            user_id = message.sender.id
-            if message.sender.username:
-                name = "@" + message.sender.username
+            try:
+                id = int(id)
+                if id <= 0:
+                    await eor(event, "رقم الهوية الذي أدخلته غير صالح")
+                    return
+            except BaseException:
+                await eor(event, "ضع عدد جانب الامر")
+                return
+            if int(id) <= (len(photos)):
+                send_photos = await event.client.download_media(photos[id - 1])
+                await borg.send_file(event.chat_id, send_photos)
             else:
-                name = "**" + message.sender.first_name + "**"
-        else:
-            user_id = message.forward.sender.id
-            if message.forward.sender.username:
-                name = "@" + message.forward.sender.username
-            else:
-                name = "*" + message.forward.sender.first_name + "*"
-        await target.edit(f"**المعرف :** {name}")
-@iqthon.on(admin_cmd(pattern="دعوه للمكالمه(?: |$)(.*)"))
-async def _(e):
-    ok = await eor(e, "`Inviting Members to Voice Chat...`")
-    users = []
-    z = 0
-    async for x in e.client.iter_participants(e.chat_id):
-        if not x.bot:
-            users.append(x.id)
-    hmm = list(user_list(users, 6))
-    for p in hmm:
-        try:
-            await e.client(invitetovc(call=await get_call(e), users=p))
-            z += 6
-        except BaseException:
-            pass
-    await ok.edit(f"`Invited {z} users`")
-@iqthon.on(admin_cmd(pattern="بدء مكالمه(?: |$)(.*)"))
-async def _(e):
-    try:
-        await e.client(startvc(e.chat_id))
-        await eor(e, "`Voice Chat Started...`")
-    except Exception as ex:
-        await eor(e, f"`{str(ex)}`")
-@iqthon.on(admin_cmd(pattern=f"{UNBANDD}(?: |$)(.*)"))
-async def nothanos(event):
-    "🝳 ⦙   لألـغاء الـحظر لـشخص في كـروب مـعين"
-    user, _ = await get_user_from_event(event)
-    if not user:
-        return
-    catevent = await edit_or_reply(event, "🝳 ⦙   جـار الـغاء الـحظر أنتـظر")
-    try:
-        await event.client(EditBannedRequest(event.chat_id, user.id, UNBAN_RIGHTS))
-        await catevent.edit(
-            f"🝳 ⦙   الـمستخدم {_format.mentionuser(user.first_name ,user.id)}\n 🝳 ⦙   تـم الـغاء حـظره بنـجاح "
-        )
-        if BOTLOG:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                "🝳 ⦙   الـغاء الـحظر \n"
-                f"الـمستخدم: [{user.first_name}](tg://user?id={user.id})\n"
-                f"الـدردشـة: {event.chat.title}(`{event.chat_id}`)",
-            )
-    except UserIdInvalidError:
-        await catevent.edit("🝳 ⦙   يـبدو أن هذه الـعمليـة تم إلغاؤهـا")
-    except Exception as e:
-        await catevent.edit(f"**خـطأ :**\n`{e}`")
-
-@iqthon.iq_cmd(incoming=True)
-async def watcher(event):
-    if is_muted(event.sender_id, event.chat_id):
-        try:
-            await event.delete()
-        except Exception as e:
-            LOGS.info(str(e))
-@iqthon.on(admin_cmd(pattern="صنع (مجموعه|قناه) (.*)"))
-async def iq(event):
-    type_of_group = event.pattern_match.group(1)
-    group_name = event.pattern_match.group(2)
-    if type_of_group == "قناه":
-        descript = "🝳 ⦙   هذه قناة إختبار أُنشئت بإستعمال تليثون العرب"
-    else:
-        descript = "🝳 ⦙   هذه المجموعه إختبار أُنشئت بإستعمال تليثون العرب"
-    if type_of_group == "مجموعه":
-        try:
-            result = await event.client(functions.messages.CreateChatRequest(users=[Config.TG_BOT_USERNAME], title=group_name))
-            created_chat_id = result.chats[0].id
-            result = await event.client(functions.messages.ExportChatInviteRequest(peer=created_chat_id))
-            await edit_or_reply(event, f"🝳 ⦙   اسم المجموعه `{group_name}` ** تم الإنشاء بنجاح  ✅  دخول ** {result.link}")
-        except Exception as e:
-            await edit_delete(event, f"**🝳 ⦙   حدث خطأ ما  🆘:**\n{str(e)}")
-    elif type_of_group == "قناه":
-        try:
-            r = await event.client(functions.channels.CreateChannelRequest(title=group_name, about=descript, megagroup=False))
-            created_chat_id = r.chats[0].id
-            result = await event.client(
-                functions.messages.ExportChatInviteRequest(peer=created_chat_id))
-            await edit_or_reply(event, f"🝳 ⦙   اسم القناه `{group_name}` ** تم الإنشاء بنجاح  ✅  دخول ** {result.link}")
-        except Exception as e:
-            await edit_delete(event, f"**🝳 ⦙   حدث خطأ ما  🆘 :**\n{str(e)}")
-    elif type_of_group == "مجموعه":
-        answer = await create_supergroup(group_name, event.client, Config.TG_BOT_USERNAME, descript)
-        if answer[0] != "error":
-            await edit_or_reply(event, f"🝳 ⦙   خارق جروب `{group_name}` ** تم الإنشاء بنجاح  ✅  دخول ** {answer[0].link}")
-        else:
-            await edit_delete(event, f"**🝳 ⦙   حدث خطأ ما  🆘 :**\n{str(answer[1])}")
-    else:
-        await edit_delete(event, "**🝳 ⦙  الاوامر` **صنع مجموعه لمعرفة كيفية استخدامي.`")
-@iqthon.on(admin_cmd(pattern="تلقائي ?(.*)"))
+                await eor(event, "ليس لديه صور 🙄")
+                return
+@iqthon.on(admin_cmd(pattern="معرفاتي(?: |$)(.*)"))
 async def _(event):
-    if (event.is_private or event.is_group):
-        return await edit_or_reply(event, "امر التلقائي يستخدم فقط للقنوات")
-    hel_ = event.pattern_match.group(1)
-    if str(hel_).startswith("-100"):
-        iq = str(hel_).replace("-100", "")
-    else:
-        iq = hel_
-    if not iq.isdigit():
-        return await edit_or_reply(event, "**رجاء قم بوضع ايدي القناه بجانب الأمر !!**")
-    if is_post(iq , event.chat_id):
-        return await edit_or_reply(event, "هذا القناه بلفعل متفعل فيها التلقائي.")
-    add_post(iq, event.chat_id)
-    await edit_or_reply(event, f"**📍 تم بدء امر التلقائي لقناه :** `{hel_}`")
-
-
-@iqthon.on(admin_cmd(pattern="الغاء_التلقائي ?(.*)"))
+    result = await event.client(GetAdminedPublicChannelsRequest())
+    output_str = "**🝳 ⦙  جميع القنوات والمجموعات التي قمت بإنشائها  💠  :**\n"
+    output_str += "".join(f"🝳 ⦙    - {channel_obj.title} @{channel_obj.username} \n"
+        for channel_obj in result.chats)
+    await edit_or_reply(event, output_str)
+@iqthon.on(admin_cmd(pattern="ملكيه ([\s\S]*)"))
 async def _(event):
-    if (event.is_private or event.is_group):
-        return await edit_or_reply(event, "امر التلقائي يستخدم فقط للقنوات.")
-    hel_ = event.pattern_match.group(1)
-    if str(hel_).startswith("-100"):
-        iq = str(hel_).replace("-100", "")
+    user_name = event.pattern_match.group(1)
+    try:
+        pwd = await event.client(functions.account.GetPasswordRequest())
+        my_srp_password = pwd_mod.compute_check(pwd, Config.TG_2STEP_VERIFICATION_CODE)
+        await event.client(
+            functions.channels.EditCreatorRequest(                channel=event.chat_id, user_id=user_name, password=my_srp_password            )        )
+    except Exception as e:
+        await event.edit(f"**🝳 ⦙  حـدث خـطأ ✕ :**\n`{str(e)}`")
     else:
-        iq = hel_
-    if not iq.isdigit():
-        return await edit_or_reply(event, "**رجاء قم بوضع ايدي القناه بجانب الأمر !!**")
-    if not is_post(iq, event.chat_id):
-        return await edit_or_reply(event, "هذا القناه لم يتم وضع تلقائي فيها.")
-    remove_post(iq, event.chat_id)
-    await edit_or_reply(event, f"**📍 تم ايقاف التلقائي لقناه : ** `{hel_}`")
-@iqthon.on(admin_cmd(pattern=r"جلب الصور(?:\s|$)([\s\S]*)"))
+        await event.edit("**🝳 ⦙  تم نقل ملكيه ✓**")
+
+
+@iqthon.on(admin_cmd(pattern=f"{plagiarism}(?: |$)(.*)"))
+async def _(event):
+    replied_user, error_i_a = await get_user_from_event(event)
+    if replied_user is None:
+        return
+    user_id = replied_user.id
+    profile_pic = await event.client.download_profile_photo(user_id, Config.TEMP_DIR)
+    first_name = html.escape(replied_user.first_name)
+    if first_name is not None:
+        first_name = first_name.replace("\u2060", "")
+    last_name = replied_user.last_name
+    if last_name is not None:
+        last_name = html.escape(last_name)
+        last_name = last_name.replace("\u2060", "")
+    if last_name is None:
+        last_name = "⁪⁬⁮⁮⁮⁮ ‌‌‌‌"
+    replied_user = (await event.client(GetFullUserRequest(replied_user.id))).full_user
+    user_bio = replied_user.about
+    if user_bio is not None:
+        user_bio = replied_user.about
+    await event.client(functions.account.UpdateProfileRequest(first_name=first_name))
+    await event.client(functions.account.UpdateProfileRequest(last_name=last_name))
+    await event.client(functions.account.UpdateProfileRequest(about=user_bio))
+    try:
+        pfile = await event.client.upload_file(profile_pic)
+    except Exception as e:
+        return await edit_delete(event, f"**خطأ :**\n__{e}__")
+    await event.client(functions.photos.UploadProfilePhotoRequest(pfile))
+    await edit_delete(event, "**تم الانتحال**")
+    if BOTLOG:
+        await event.client.send_message(            BOTLOG_CHATID,            f"انتحال \nتم انتحال : [{first_name}](tg://user?id={user_id })",        )
+async def autobio_loop():
+    AUTOBIOSTART = gvarstatus(f"{OR_AUTOBIO}") == "true"
+    while AUTOBIOSTART:
+        HM = time.strftime("%I:%M")
+        Dont1Tags = gvarstatus("FONTS_AUTO") or "font1"
+        FONT1 = requests.get(f"https://tufe.zzz.com.ua/FONTS/{Dont1Tags}.php?text={HM}").json()['newText']
+        bio = f"{EMOJI_TELETHON} {DEFAULTUSERBIO}  • {FONT1}"
+        LOGS.info(bio)
+        try:
+            await iqthon(functions.account.UpdateProfileRequest(about=bio))
+        except FloodWaitError as ex:
+            LOGS.warning(str(ex))
+            await asyncio.sleep(ex.seconds)
+        await asyncio.sleep(Config.CHANGE_TIME)
+        AUTOBIOSTART = gvarstatus(f"{OR_AUTOBIO}") == "true"
+@iqthon.on(admin_cmd(pattern=f"{unplagiarism}(?: |$)(.*)"))
+async def _(event):
+    name = f"{DEFAULTUSER}"
+    blank = ""
+    bio = f"{DEFAULTUSERBIO}"
+    await event.client(
+        functions.photos.DeletePhotosRequest(            await event.client.get_profile_photos("me", limit=1)        )    )
+    await event.client(functions.account.UpdateProfileRequest(about=bio))
+    await event.client(functions.account.UpdateProfileRequest(first_name=name))
+    await event.client(functions.account.UpdateProfileRequest(last_name=blank))
+    await edit_delete(event, "**🝳 ⦙  تمّـت إعـادة حسـابك بنجـاح ✓**")
+    if BOTLOG:
+        await event.client.send_message(            BOTLOG_CHATID, f"🝳 ⦙   **الأعـادة ♲ :**\n**🝳 ⦙   تـم إعـادة ضبـط حسـابك إلـى وضعـه الطبيـعي بـنجاح ✓**"        )
+
+
+async def fetch_info(replied_user, event):
+    FullUser = (await event.client(GetFullUserRequest(replied_user.id))).full_user
+    replied_user_profile_photos = await event.client(        GetUserPhotosRequest(user_id=replied_user.id, offset=42, max_id=0, limit=80)    )
+    replied_user_profile_photos_count = "لاتوجد صوره"
+    dc_id = "لايوجد ايدي"
+    try:
+        replied_user_profile_photos_count = replied_user_profile_photos.count
+        dc_id = replied_user.photo.dc_id
+    except AttributeError:
+        pass
+    user_id = replied_user.id
+    first_name = replied_user.first_name
+    last_name = replied_user.user.last_name
+    full_name = FullUser.private_forward_name
+    common_chat = FullUser.common_chats_count
+    username = replied_user.username
+    user_bio = FullUser.about
+    is_bot = replied_user.bot
+    restricted = replied_user.restricted
+    verified = replied_user.verified
+    photo = await event.client.download_profile_photo(        user_id,        Config.TMP_DOWNLOAD_DIRECTORY + str(user_id) + ".jpg",        download_big=True,    )
+    first_name = (        first_name.replace("\u2060", "")        if first_name        else ("ليس لديه اسم")    )
+    last_name = (        last_name.replace("\u2060", "")        if last_name        else (" ")    )
+    full_name = full_name or first_name
+    username = "@{}".format(username) if username else ("ليس لديه معرف")
+    user_bio = "لايوجد نبذه" if not user_bio else user_bio
+    caption = "<b>𓍹ⵧⵧⵧⵧⵧⵧⵧⵧ⁦⁦ⵧⵧⵧⵧⵧⵧⵧⵧ𓍻</b>\n"
+    caption += f"<b>• ⚜️ | الاســم  :  </b> {first_name} {last_name}\n"
+    caption += f"<b>• ⚜️ | الــمــ؏ــࢪف  : </b> {username}\n"
+    caption += f"<b>• ⚜️ | الايــدي  :  </b> <code>{user_id}</code>\n"
+    caption += f"<b>• ⚜️ | ؏ــدد صــوࢪ  : </b> {replied_user_profile_photos_count}\n"
+    caption += f"<b>• ⚜️ | الـحـسـاب  :  </b> "
+    caption += f' <a href="tg://user?id={user_id}">{first_name}{last_name}</a> \n'
+    caption += "<b>𓍹ⵧⵧⵧⵧⵧⵧⵧⵧ⁦⁦ⵧⵧⵧⵧⵧⵧⵧⵧ𓍻</b>\n"
+    return photo, caption
+
+
+
+async def autoname_loop():
+    AUTONAMESTART = gvarstatus(f"{OR_NAMEAUTO}") == "true"
+    while AUTONAMESTART:
+        HM = time.strftime("%I:%M")
+        Dont1Tags = gvarstatus(f"FONTS_AUTO") or "font1"
+        FONT1 = requests.get(f"https://tufe.zzz.com.ua/FONTS/{Dont1Tags}.php?text={HM}").json()['newText']
+        name = f"{EMOJI_TELETHON} {FONT1} • "
+        LOGS.info(name)
+        try:
+            await iqthon(functions.account.UpdateProfileRequest(first_name=name))
+        except FloodWaitError as ex:
+            LOGS.warning(str(ex))
+            await asyncio.sleep(ex.seconds)
+        await asyncio.sleep(Config.CHANGE_TIME)
+        AUTONAMESTART = gvarstatus(f"{OR_NAMEAUTO}") == "true"
+@iqthon.on(admin_cmd(pattern="كشف(?:\s|$)([\s\S]*)"))
+async def _(event):
+    replied_user, error_i_a = await get_user_from_event(event)
+    if not replied_user:
+        return
+    catevent = await edit_or_reply(event, "جاري الكشف عن الشخص")
+    replied_user = await event.client(GetFullUserRequest(replied_user.id))
+    user_id = replied_user.user.id
+    first_name = html.escape(replied_user.user.first_name)
+    if first_name is not None:
+        first_name = first_name.replace("\u2060", "")
+    common_chats = replied_user.common_chats_count
+    try:
+        dc_id, location = get_input_location(replied_user.profile_photo)
+    except Exception:
+        dc_id = " عذرا لانقدر على جلب المعلومات الخاصه له!"
+    if spamwatch:
+        ban = spamwatch.get_ban(user_id)
+        if ban:
+            sw = f"**حظر المشاهد :** `شغال` \n       **-**🤷‍♂️**السبب : **`{ban.reason}`"
+        else:
+            sw = f"**حظر المشاهد :** `معطل`"
+    else:
+        sw = "**محظور المشاهد :**`غير متصل`"
+    try:
+        casurl = "https://api.cas.chat/check?user_id={}".format(user_id)
+        data = get(casurl).json()
+    except Exception as e:
+        LOGS.info(e)
+        data = None
+    if data:
+        if data["ok"]:
+            cas = "**الحظر :** `محظور`"
+        else:
+            cas = "**الحظر :** `لست محضور`"
+    else:
+        cas = "**الحظر :** `لايمكن جلب معلومات الشخص`"
+    caption = """**معلومات حول : [{}](tg://user?id={}):
+   -🔖 الايدي : **`{}`
+   **-**👥**المجموعات المشتركة : **`{}`
+   **-**🌏**رقم مركز البيانات : **`{}`
+   **-**🔏**مقيد من تليجرام : **`{}`
+   **-**🦅{}
+   **-**👮‍♂️{}
+""".format(        first_name,
+        user_id,
+        user_id,
+        common_chats,
+        dc_id,
+        replied_user.user.restricted,
+        sw,
+        cas    )
+    await edit_or_reply(catevent, caption)
+@iqthon.on(admin_cmd(pattern=f"{idee}(?:\s|$)([\s\S]*)"))
+async def who(event):
+    if not os.path.isdir(Config.TMP_DOWNLOAD_DIRECTORY):
+        os.makedirs(Config.TMP_DOWNLOAD_DIRECTORY)
+    replied_user, reason = await get_user_from_event(event)
+    if not replied_user:
+        return
+    cat = await edit_or_reply(event, " جاري جلب معلومات الشخص ....")
+    try:
+        photo, caption = await fetch_info(replied_user, event)
+    except AttributeError:
+        return await edit_or_reply(cat, "تعذر جلب المعلومات")
+    message_id_to_reply = await reply_id(event)
+    try:
+        await event.client.send_file(
+            event.chat_id,
+            photo,
+            caption=caption,
+            link_preview=False,
+            force_document=False,
+            reply_to=message_id_to_reply,
+            parse_mode="html",
+        )
+        if not photo.startswith("http"):
+            os.remove(photo)
+        await cat.delete()
+    except TypeError:
+        await cat.edit(caption, parse_mode="html")
+FONT_FILE_TO_USE = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+TELEGRAPH_MEDIA_LINKS = [    "https://telegra.ph/file/e354ce72d5cc6a1d27c4d.jpg",    "https://telegra.ph/file/8f9ff3d743e6707a61489.jpg",    "https://telegra.ph/file/bfc97f4abc4bec6fe860d.jpg",    "https://telegra.ph/file/5ef0f060023600ec08c19.jpg",    "https://telegra.ph/file/a448465a3a8a251170f76.jpg",    "https://telegra.ph/file/eb0ac1557668a98a38cb6.jpg",    "https://telegra.ph/file/fdb3691a17a2c91fbe76c.jpg",    "https://telegra.ph/file/ccdf69ebf6cb85c52a25b.jpg",    "https://telegra.ph/file/2adffc55ac0c9733ecc7f.jpg",    "https://telegra.ph/file/faca3b435da33f2f156f1.jpg",    "https://telegra.ph/file/93d0a48c31e16f036f0e8.jpg",    "https://telegra.ph/file/9ed89dc742b172a779312.jpg",    "https://telegra.ph/file/0b4c19a19fb834d922d66.jpg",    "https://telegra.ph/file/a95a0deb86f642129b067.jpg",    "https://telegra.ph/file/c4c3d8b5cfc3cc5040833.jpg",    "https://telegra.ph/file/1e1a1b52b9a313e066a04.jpg",    "https://telegra.ph/file/a582950a8a259efdcbbc0.jpg",    "https://telegra.ph/file/9c3a784d45790b193ca36.jpg",    "https://telegra.ph/file/6aa74b17ae4e7dc46116f.jpg",    "https://telegra.ph/file/e63cf624d1b68a5c819b6.jpg",    "https://telegra.ph/file/7e420ad5995952ba1c262.jpg",    "https://telegra.ph/file/c7a4dc3d2a9a422c19723.jpg",    "https://telegra.ph/file/163c7eba56fd2e8c266e4.jpg",    "https://telegra.ph/file/5c87b63ae326b5c3cd713.jpg",    "https://telegra.ph/file/344ca22b35868c0a7661d.jpg",    "https://telegra.ph/file/a0ef3e56f558f04a876aa.jpg",    "https://telegra.ph/file/217b997ad9b5af8b269d0.jpg",    "https://telegra.ph/file/b3595f99b221c56a5679b.jpg",    "https://telegra.ph/file/aba7f4b4485c5aae53c52.jpg",    "https://telegra.ph/file/209ca51dba6c0f1fba85f.jpg",    "https://telegra.ph/file/2a0505ee2630bd6d7acca.jpg",    "https://telegra.ph/file/d193d4191012f4aafd4d2.jpg",    "https://telegra.ph/file/47e2d151984bd54a5d947.jpg",    "https://telegra.ph/file/2a6c735b47db947b44599.jpg",    "https://telegra.ph/file/7567774412fb76ceba95c.jpg",    "https://telegra.ph/file/6dd8b0edec92b24985e13.jpg",    "https://telegra.ph/file/dcf5e16cc344f1c030469.jpg",    "https://telegra.ph/file/0718be0bd52a2eb7e36aa.jpg",    "https://telegra.ph/file/0d7fcb82603b5db683890.jpg",    "https://telegra.ph/file/44595caa95717f4db4788.jpg",    "https://telegra.ph/file/f3a063d884d0dcde437e3.jpg",    "https://telegra.ph/file/733425275da19cbed0822.jpg",    "https://telegra.ph/file/aff5223e1aa29f212a46a.jpg",    "https://telegra.ph/file/45ccfa3ef878bea9cfc02.jpg",    "https://telegra.ph/file/a38aa50d009835177ac16.jpg",    "https://telegra.ph/file/53e25b1b06f411ec051f0.jpg",    "https://telegra.ph/file/96e801400487d0a120715.jpg",    "https://telegra.ph/file/6ae8e799f2acc837e27eb.jpg",    "https://telegra.ph/file/265ff1cebbb7042bfb5a7.jpg",    "https://telegra.ph/file/4c8c9cd0751eab99600c9.jpg",    "https://telegra.ph/file/1c6a5cd6d82f92c646c0f.jpg",    "https://telegra.ph/file/2c1056c91c8f37fea838a.jpg",    "https://telegra.ph/file/f140c121d03dfcaf4e951.jpg",    "https://telegra.ph/file/39f7b5d1d7a3487f6ba69.jpg",]
+@iqthon.on(admin_cmd(pattern="رابطه(?:\s|$)([\s\S]*)"))
+async def permalink(mention):
+    user, custom = await get_user_from_event(mention)
+    if not user:
+        return
+    if custom:
+        return await edit_or_reply(mention, f"⨳ | [{custom}](tg://user?id={user.id})")
+    tag = user.first_name.replace("\u2060", "") if user.first_name else user.username
+    await edit_or_reply(mention, f"⨳ | [{tag}](tg://user?id={user.id})")
+
+
+@iqthon.on(admin_cmd(pattern="محادثة وقتية"))
+async def _(event):
+    ison = getGrChAuto()
+    if event.is_group or event.is_channel:
+        if ison is not None and ison == str(event.chat_id):
+            return await edit_delete(event, "** الوقتية شغال للكروب/القناة**")
+        chid = event.chat_id
+        Auto_ChGR(str(chid))
+        await edit_delete(event, "**تم تفـعيل الاسـم الوقتي للقناة/الكروب ✓**")
+        await GrChiq_loop()
+    else:
+        return await edit_delete(event, "**يمكنك استعمال  الوقتية في الكروب او في القناة فقط**")
+@iqthon.on(admin_cmd(pattern="اسمه(?:\s|$)([\s\S]*)"))
+async def permalink(mention):
+    user, custom = await get_user_from_event(mention)
+    if not user:
+        return
+    if custom:
+        return await edit_or_reply(mention, f"⨳ | {custom} ")
+    ll5 = user.first_name.replace("\u2060", "") if user.first_name else (" ")
+    kno = user.last_name.replace("\u2060", "") if user.last_name else (" ")
+    await edit_or_reply(mention, f"⨳  {ll5} {kno}")  
+@iqthon.on(admin_cmd(pattern="صورته(?:\s|$)([\s\S]*)"))
 async def potocmd(event):
     uid = "".join(event.raw_text.split(maxsplit=1)[1:])
     user = await event.get_reply_message()
@@ -2228,9 +1542,7 @@ async def potocmd(event):
     if uid.strip() == "":
         uid = 1
         if int(uid) > (len(photos)):
-            return await edit_delete(
-                event, "**🝳 ⦙   لم يتم العثور على صورة لهذا  الشخص 🏞**"
-            )
+            return await edit_delete(                event, "**🝳 ⦙   لم يتم العثور على صورة لهذا  الشخص 🏞**"            )
         send_photos = await event.client.download_media(photos[uid - 1])
         await event.client.send_file(event.chat_id, send_photos)
     elif uid.strip() == "جميعها":
@@ -2249,205 +1561,1311 @@ async def potocmd(event):
         try:
             uid = int(uid)
             if uid <= 0:
-                await edit_or_reply(
-                    event, "**🝳 ⦙   الرقم غير صحيح - اختر رقم صوره موجود فعليا ⁉️**"
-                )
+                await edit_or_reply(                    event, "**🝳 ⦙   الرقم غير صحيح - اختر رقم صوره موجود فعليا ⁉️**"                )
                 return
         except BaseException:
             await edit_or_reply(event, "**🝳 ⦙   هناك خطا  ⁉️**")
             return
         if int(uid) > (len(photos)):
-            return await edit_delere(
-                event, "**🝳 ⦙   لم يتم العثور على صورة لهذا  الشخص 🏞**"
-            )
+            return await edit_delere(                event, "**🝳 ⦙   لم يتم العثور على صورة لهذا  الشخص 🏞**"            )
 
         send_photos = await event.client.download_media(photos[uid - 1])
         await event.client.send_file(event.chat_id, send_photos)
-    await event.delete()
-@iqthon.on(admin_cmd(pattern="تفعيل ([\s\S]*)"))    
-async def _(event):  
-    input_str = event.pattern_match.group(1)
-    peer_id = event.chat_id
-    if not event.is_group:
-        return await edit_delete(event, "**🝳 ⦙ هذه ليست مجموعة لقفل الأشياء**")
-    chat_per = (await event.get_chat()).default_banned_rights
-    cat = base64.b64decode("QUFBQUFGRV9vWjVYVE5fUnVaaEtOdw==")
-    if input_str in (("bots", "commands", "email", "forward", "url")):
-        update_lock(peer_id, input_str, True)
-        await edit_or_reply(event, "`Locked {}`".format(input_str))
-    else:
-        msg = chat_per.send_messages
-        media = chat_per.send_media
-        sticker = chat_per.send_stickers
-        gif = chat_per.send_gifs
-        gamee = chat_per.send_games
-        ainline = chat_per.send_inline
-        embed_link = chat_per.embed_links
-        gpoll = chat_per.send_polls
-        adduser = chat_per.invite_users
-        cpin = chat_per.pin_messages
-        changeinfo = chat_per.change_info
-        if input_str == "msg":
-            if msg:
-                return await edit_delete(event, "**🝳 ⦙ هذه المجموعة مؤمنة بالفعل بإذن المراسلة**")
-            msg = True
-            locktype = "messages"
-        elif input_str == "حمايه المجموعه":
-            msg = False
-            media = True
-            sticker = True
-            gif = True
-            gamee = True
-            ainline = True
-            embed_link = True
-            gpoll = True
-            adduser = True
-            cpin = True
-            changeinfo = True
-            locktype = "everything"
-        elif input_str:
-            return await edit_delete(event, f"**🝳 ⦙ عذرا خطا بكتابه الأمر :** `{input_str}`", time=5)
-
-        else:
-            return await edit_or_reply(event, "**🝳 ⦙ لااستطيع تفعيل حمايه المجموعه**")
-        try:
-            cat = Get(cat)
-            await event.client(cat)
-        except BaseException:
-            pass
-        lock_rights = ChatBannedRights(until_date=None, send_messages=msg, send_media=media, send_stickers=sticker, send_gifs=gif, send_games=gamee, send_inline=ainline, embed_links=embed_link, send_polls=gpoll, invite_users=adduser, pin_messages=cpin, change_info=changeinfo)
-        try:
-            await event.client(EditChatDefaultBannedRightsRequest(peer=peer_id, banned_rights=lock_rights))
-            await edit_or_reply(event, f"**🝳 ⦙ تفعيل حمايه المجموعه تم بنجاح**")
-        except BaseException as e:
-            await edit_delete(event,f"**🝳 ⦙ هناك خطا:** `{e}`", time=5)
-@iqthon.on(admin_cmd(pattern="تعطيل ([\s\S]*)"))    
-async def _(event):  
-    input_str = event.pattern_match.group(1)
-    peer_id = event.chat_id
-    if not event.is_group:
-        return await edit_delete(event, "**🝳 ⦙ هذه ليست مجموعة لقفل الأشياء**")
-    cat = base64.b64decode("QUFBQUFGRV9vWjVYVE5fUnVaaEtOdw==")
-    chat_per = (await event.get_chat()).default_banned_rights
-    if input_str in (("bots", "commands", "email", "forward", "url")):
-        update_lock(peer_id, input_str, False)
-        await edit_or_reply(event, "**🝳 ⦙ تعطيل حمايه المجموعه تم بنجاح**".format(input_str))
-    else:
-        msg = chat_per.send_messages
-        media = chat_per.send_media
-        sticker = chat_per.send_stickers
-        gif = chat_per.send_gifs
-        gamee = chat_per.send_games
-        ainline = chat_per.send_inline
-        gpoll = chat_per.send_polls
-        embed_link = chat_per.embed_links
-        adduser = chat_per.invite_users
-        cpin = chat_per.pin_messages
-        changeinfo = chat_per.change_info
-        if input_str == "msg":
-            if not msg:
-                return await edit_delete(event, "**🝳 ⦙ هذه المجموعة غير مؤمنة بالفعل بإذن المراسلة**")
-            msg = False
-            locktype = "messages"
-        elif input_str == "حمايه المجموعه":
-            msg = False
-            media = False
-            sticker = False
-            gif = False
-            gamee = False
-            ainline = False
-            gpoll = False
-            embed_link = False
-            adduser = True
-            cpin = True
-            changeinfo = True
-            locktype = "everything"
-        elif input_str:
-            return await edit_delete(event, f"**🝳 ⦙ عذرا خطا بكتابه الأمر :** `{input_str}`", time=5)
-
-        else:
-            return await edit_or_reply(event, "**🝳 ⦙ لااستطيع تعطيل حمايه المجموعه**")
-        try:
-            cat = Get(cat)
-            await event.client(cat)
-        except BaseException:
-            pass
-        unlock_rights = ChatBannedRights(until_date=None, send_messages=msg, send_media=media, send_stickers=sticker, send_gifs=gif, send_games=gamee, send_inline=ainline, send_polls=gpoll, embed_links=embed_link, invite_users=adduser, pin_messages=cpin, change_info=changeinfo)
-        try:
-            await event.client(EditChatDefaultBannedRightsRequest(peer=peer_id, banned_rights=unlock_rights))
-            await edit_or_reply(event, "**🝳 ⦙ تعطيل حمايه المجموعه تم بنجاح**")
-        except BaseException as e:
-            return await edit_delete(event, f"**🝳 ⦙ هناك خطا:** `{e}`", time=5)
-@iqthon.on(admin_cmd(pattern="صلاحيات المجموعه$"))    
-async def _(event):  
-    res = ""
-    current_db_locks = get_locks(event.chat_id)
-    if not current_db_locks:
-        res = "لا توجد إعدادات في هذه الدردشة"
-    else:
-        res = "**🝳 ⦙ أذونات الصلاحيه في هذه الدردشة : **\n"
-        ubots = "❌" if current_db_locks.bots else "✅"
-        ucommands = "❌" if current_db_locks.commands else "✅"
-        uemail = "❌" if current_db_locks.email else "✅"
-        uforward = "❌" if current_db_locks.forward else "✅"
-        uurl = "❌" if current_db_locks.url else "✅"
-        res += f"**🝳 ⦙ البوتات :** `{ubots}`\n"
-        res += f"**🝳 ⦙ الرسائل :** `{ucommands}`\n"
-        res += f"**🝳 ⦙ التوجيهات :** `{uforward}`\n"
-        res += f"**🝳 ⦙ الروابط :** `{uurl}`\n"
-    current_chat = await event.get_chat()
-    try:
-        chat_per = current_chat.default_banned_rights
-    except AttributeError as e:
-        logger.info(str(e))
-    else:
-        umsg = "❌" if chat_per.send_messages else "✅"
-        umedia = "❌" if chat_per.send_media else "✅"
-        usticker = "❌" if chat_per.send_stickers else "✅"
-        ugif = "❌" if chat_per.send_gifs else "✅"
-        ugamee = "❌" if chat_per.send_games else "✅"
-        uainline = "❌" if chat_per.send_inline else "✅"
-        uembed_link = "❌" if chat_per.embed_links else "✅"
-        ugpoll = "❌" if chat_per.send_polls else "✅"
-        uadduser = "❌" if chat_per.invite_users else "✅"
-        ucpin = "❌" if chat_per.pin_messages else "✅"
-        uchangeinfo = "❌" if chat_per.change_info else "✅"
-        res += "\n**🝳 ⦙ هذه هي الأذونات الحالية لهذه الدردشة :** \n"
-        res += f"**🝳 ⦙ الرسائل :** `{umsg}`\n"
-        res += f"**🝳 ⦙ الميديا :** `{umedia}`\n"
-        res += f"**🝳 ⦙ الملصقات :** `{usticker}`\n"
-        res += f"**🝳 ⦙ المتحركه :** `{ugif}`\n"
-        res += f"**🝳 ⦙ معاينه الروابط :** `{uembed_link}`\n"
-        res += f"**🝳 ⦙ الالعاب :** `{ugamee}`\n"
-        res += f"**🝳 ⦙ الاونلاين :** `{uainline}`\n"
-        res += f"**🝳 ⦙ اضافه الاعضاء :** `{uadduser}`\n"
-        res += f"**🝳 ⦙ تغير معلومات :** `{uchangeinfo}`\n"
-    await edit_or_reply(event, res)
-@iqthon.on(events.ChatAction())
+    await event.delete()  
+@iqthon.on(admin_cmd(pattern=f"{OR_FOTOAUTO}(?: |$)(.*)"))
 async def _(event):
-    if not event.is_private:
-        chat = await event.get_cihat()
-        admin = chat.admin_rights
-        creator = chat.creator
-        if not admin and not creator:
-            return
-    if not is_locked(event.chat_id, "bots"):
+    downloader = SmartDL(digitalpfp, digitalpic_path, progress_bar=False)
+    downloader.start(blocking=False)
+    while not downloader.isFinished():
+        pass
+    if gvarstatus(f"{OR_FOTOAUTO}") is not None and gvarstatus(f"{OR_FOTOAUTO}") == "true":
+        return await edit_delete(event, f"**🝳 ⦙  صوره وقتية مفعّلـة بالفعـل !**")
+    addgvar(f"{OR_FOTOAUTO}", True)
+    await edit_delete(event, f"**🝳 ⦙  تـمّ بـدأ الصـورة الديجيتـال بواسطـة المستخـدم ✓**")
+    await digitalpicloop()
+@iqthon.on(admin_cmd(pattern="الملفات ?(.*)"))
+async def _(e):
+    files = e.pattern_match.group(1)
+    if not files:
+        files = "*"
+    elif files.endswith("/"):
+        files = files + "*"
+    elif "*" not in files:
+        files = files + "/*"
+    files = glob.glob(files)
+    if not files:
+        return await eor(e, "الدليل فارغ أو غير صحيح", time=5)
+    pyfiles = []
+    jsons = []
+    vdos = []
+    audios = []
+    pics = []
+    others = []
+    otherfiles = []
+    folders = []
+    text = []
+    apk = []
+    exe = []
+    zip_ = []
+    book = []
+    for file in sorted(files):
+        if os.path.isdir(file):
+            folders.append("📂 " + str(file))
+        elif str(file).endswith(".py"):
+            pyfiles.append("🐍 " + str(file))
+        elif str(file).endswith(".json"):
+            jsons.append("🔮 " + str(file))
+        elif str(file).endswith((".mkv", ".mp4", ".avi", ".gif", "webm")):
+            vdos.append("🎥 " + str(file))
+        elif str(file).endswith((".mp3", ".ogg", ".m4a", ".opus")):
+            audios.append("🔊 " + str(file))
+        elif str(file).endswith((".jpg", ".jpeg", ".png", ".webp")):
+            pics.append("🖼 " + str(file))
+        elif str(file).endswith((".txt", ".text", ".log")):
+            text.append("📄 " + str(file))
+        elif str(file).endswith((".apk", ".xapk")):
+            apk.append("📲 " + str(file))
+        elif str(file).endswith(".exe"):
+            exe.append("⚙ " + str(file))
+        elif str(file).endswith((".zip", ".rar")):
+            zip_.append("🗜 " + str(file))
+        elif str(file).endswith((".pdf", ".epub")):
+            book.append("📗 " + str(file))
+        elif "." in str(file)[1:]:
+            others.append("🏷 " + str(file))
+        else:
+            otherfiles.append("📒 " + str(file))
+    omk = [        *sorted(folders),        *sorted(pyfiles),        *sorted(jsons),        *sorted(zip_),        *sorted(vdos),        *sorted(pics),        *sorted(audios),        *sorted(apk),        *sorted(exe),        *sorted(book),        *sorted(text),        *sorted(others),        *sorted(otherfiles),    ]
+    text = ""
+    fls, fos = 0, 0
+    flc, foc = 0, 0
+    for i in omk:
+        try:
+            emoji = i.split()[0]
+            name = i.split(maxsplit=1)[1]
+            nam = name.split("/")[-1]
+            if os.path.isdir(name):
+                size = 0
+                for path, dirs, files in os.walk(name):
+                    for f in files:
+                        fp = os.path.join(path, f)
+                        size += os.path.getsize(fp)
+                if hb(size):
+                    text += emoji + f" `{nam}`" + "  `" + hb(size) + "`\n"
+                    fos += size
+                else:
+                    text += emoji + f" `{nam}`" + "\n"
+                foc += 1
+            else:
+                if hb(int(os.path.getsize(name))):
+                    text += (                        emoji                        + f" `{nam}`"                        + "  `"                        + hb(int(os.path.getsize(name)))                        + "`\n"                    )
+                    fls += int(os.path.getsize(name))
+                else:
+                    text += emoji + f" `{nam}`" + "\n"
+                flc += 1
+        except BaseException:
+            pass
+    tfos, tfls, ttol = hb(fos), hb(fls), hb(fos + fls)
+    if not hb(fos):
+        tfos = "0 B"
+    if not hb(fls):
+        tfls = "0 B"
+    if not hb(fos + fls):
+        ttol = "0 B"
+    text += f"\n\nالمجلدات :  `{foc}` :   `{tfos}`\nعدد الملفات :       `{flc}` :   `{tfls}`\nالمجموع :       `{flc+foc}` :   `{ttol}`"
+    try:
+        await eor(e, text)
+    except MessageTooLongError:
+        with io.BytesIO(str.encode(text)) as out_file:
+            out_file.name = "output.txt"
+            await e.reply(                f"`{e.text}`", file=out_file, thumb=None ) 
+        await e.delete()
+@iqthon.on(admin_cmd(pattern="كول (.*)"))
+async def _(event):
+    bxt = Config.TG_BOT_USERNAME
+    try:
+        tex = str(event.text[6:])
+        await tgbot.send_message(event.chat_id, tex)
+        await event.delete()
+    except BaseException:
+        await event.client.send_message(event.chat_id, f"رجاء اضف البوت الخاص بك هنا : @{bxt}  !")
+        await event.delete()
+def text_set(text):
+    lines = []
+    if len(text) <= 55:
+        lines.append(text)
+    else:
+        all_lines = text.split("\n")
+        for line in all_lines:
+            if len(line) <= 55:
+                lines.append(line)
+            else:
+                k = int(len(line) / 55)
+                for z in range(1, k + 2):
+                    lines.append(line[((z - 1) * 55) : (z * 55)])
+    return lines[:25]
+    
+
+@iqthon.on(admin_cmd(pattern="كتابه ?(.*)"))
+async def writer(e):
+    if e.reply_to:
+        reply = await e.get_reply_message()
+        text = reply.message
+    elif e.pattern_match.group(1):
+        text = e.text.split(maxsplit=1)[1]
+    else:
+        return await e.edit("Privode Some Text🥲")
+    img = Image.open("SQL/template.jpg")
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("SQL/assfont.ttf", 30)
+    x, y = 150, 140
+    lines = text_set(text)
+    line_height = font.getsize("hg")[1]
+    for line in lines:
+        draw.text((x, y), line, fill=(1, 22, 55), font=font)
+        y = y + line_height - 5
+    file = "iqthon_Write.jpg"
+    img.save(file)
+    await e.reply(file=file)
+    os.remove(file)
+    await e.delete()
+@iqthon.on(admin_cmd(pattern="عد الردود ?(.*)"))
+async def _(event):
+    await eor(event, "جاري العد ...")
+    count = -1
+    message = event.message
+    while message:
+        reply = await message.get_reply_message()
+        if reply is None:
+            await borg(                SaveDraftRequest(                    await event.get_input_chat(), "", reply_to_msg_id=message.id                )            )
+        message = reply
+        count += 1
+    await eor(event, f"عدد الردود على هذا الرساله : {count}")
+
+@iqthon.on(admin_cmd(pattern="زاجل ?(.*)"))
+async def pmto(event):
+    a = event.pattern_match.group(1)
+    b = a.split(" ")
+    chat_id = b[0]
+    try:
+        chat_id = int(chat_id)
+    except BaseException:
+        pass
+    msg = ""
+    for i in b[1:]:
+        msg += i + " "
+    if msg == "":
         return
-    if event.user_added:
-        users_added_by = event.action_message.sender_id
-        is_ban_able = False
-        rights = types.ChatBannedRights(until_date=None, view_messages=True)
-        added_users = event.action_message.action.users
-        for user_id in added_users:
-            user_obj = await event.client.get_entity(user_id)
-            if user_obj.bot:
-                is_ban_able = True
+    try:
+        await borg.send_message(chat_id, msg)
+        await event.edit("تم الارسال !🤗")
+    except BaseException:
+        await event.edit("هناك خطا .")
+@iqthon.on(admin_cmd(pattern=f"{OR_NAMEAUTO}(?: |$)(.*)"))
+async def _(event):
+    if gvarstatus(f"{OR_NAMEAUTO}") is not None and gvarstatus(f"{OR_NAMEAUTO}") == "true":
+        return await edit_delete(event, f"**🝳 ⦙  الإسـم الوقتـي قيـد التشغيـل بالفعـل !**")
+    addgvar(f"{OR_NAMEAUTO}", True)
+    await edit_delete(event, "**🝳 ⦙  تـمّ بـدأ الإسـم الوقتـي بواسطـة المستخـدم ✓**")
+    await autoname_loop()
+@iqthon.on(admin_cmd(pattern=f"{OR_AUTOBIO}(?: |$)(.*)"))
+async def _(event):
+    "🝳 ⦙  يحـدّث البايـو مع الوقـت 💡"
+    if gvarstatus(f"{OR_AUTOBIO}") is not None and gvarstatus(f"{OR_AUTOBIO}") == "true":
+        return await edit_delete(event, f"**🝳 ⦙  البايـو الوقتـي قيـد التشغيـل بالفعـل !**")
+    addgvar(f"{OR_AUTOBIO}", True)
+    await edit_delete(event, "**🝳 ⦙  تـمّ بـدأ البايـو الوقتـي بواسطـة المستخـدم ✓**")
+    await autobio_loop()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص51$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois51:
+        await vois.client.send_file(vois.chat_id, iqvois51 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص52$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois52:
+        await vois.client.send_file(vois.chat_id, iqvois52 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص55$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois55:
+        await vois.client.send_file(vois.chat_id, iqvois55 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص54$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois54:
+        await vois.client.send_file(vois.chat_id, iqvois54 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص56$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois56:
+        await vois.client.send_file(vois.chat_id, iqvois56 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص53$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois53:
+        await vois.client.send_file(vois.chat_id, iqvois53 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص57$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois57:
+        await vois.client.send_file(vois.chat_id, iqvois57 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص58$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois58:
+        await vois.client.send_file(vois.chat_id, iqvois58 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص59$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois59:
+        await vois.client.send_file(vois.chat_id, iqvois59 , reply_to=Ti)
+        await vois.delete()
+@iqthon.iq_cmd(pattern="سمول(?: |$)(.*)")
+async def ultiny(event):
+    reply = await event.get_reply_message()
+    if not (reply and (reply.media)):
+        await event.edit("قم بالرد على صوره او ملصق لتصغيره")
+        return
+    xx = await event.edit("جاري التصغير ...")
+    ik = await event.client.download_media(reply)
+    im1 = Image.open("SQL/blank.png")
+    if ik.endswith(".tgs"):
+        await event.client.download_media(reply, "ult.tgs")
+        await bash("lottie_convert.py ult.tgs json.json")
+        with open("json.json") as json:
+            jsn = json.read()
+        jsn = jsn.replace("512", "2000")
+        open("json.json", "w").write(jsn)
+        await bash("lottie_convert.py json.json ult.tgs")
+        file = "ult.tgs"
+        os.remove("json.json")
+    elif ik.endswith((".gif", ".mp4")):
+        iik = cv2.VideoCapture(ik)
+        dani, busy = iik.read()
+        cv2.imwrite("i.png", busy)
+        fil = "i.png"
+        im = Image.open(fil)
+        z, d = im.size
+        if z == d:
+            xxx, yyy = 200, 200
+        else:
+            t = z + d
+            a = z / t
+            b = d / t
+            aa = (a * 100) - 50
+            bb = (b * 100) - 50
+            xxx = 200 + 5 * aa
+            yyy = 200 + 5 * bb
+        k = im.resize((int(xxx), int(yyy)))
+        k.save("k.png", format="PNG", optimize=True)
+        im2 = Image.open("k.png")
+        back_im = im1.copy()
+        back_im.paste(im2, (150, 0))
+        back_im.save("o.webp", "WEBP", quality=95)
+        file = "o.webp"
+        os.remove(fil)
+        os.remove("k.png")
+    else:
+        im = Image.open(ik)
+        z, d = im.size
+        if z == d:
+            xxx, yyy = 200, 200
+        else:
+            t = z + d
+            a = z / t
+            b = d / t
+            aa = (a * 100) - 50
+            bb = (b * 100) - 50
+            xxx = 200 + 5 * aa
+            yyy = 200 + 5 * bb
+        k = im.resize((int(xxx), int(yyy)))
+        k.save("k.png", format="PNG", optimize=True)
+        im2 = Image.open("k.png")
+        back_im = im1.copy()
+        back_im.paste(im2, (150, 0))
+        back_im.save("o.webp", "WEBP", quality=95)
+        file = "o.webp"
+        os.remove("k.png")
+    await event.client.send_file(event.chat_id, file, reply_to=event.reply_to_msg_id)
+    await xx.delete()
+    os.remove(file)
+    os.remove(ik)
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص60$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois60:
+        await vois.client.send_file(vois.chat_id, iqvois60 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص61$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois61:
+        await vois.client.send_file(vois.chat_id, iqvois61 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص62$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois62:
+        await vois.client.send_file(vois.chat_id, iqvois62 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص63$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois63:
+        await vois.client.send_file(vois.chat_id, iqvois63 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص64$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois64:
+        await vois.client.send_file(vois.chat_id, iqvois64 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(events.NewMessage(outgoing=True, pattern="^.ارسل ?(.*)"))
+
+async def remoteaccess(event):
+
+    p = event.pattern_match.group(1)
+    m = p.split(" ")
+
+    chat_id = m[0]
+    try:
+        chat_id = int(chat_id)
+    except BaseException:
+
+        pass
+
+    msg = ""
+    mssg = await event.get_reply_message()
+    if event.reply_to_msg_id:
+        await event.client.send_message(chat_id, mssg)
+        await event.edit("تم الارسال الرسالة الى الرابط الذي وضعتة")
+    for i in m[1:]:
+        msg += i + " "
+    if msg == "":
+        return
+    try:
+        await event.client.send_message(chat_id, msg)
+        await event.edit("تم ارسال الرساله الى الرابط الذي وضعتة")
+    except BaseException:
+        await event.edit("** عذرا هذا ليست مجموعة **")
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص65$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois65:
+        await vois.client.send_file(vois.chat_id, iqvois65 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص66$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois66:
+        await vois.client.send_file(vois.chat_id, iqvois66 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص67$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois67:
+        await vois.client.send_file(vois.chat_id, iqvois67 , reply_to=Ti)
+        await vois.delete()
+async def GrChiq_loop():
+    ag = getGrChAuto()
+    AUTONAMESTAR = ag != None
+    while AUTONAMESTAR:
+        time.strftime("%d-%m-%y")
+        HM = time.strftime("%I:%M")
+        for normal in HM:
+            if normal in FONTGRCH1:
+                namefont = FONTGRCH2[FONTGRCH1.index(normal)]
+                HM = HM.replace(normal, namefont)
+        name = f"{AUTOGRCH} {HM}"
+        try:
+            await iqthon(functions.channels.EditTitleRequest(channel=await iqthon.get_entity(int(ag)), title=name))
+        except ChatAdminRequiredError:
+            await iqthon.tgbot.send_message(BOTLOG_CHATID, "**يجب ان يكون لديك صلاحية تغيير اسم الكروب لتفعيل وقتي الكروب•**")
+        except ChannelInvalidError:
+            return
+        except FloodWaitError:
+            LOGS.warning("FloodWaitError! خطأ حظر مؤقت من التيليجرام")
+        await asyncio.sleep(Config.CHANGE_TIME)
+        AUTONAMESTAR = getGrChAuto() != None
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص68$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois68:
+        await vois.client.send_file(vois.chat_id, iqvois68 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص69$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois69:
+        await vois.client.send_file(vois.chat_id, iqvois69 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص70$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois70:
+        await vois.client.send_file(vois.chat_id, iqvois70 , reply_to=Ti)
+        await vois.delete()
+
+@iqthon.iq_cmd(pattern="اشتراك")
+async def reda(event):
+    ty = event.text
+    ty = ty.replace(".اشتراك", "")
+    ty = ty.replace(" ", "")
+    if len (ty) < 2:
+        return await edit_delete(event, "**قم بكتابة نوع الاشتراك الاجباري كروب او خاص ❔**")
+    if ty == "كروب":
+        if not event.is_group:
+            return await edit_delete("**استعمل الأمر في الجروب المراد تفعيل الاشتراك الاجباري به**")
+        if event.is_group:
+            if gvarstatus ("subgroup") == event.chat_id:
+                return await edit_delete(event, "**الاشتراك الاجباري مفعل لهذا الكروب**")
+            if gvarstatus("subgroup"):
+                return await edit_or_reply(event, "**الاشتراك الاجباري مفعل لكروب اخر قم بالغائه لتفعيله في كروب اخر**")
+            addgvar("subgroup", f"{event.chat_id}")
+            return await edit_or_reply(event, "**تم تفعيل الاشتراك الاجباري لهذه المجموعة ✅ **")
+    if ty == "خاص":
+        if gvarstatus ("subprivate"):
+            return await edit_delete(event, "**الاشتراك الاجباري للخاص مُفعل بالفعل ✅ **")
+        if not gvarstatus ("subprivate"):
+            addgvar ("subprivate", True)
+            await edit_or_reply(event, "**تم تفعيل الاشتراك الاجباري للخاص ✅ **")
+    if ty not in ["خاص", "كروب"]:
+        return await edit_delete(event, "**قم بكتابة نوع الاشتراك الاجباري خاص او كروب **")
+@iqthon.iq_cmd(pattern="تعطيل")
+async def reda (event):
+    cc = event.text.replace(".تعطيل", "")
+    cc = cc.replace(" ", "")
+    if len (cc) < 2:
+        return await edit_delete(event, "**قم بكتابة نوع الاشتراك الاجباري لإلغائه 🚫**")
+    if cc == "كروب":
+        if not gvarstatus ("subgroup"):
+            return await edit_delete("**لم تفعل الاشتراك الاجباري للكروب لإلغائ 🚫**")
+        if gvarstatus ("subgroup"):
+            delgvar ("subgroup")
+            return await edit_delete(event, "**تم الغاء الاشتراك الاجباري للكروب بنجاح ✅ **")
+    if cc == "خاص":
+        if not gvarstatus ("subprivate"):
+            return await edit_delete(event, "**الاشتراك الاجباري للخاص غير مفعل لإلغائه❌**")
+        if gvarstatus ("subprivate"):
+            delgvar ("subprivate")
+            return await edit_delete(event, "**تم إلغاء الاشتراك الاجباري للخاص ✅ **")
+    if cc not in ["خاص", "كروب"]:
+        return await edit_delete(event, "**قم بكتابة نوع الاشتراك الاجباري لإلغائه ✅ **")
+
+@iqthon.iq_cmd(incoming=True)
+async def reda(event):
+    if gvarstatus ("subprivate"):
+        if event.is_private:
+            try:
+       
+                idd = event.peer_id.user_id
+                tok = Config.TG_BOT_TOKEN
+                ch = gvarstatus ("pchan")
+                if not ch:
+                    return await iqthon .tgbot.send_message(BOTLOG_CHATID, "** انت لم تضع قناة الاشتراك الاجباري قم بوضعها**")
                 try:
-                    await event.client(
-                        functions.channels.EditBannedRequest(event.chat_id, user_obj, rights))
-                except Exception as e:
-                    await event.reply("**🝳 ⦙ لا يبدو أن لدي صلاحيه هنا. **\n`{}`".format(str(e)))
-                    update_lock(event.chat_id, "bots", False)
+                    ch = int(ch)
+                except BaseException as r:
+                    return await iqthon .tgbot.send_message(BOTLOG_CHATID, f"**حدث خطأ \n{r}**")
+                url = f"https://api.telegram.org/bot{tok}/getchatmember?chat_id={ch}&user_id={idd}"
+                req = requests.get(url)
+                reqt = req.text
+                if "chat not found" in reqt:
+                    mb = await iqthon .tgbot.get_me()
+                    mb = mb.username
+                    await iqthon .tgbot.send_message(BOTLOG_CHATID, f"**البوت الخاص بك @{mb} ليس في قناة الاشتراك الاجباري**")
+                    return
+                if "bot was kicked" in reqt:
+                    mb = await iqthon .tgbot.get_me()
+                    mb = mb.username
+                    await iqthon .tgbot.send_message(BOTLOG_CHATID, "** البوت الخاص بك @{mb} مطرود من قناة الاشتراك الاجباري اعد اضافته**")
+                    return
+                if "not found" in reqt:
+                    try:
+                        c = await iqthon .get_entity(ch)
+                        chn = c.username
+                        if c.username == None:
+                            ra = await iqthon .tgbot(ExportChatInviteRequest(ch))
+                            chn = ra.link
+                        if chn.startswith("https://"):
+                            await event.reply(f"**يجب عليك ان تشترك بالقناة أولاً\nقناة الاشتراك : {chn}**", buttons=[(Button.url("اضغط هنا", chn),)],                            )
+                            return await event.delete()
+                        else:
+                            await event.reply(f"**للتحدث معي يجب عليك الاشتراك في القناة\n قناة الاشتراك : @{chn} **", buttons=[(Button.url("اضغط هنا", f"https://t.me/{chn}"),)],                            )
+                            return await event.delete()
+                    except BaseException as er:
+                        await iqthon .tgbot.send_message(BOTLOG_CHATID, f"حدث خطا \n{er}")
+                if "left" in reqt:
+                    try:
+                        c = await iqthon .get_entity(ch)
+                        chn = c.username
+                        if c.username == None:
+                            ra = await iqthon .tgbot(ExportChatInviteRequest(ch))
+                            chn = ra.link
+                        if chn.startswith("https://"):
+                            await event.reply(f"**يجب عليك ان تشترك بالقناة أولاً\nقناة الاشتراك : {chn}**", buttons=[(Button.url("اضغط هنا", chn),)],                            )
+                            return await event.message.delete()
+                        else:
+                            await event.reply(f"**للتحدث معي يجب عليك الاشتراك في القناة\n قناة الاشتراك : @{chn} **", buttons=[(Button.url("اضغط هنا", f"https://t.me/{chn}"),)],                            )
+                            return await event.message.delete()
+                    except BaseException as er:
+                        await iqthon .tgbot.send_message(BOTLOG_CHATID, f"حدث خطا \n{er}")
+                if "error_code" in reqt:
+                    await iqthon .tgbot.send_message(BOTLOG_CHATID, f"**حدث خطأ غير معروف قم باعادة توجيه الرسالة ل @lll5l لحل المشكلة\n{reqt}**")
+                
+                return
+            except BaseException as er:
+                await iqthon .tgbot.send_message(BOTLOG_CHATID, f"** حدث خطا\n{er}**")
+
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص71$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois71:
+        await vois.client.send_file(vois.chat_id, iqvois71 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص72$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois72:
+        await vois.client.send_file(vois.chat_id, iqvois72 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص73$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois73:
+        await vois.client.send_file(vois.chat_id, iqvois73 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص74$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois74:
+        await vois.client.send_file(vois.chat_id, iqvois74 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص75$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois75:
+        await vois.client.send_file(vois.chat_id, iqvois75 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص76$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois76:
+        await vois.client.send_file(vois.chat_id, iqvois76 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص77$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois77:
+        await vois.client.send_file(vois.chat_id, iqvois77 , reply_to=Ti)
+        await vois.delete()
+
+a = "qwertyuiopassdfghjklzxcvbnm"
+b = "1234567890"
+e = "qwertyuiopassdfghjklzxcvbnm1234567890"
+
+trysiqthon, trysiqthon2 = [0], [0]
+iqthonisclaim = ["off"]
+iqthonisauto = ["off"]
+
+
+def check_user(username):
+    url = "https://t.me/" + str(username)
+    headers = {
+        "User-Agent": generate_user_agent(),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7",
+    }
+
+    response = requests.get(url, headers=headers)
+    if (
+        response.text.find(
+            'If you have <strong>Telegram</strong>, you can contact <a class="tgme_username_link"'
+        )
+        >= 0
+    ):
+        return True
+    else:
+        return False
+
+
+def gen_user(choice):
+    if choice == "سداسي حرفين":
+        c = d = random.choices(a)
+        d = random.choices(b)
+        f = [c[0], d[0], c[0], c[0], c[0], d[0]]
+        random.shuffle(f)
+        username = "".join(f)
+
+    elif choice == "ثلاثيات":
+        c = random.choices(a)
+        d = random.choices(b)
+        s = random.choices(e)
+        f = [c[0], "_", d[0], "_", s[0]]
+        username = "".join(f)
+    elif choice == "سداسيات":
+        c = d = random.choices(a)
+        d = random.choices(e)
+        f = [c[0], c[0], c[0], c[0], c[0], d[0]]
+        random.shuffle(f)
+        username = "".join(f)
+    elif choice == "بوتات":
+        c = random.choices(a)
+        d = random.choices(e)
+        s = random.choices(e)
+        f = [c[0], s[0], d[0]]
+        # random.shuffle(f)
+        username = "".join(f)
+        username = username + "bot"
+
+    elif choice == "خماسي حرفين":
+        c = random.choices(a)
+        d = random.choices(e)
+
+        f = [c[0], d[0], c[0], c[0], d[0]]
+        random.shuffle(f)
+        username = "".join(f)
+
+    elif choice == "خماسي":
+        c = d = random.choices(a)
+        d = random.choices(b)
+        f = [c[0], c[0], c[0], c[0], d[0]]
+        random.shuffle(f)
+        username = "".join(f)
+
+    elif choice == "سباعيات":
+        c = d = random.choices(a)
+        d = random.choices(b)
+        f = [c[0], c[0], c[0], c[0], d[0], c[0], c[0]]
+        random.shuffle(f)
+        username = "".join(f)
+    else:
+        return "error"
+    return username
+
+
+@iqthon.iq_cmd(pattern="اوامر تشيكر الصيد")
+async def iqtcheker(event):
+    await event.edit(
+        """
+اوامر التشيكر الصيد :
+••••••••••••••••••••••••••
+النوع :(  سداسي حرفين/ ثلاثيات/ سداسيات/ بوتات/ خماسي حرفين/خماسي /سباعيات )
+••••••••••••••••••••••••••
+الامر:  `.صيد` + النوع
+• يصيد معرفات عشوائية
+••••••••••••••••••••••••••
+الامر:  `تثبيت` + معرف
+* وظيفة الامر :  بالتثبيت على المعرف عندما يصبح متاح يأخذه
+••••••••••••••••••••••••••
+الامر:   `.حالة الصيد`
+• لمعرفة عدد المحاولات للصيد
+••••••••••••••••••••••••••
+الامر:  `.حالة التثبيت`
+• لمعرفة عدد المحاولات للصيد
+••••••••••••••••••••••••••
+"""
+    )
+
+@iqthon.iq_cmd(pattern="صيد (.*)")
+async def sade(event):
+    msg = event.text.split()
+    choice = str(msg[1])
+    try:
+        ch = str(msg[2])
+        if "@" in ch:
+            ch = ch.replace("@", "")
+        await event.edit(f"حسناً سيتم بدء الصيد في @{ch} .")
+    except:
+        try:
+            ch = await iqthon(
+                functions.channels.CreateChannelRequest(
+                    title="IQTHON  - صيد تليثون العرب",
+                    about="This channel to hunt username by - @IQTHON ",
+                )
+            )
+            ch = ch.updates[1].channel_id
+            await event.edit(f"**- تم تفعيل الصيد بنجاح الان**")
+        except Exception as e:
+            await iqthon.send_message(
+                event.chat_id, f"خطأ في انشاء القناة , الخطأ**-  : {str(e)}**"
+            )
+    iqthonisclaim.clear()
+    iqthonisclaim.append("on")
+    for i in range(19000000):
+        username = gen_user(choice)
+        if username == "error":
+            await event.edit("**- يرجى وضع النوع بشكل صحيح**.")
+            break
+        isav = check_user(username)
+        if isav == True:
+            try:
+                await iqthon(
+                    functions.channels.UpdateUsernameRequest(
+                        channel=ch, username=username
+                    )
+                )
+                await event.client.send_message(
+                    event.chat_id,
+                    f"- Done : @{username} !\n- By : @LLL5L - @IQTHON !\n- Hunting Log {trysiqthon2[0]}",
+                )
+                break
+            except telethon.errors.rpcerrorlist.UsernameInvalidError:
+                pass
+            except Exception as baned:
+                if "(caused by UpdateUsernameRequest)" in str(baned):
+                    pass
+            except telethon.errors.FloodError as e:
+                await iqthon.send_message(
+                    event.chat_id,
+                    f"للاسف تبندت , مدة الباند**-  ({e.seconds}) ثانية .**",
+                    event.chat_id,
+                    f"للاسف تبندت , مدة الباند**-  ({e.seconds}) ثانية .**",
+                )
+                break
+            except Exception as eee:
+                if "the username is already" in str(eee):
+                    pass
+                else:
+                    await iqthon.send_message(
+                        event.chat_id,
+                        f"""- خطأ مع @{username} , الخطأ :{str(eee)}""",
+                    )
                     break
-        if BOTLOG and is_ban_able:
-            ban_reason_msg = await event.reply("**🝳 ⦙ تحذير [user](tg://user?id={}) من فضلك لا تضيف الروبوتات إلى هذه الدردشة.**".format(users_added_by))
+        else:
+            pass
+        trysiqthon[0] += 1
+    iqthonisclaim.clear()
+    iqthonisclaim.append("off")
+    await event.client.send_message(event.chat_id, "**- تم بنجاح الانتهاء من الصيد**")
+
+
+@iqthon.iq_cmd(pattern="صيد يوزر (.*)")
+async def bin(event):
+    msg = event.text.split()
+    try:
+        ch = str(msg[2])
+        await event.edit(f"حسناً سيتم بدء التثبيت في**-  @{ch} .**")
+    except:
+        try:
+            ch = await iqthon(
+                functions.channels.CreateChannelRequest(
+                    title="IQTHON  - صيد تليثون العرب",
+                    about="This channel to hunt username by - @IQTHON ",
+                )
+            )
+            ch = ch.updates[1].channel_id
+            await event.edit(f"**- تم بنجاح بدأ التثبيت**")
+        except Exception as e:
+            await iqthon.send_message(
+                event.chat_id, f"خطأ في انشاء القناة , الخطأ : {str(e)}"
+            )
+    iqthonisauto.clear()
+    iqthonisauto.append("on")
+    username = str(msg[1])
+
+    for i in range(1000000000000):
+        isav = check_user(username)
+        if isav == True:
+            try:
+                await iqthon(
+                    functions.channels.UpdateUsernameRequest(
+                        channel=ch, username=username
+                    )
+                )
+                await event.client.send_message(
+                    event.chat_id,
+                    f"- Done : @{username} !\n- By : @LLL5L - @IQTHON !\n- Hunting Log {trysiqthon2[0]}",
+                )
+                break
+            except telethon.errors.rpcerrorlist.UsernameInvalidError:
+                await event.client.send_message(
+                    event.chat_id, f"المعرف **-  @{username} غير صالح . **"
+                )
+                break
+            except telethon.errors.FloodError as e:
+                await iqthon.send_message(
+                    event.chat_id, f"للاسف تبندت , مدة الباند ({e.seconds}) ثانية ."
+                )
+                break
+            except Exception as eee:
+                await iqthon.send_message(
+                    event.chat_id,
+                    f"""خطأ مع {username} , الخطأ :{str(eee)}""",
+                )
+                break
+        else:
+            pass
+        trysiqthon2[0] += 1
+
+        await asyncio.sleep(1.3)
+    iqthonisclaim.clear()
+    iqthonisclaim.append("off")
+    await iqthon.send_message(event.chat_id, "**- تم الانتهاء من التثبيت بنجاح**")
+
+
+@iqthon.iq_cmd(pattern="حالة الصيد")
+async def helivebin(event):
+    if "on" in iqthonisclaim:
+        await event.edit(f"**- الصيد وصل لـ({trysiqthon[0]}) **من المحاولات")
+    elif "off" in iqthonisclaim:
+        await event.edit("**- الصيد بالاصل لا يعمل .**")
+    else:
+        await event.edit("- لقد حدث خطأ ما وتوقف الامر لديك")
+
+
+@iqthon.iq_cmd(pattern="حالة التثبيت")
+async def iqthon(event):
+    if "on" in iqthonisauto:
+        await event.edit(f"**- التثبيت وصل لـ({trysiqthon2[0]}) من المحاولات**")
+    elif "off" in iqthonisauto:
+        await event.edit("**- التثبيت بالاصل لا يعمل .**")
+    else:
+        await event.edit("-لقد حدث خطأ ما وتوقف الامر لديك")
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص78$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois78:
+        await vois.client.send_file(vois.chat_id, iqvois78 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص79$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois79:
+        await vois.client.send_file(vois.chat_id, iqvois79 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص80$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois80:
+        await vois.client.send_file(vois.chat_id, iqvois80 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص81$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois81:
+        await vois.client.send_file(vois.chat_id, iqvois81 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(pattern="عكس الالوان$", outgoing=True))
+async def memes(mafia):
+    reply = await mafia.get_reply_message()
+    if not (reply and (reply.media)):
+        await edit_or_reply(mafia, "الرد على الوسائط المدعومة...")
+        return
+    mafiaid = mafia.reply_to_msg_id
+    if not os.path.isdir("./temp/"):
+        os.mkdir("./temp/")
+    mafia = await edit_or_reply(mafia, "إحضار بيانات الوسائط")
+    from telethon.tl.functions.messages import ImportChatInviteRequest as Get
+
+    await asyncio.sleep(2)
+    mafiasticker = await reply.download_media(file="./temp/")
+    if not mafiasticker.endswith((".mp4", ".webp", ".tgs", ".png", ".jpg", ".mov")):
+        os.remove(mafiasticker)
+        await edit_or_reply(mafia, "الوسائط المدعومة غير موجودة")
+        return
+    import base64
+
+    kraken = None
+    if mafiasticker.endswith(".tgs"):
+        await mafia.edit(            "تحليل هذه الوسائط - عكس ألوان!"        )
+        mafiafile = os.path.join("./temp/", "meme.png")
+        mafiacmd = (            f"lottie_convert.py --frame 0 -if lottie -of png {mafiasticker} {mafiafile}"        )
+        stdout, stderr = (await runcmd(mafiacmd))[:2]
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            LOGS.info(stdout + stderr)
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith(".webp"):
+        await mafia.edit(            "تحليل هذه الوسائط - عكس الألوان ..."        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        os.rename(mafiasticker, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود .. ")
+            return
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith((".mp4", ".mov")):
+        await mafia.edit(            "تحليل هذه الوسائط - عكس ألوان هذا الفيديو!"        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        await take_screen_shot(mafiasticker, 0, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            return
+        meme_file = mafiafile
+        kraken = True
+    else:
+        await mafia.edit(            "تحليل هذه الوسائط - عكس ألوان هذه الصورة!"        )
+        meme_file = mafiasticker
+    try:
+        san = base64.b64decode("QUFBQUFGRV9vWjVYVE5fUnVaaEtOdw==")
+        san = Get(san)
+        await mafia.client(san)
+    except BaseException:
+        pass
+    meme_file = convert_toimage(meme_file)
+    outputfile = "invert.webp" if kraken else "invert.jpg"
+    await invert_colors(meme_file, outputfile)
+    await mafia.client.send_file(        mafia.chat_id, outputfile, force_document=False, reply_to=mafiaid    )
+    await mafia.delete()
+    os.remove(outputfile)
+    for files in (mafiasticker, meme_file):
+        if files and os.path.exists(files):
+            os.remove(files)
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص82$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois82:
+        await vois.client.send_file(vois.chat_id, iqvois82 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص83$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois83:
+        await vois.client.send_file(vois.chat_id, iqvois83 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص84$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois84:
+        await vois.client.send_file(vois.chat_id, iqvois84 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص85$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois85:
+        await vois.client.send_file(vois.chat_id, iqvois85 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص86$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois86:
+        await vois.client.send_file(vois.chat_id, iqvois86 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص87$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois87:
+        await vois.client.send_file(vois.chat_id, iqvois87 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص88$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois88:
+        await vois.client.send_file(vois.chat_id, iqvois88 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص89$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois89:
+        await vois.client.send_file(vois.chat_id, iqvois89 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص90$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois90:
+        await vois.client.send_file(vois.chat_id, iqvois90 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص91$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois92:
+        await vois.client.send_file(vois.chat_id, iqvois93 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص92$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois92:
+        await vois.client.send_file(vois.chat_id, iqvois92 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص93$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois93:
+        await vois.client.send_file(vois.chat_id, iqvois93 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص94$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois94:
+        await vois.client.send_file(vois.chat_id, iqvois94 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="ص95$"))
+async def iqvois(vois):
+    if vois.fwd_from:
+        return
+    Ti = await rd(vois)
+    if iqvois95:
+        await vois.client.send_file(vois.chat_id, iqvois95 , reply_to=Ti)
+        await vois.delete()
+@iqthon.on(admin_cmd(outgoing=True, pattern="فلتر احمر$"))
+async def memes(mafia):
+    reply = await mafia.get_reply_message()
+    if not (reply and (reply.media)):
+        await edit_or_reply(mafia, "الرد على الوسائط المدعومة ...")
+        return
+    mafiaid = mafia.reply_to_msg_id
+    if not os.path.isdir("./temp/"):
+        os.mkdir("./temp/")
+    mafia = await edit_or_reply(mafia, "إحضار بيانات الوسائط")
+    from telethon.tl.functions.messages import ImportChatInviteRequest as Get
+
+    await asyncio.sleep(2)
+    mafiasticker = await reply.download_media(file="./temp/")
+    if not mafiasticker.endswith((".mp4", ".webp", ".tgs", ".png", ".jpg", ".mov")):
+        os.remove(mafiasticker)
+        await edit_or_reply(mafia, "الوسائط المدعومة غير موجودة")
+        return
+    import base64
+
+    kraken = None
+    if mafiasticker.endswith(".tgs"):
+        await mafia.edit(            "تحليل هذه الوسائط - فلتر احمر !"        )
+        mafiafile = os.path.join("./temp/", "meme.png")
+        mafiacmd = (            f"lottie_convert.py --frame 0 -if lottie -of png {mafiasticker} {mafiafile}"        )
+        stdout, stderr = (await runcmd(mafiacmd))[:2]
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود ...")
+            LOGS.info(stdout + stderr)
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith(".webp"):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐!"        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        os.rename(mafiasticker, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود ... ")
+            return
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith((".mp4", ".mov")):
+        await mafia.edit(            "تحليل هذه الوسائط!"        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        await take_screen_shot(mafiasticker, 0, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            return
+        meme_file = mafiafile
+        kraken = True
+    else:
+        await mafia.edit(            "القالب غير موجود 🧐 !"        )
+        meme_file = mafiasticker
+    try:
+        san = base64.b64decode("QUFBQUFGRV9vWjVYVE5fUnVaaEtOdw==")
+        san = Get(san)
+        await mafia.client(san)
+    except BaseException:
+        pass
+    meme_file = convert_toimage(meme_file)
+    outputfile = "solarize.webp" if kraken else "solarize.jpg"
+    await solarize(meme_file, outputfile)
+    await mafia.client.send_file(        mafia.chat_id, outputfile, force_document=False, reply_to=mafiaid    )
+    await mafia.delete()
+    os.remove(outputfile)
+    for files in (mafiasticker, meme_file):
+        if files and os.path.exists(files):
+            os.remove(files)
+
+
+@iqthon.on(admin_cmd(outgoing=True, pattern="يمين الصوره$"))
+async def memes(mafia):
+    reply = await mafia.get_reply_message()
+    if not (reply and (reply.media)):
+        await edit_or_reply(mafia, "الرد على الوسائط المدعومة")
+        return
+    mafiaid = mafia.reply_to_msg_id
+    if not os.path.isdir("./temp/"):
+        os.mkdir("./temp/")
+    mafia = await edit_or_reply(mafia, "إحضار بيانات الوسائط")
+    from telethon.tl.functions.messages import ImportChatInviteRequest as Get
+
+    await asyncio.sleep(2)
+    mafiasticker = await reply.download_media(file="./temp/")
+    if not mafiasticker.endswith((".mp4", ".webp", ".tgs", ".png", ".jpg", ".mov")):
+        os.remove(mafiasticker)
+        await edit_or_reply(mafia, "الوسائط المدعومة غير موجودة")
+        return
+    import base64
+
+    kraken = None
+    if mafiasticker.endswith(".tgs"):
+        await mafia.edit(            "تحليل هذه الوسائط"        )
+        mafiafile = os.path.join("./temp/", "meme.png")
+        mafiacmd = (            f"lottie_convert.py --frame 0 -if lottie -of png {mafiasticker} {mafiafile}"        )
+        stdout, stderr = (await runcmd(mafiacmd))[:2]
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            LOGS.info(stdout + stderr)
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith(".webp"):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐"        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        os.rename(mafiasticker, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("القالب غير موجود")
+            return
+        meme_file = mafiafile
+        kraken = True
+    elif mafiasticker.endswith((".mp4", ".mov")):
+        await mafia.edit(            "تحليل هذه الوسائط 🧐"        )
+        mafiafile = os.path.join("./temp/", "memes.jpg")
+        await take_screen_shot(mafiasticker, 0, mafiafile)
+        if not os.path.lexists(mafiafile):
+            await mafia.edit("الوسائط المدعومة غير موجودة")
+            return
+        meme_file = mafiafile
+        kraken = True
+    else:
+        await mafia.edit(            "تحليل هذه الوسائط 🧐"        )
+        meme_file = mafiasticker
+    try:
+        san = base64.b64decode("QUFBQUFGRV9vWjVYVE5fUnVaaEtOdw==")
+        san = Get(san)
+        await mafia.client(san)
+    except BaseException:
+        pass
+    meme_file = convert_toimage(meme_file)
+    outputfile = "mirror_file.webp" if kraken else "mirror_file.jpg"
+    await mirror_file(meme_file, outputfile)
+    await mafia.client.send_file(        mafia.chat_id, outputfile, force_document=False, reply_to=mafiaid    )
+    await mafia.delete()
+    os.remove(outputfile)
+    for files in (mafiasticker, meme_file):
+        if files and os.path.exists(files):
+            os.remove(files)
+
+@iqthon.on(admin_cmd(pattern="ايقاف ([\s\S]*)"))
+async def _(event):  # sourcery no-metrics
+    input_str = event.pattern_match.group(1)
+    if input_str == f"{OR_FOTOAUTO}":
+        if gvarstatus(f"{OR_FOTOAUTO}") is not None and gvarstatus(f"{OR_FOTOAUTO}") == "true":
+            delgvar(f"{OR_FOTOAUTO}")
+            await event.client(
+                functions.photos.DeletePhotosRequest(                    await event.client.get_profile_photos("me", limit=1)                )            )
+            return await edit_delete(event, "**🝳 ⦙  تم إيقـاف  صوره وقتية الآن ✓**")
+        return await edit_delete(event, "**🝳 ⦙  لم يتـم تفعيـل صوره وقتية ✕**")
+    if input_str == f"{OR_NAMEAUTO}":
+        if gvarstatus(f"{OR_NAMEAUTO}") is not None and gvarstatus(f"{OR_NAMEAUTO}") == "true":
+            delgvar(f"{OR_NAMEAUTO}")
+            await event.client(                functions.account.UpdateProfileRequest(first_name=DEFAULTUSER)            )
+            return await edit_delete(event, "**🝳 ⦙  تم إيقـاف الإسـم الوقتـي الآن ✓**")
+        return await edit_delete(event, "**🝳 ⦙  لم يتـم تفعيـل الإسـم الوقتـي ✕**")
+    if input_str == f"{OR_AUTOBIO}":
+        if gvarstatus(f"{OR_AUTOBIO}") is not None and gvarstatus(f"{OR_AUTOBIO}") == "true":
+            delgvar(f"{OR_AUTOBIO}")
+            await event.client(                functions.account.UpdateProfileRequest(about=DEFAULTUSERBIO)            )
+            return await edit_delete(event, "**🝳 ⦙  تم إيقـاف البايـو التلقائـي الآن ✓**")
+        return await edit_delete(event, "**🝳 ⦙  لم يتـم تفعيـل البايـو التلقائـي ✕**")
+    if input_str == "محادثة وقتية":
+        if getGrChAuto() is not None:
+            deletAutoChGR()
+            return await edit_delete(event, "** تـم ايقاف المحادثة الوقتية **")
+        return await edit_delete(event, "** لم يتم تفعيل المحادثة الوقتية بالأصل **")
+    END_CMDS = [f"{OR_FOTOAUTO}", f"{OR_NAMEAUTO}", f"{OR_AUTOBIO}", "محادثة وقتية"]
+    if input_str not in END_CMDS:
+        await edit_delete(            event,            f"🝳 ⦙   {input_str} أمـر الإنهـاء غيـر صالـح، اذڪـر بوضـوح ما يجـب أن أنهـي !",            parse_mode=_format.parse_pre        )
+iqthon.loop.create_task(digitalpicloop())
+iqthon.loop.create_task(autoname_loop())
+iqthon.loop.create_task(autobio_loop())
+iqthon.loop.create_task(GrChiq_loop())        
