@@ -1016,7 +1016,29 @@ async def iqtext(event):
     if isiqknoiq:
         delgvar("iqknoiq")
         await edit_delete(event, "**تم اطفاء خط الرمز بنجاح ✅ **")
-        return        
+        return    
+
+@iqthon.on(events.NewMessage(outgoing=True))
+async def klanr(event):
+    isiqboldiq = gvarstatus("iqboldiq")
+    if isiqboldiq:
+        try:
+            await event.edit(f"**{event.message.message}**")
+        except MessageIdInvalidError:
+            pass
+    isiqknoiq = gvarstatus("iqknoiq")
+    if isiqknoiq:
+        try:
+            await event.edit(f"`{event.message.message}`")
+        except MessageIdInvalidError:
+            pass
+    isiqmailiq = gvarstatus("isiqmailiq")    
+    if isiqmailiq:
+        try:
+            await event.edit(f"__{event.message.message}__")
+        except MessageIdInvalidError:
+            pass            
+    
 @iqthon.on(admin_cmd(pattern="النضام الشمسي(?: |$)(.*)"))
 async def _(event):
     "أمر الرسوم المتحركة"
@@ -1046,26 +1068,7 @@ async def _(event):
         await asyncio.sleep(0.2)
         await event.edit("".join(deq))
         deq.rotate(1)
-@iqthon.on(events.NewMessage(outgoing=True))
-async def klanr(event):
-    isiqboldiq = gvarstatus("iqboldiq")
-    if isiqboldiq:
-        try:
-            await event.edit(f"**{event.message.message}**")
-        except MessageIdInvalidError:
-            pass
-    isiqknoiq = gvarstatus("iqknoiq")
-    if isiqknoiq:
-        try:
-            await event.edit(f"`{event.message.message}`")
-        except MessageIdInvalidError:
-            pass
-    isiqknoiq = gvarstatus("isiqmailiq")    
-    if isiqmailiq:
-        try:
-            await event.edit(f"__{event.message.message}__")
-        except MessageIdInvalidError:
-            pass            
+
 @iqthon.on(admin_cmd(pattern="ضحك(?: |$)(.*)"))
 async def _(event):
     "أمر الرسوم المتحركة"
@@ -2687,6 +2690,5 @@ async def iq(mention):
     my_first = me.first_name
     my_mention = f"[{me.first_name}](tg://user?id={me.id})"
     await edit_or_reply(mention, f"**🚹 ¦ المستخدم ⪼ • ** [{iqth2}](tg://user?id={user.id}) \n ☑️ **¦  تـم رفـعه سعـلوه 🦎 .** \n**🤵‍♂️ ¦ بواسطه  : ** {my_mention} ")
-
 
 
