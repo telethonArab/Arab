@@ -2233,7 +2233,7 @@ iqthonisclaim = ["off"]
 iqthonisauto = ["off"]
 
 
-def check_user_iqthon(username):
+def check_user(username):
     url = "https://t.me/" + str(username)
     headers = {
         "User-Agent": generate_user_agent(),
@@ -2362,7 +2362,7 @@ async def sade(event):
         if username == "error":
             await event.edit("**- يرجى وضع النوع بشكل صحيح**.")
             break
-        isav = check_user_iqthon(username)
+        isav = check_user(username)
         if isav == True:
             try:
                 await iqthon(
@@ -2430,7 +2430,7 @@ async def bin(event):
     username = str(msg[1])
 
     for i in range(1000000000000):
-        isav = check_user_iqthon(username)
+        isav = check_user(username)
         if isav == True:
             try:
                 await iqthon(
