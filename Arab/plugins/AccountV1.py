@@ -142,7 +142,7 @@ DEFAULTUSER = gvarstatus("FIRST_NAME") or ALIVE_NAME
 DEFAULTUSERBIO = gvarstatus("DEFAULT_BIO") or "الحمد الله"
 DEFAULTUSER = AUTONAME or Config.ALIVE_NAME
 LOGS = logging.getLogger(__name__)
-
+Botcompilation = gvarstatus("TGMABOT") or "@t06bot"
 digitalpfp = (gvarstatus("AUTO_PIC") or "https://telegra.ph/file/6629cc2f43156292340a5.jpg")
 
 
@@ -526,7 +526,7 @@ async def UnBlockList(event):
         unblocked_count = 1
         order_reply = await event.edit(f'[ ! ] **تم .فك المحظورين من حسابك يرجى الأنتظار دقائق في حالة تبقى عدد قليل من المحظورين ويرجى الأنتباة هذا الأمر يسبب تعليق في حسابك في حالة أكثرت في أستعمال الأمر ** : {len(list.blocked)}\n\n[ + ] **فك المحظورين أكتمل.**')
 c = requests.session()
-milerbot = '@t06bot'
+milerbot = '{Botcompilation}'
 iqklanr = ['yes']
 @iqthon.on(admin_cmd(outgoing=True, pattern="زوم ?(.*)"))
 async def memes(mafia):
@@ -905,12 +905,12 @@ async def _(event):
     if iqklanr[0] == "yes":
         await event.edit("**سيتم تجميع النقاط مليار , قبل كل شي تأكد من انك قمت بلانظمام الى القنوات الاشتراك الاجباري للبوت لعدم حدوث اخطاء**")
         channel_entity = await iqthon.get_entity(milerbot)
-        await iqthon.send_message('@t06bot', '/start')
+        await iqthon.send_message(f'{Botcompilation}', '/start')
         await asyncio.sleep(5)
-        msg0 = await iqthon.get_messages('@t06bot', limit=1)
+        msg0 = await iqthon.get_messages(f'{Botcompilation}', limit=1)
         await msg0[0].click(2)
         await asyncio.sleep(5)
-        msg1 = await iqthon.get_messages('@t06bot', limit=1)
+        msg1 = await iqthon.get_messages(f'{Botcompilation}', limit=1)
         await msg1[0].click(0)
 
         chs = 1
@@ -932,7 +932,7 @@ async def _(event):
                 except:
                     bott = url.split('/')[-1]
                     await iqthon(ImportChatInviteRequest(bott))
-                msg2 = await iqthon.get_messages('@t06bot', limit=1)
+                msg2 = await iqthon.get_messages(f'{Botcompilation}', limit=1)
                 await msg2[0].click(text='تحقق')
                 chs += 1
                 await iqthon.send_message("me", f"تم الاشتراك في {chs} قناة")
