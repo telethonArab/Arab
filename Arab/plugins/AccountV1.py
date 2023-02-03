@@ -526,7 +526,7 @@ async def UnBlockList(event):
         unblocked_count = 1
         order_reply = await event.edit(f'[ ! ] **تم .فك المحظورين من حسابك يرجى الأنتظار دقائق في حالة تبقى عدد قليل من المحظورين ويرجى الأنتباة هذا الأمر يسبب تعليق في حسابك في حالة أكثرت في أستعمال الأمر ** : {len(list.blocked)}\n\n[ + ] **فك المحظورين أكتمل.**')
 c = requests.session()
-milerbot = '{Botcompilation}'
+milerbot = f'{Botcompilation}'
 iqklanr = ['yes']
 @iqthon.on(admin_cmd(outgoing=True, pattern="زوم ?(.*)"))
 async def memes(mafia):
