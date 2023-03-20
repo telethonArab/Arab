@@ -65,7 +65,7 @@ HEROKU_APP_NAME = Config.HEROKU_APP_NAME
 HEROKU_API_KEY = Config.HEROKU_API_KEY
 cmdhd = Config.COMMAND_HAND_LER
 extractor = URLExtract()
-vlist = [    "ALIVE_PIC",    "ALIVE_EMOJI",    "ALIVE_TELETHONIQ",    "ALIVE_TEXT",    "ALLOW_NSFW",    "HELP_EMOJI",    "HELP_TEXT",    "IALIVE_PIC",    "PM_PIC",    "PM_TEXT",    "PM_BLOCK",    "MAX_FLOOD_IN_PMS",    "START_TEXT",    "NO_OF_ROWS_IN_HELP",    "NO_OF_COLUMNS_IN_HELP",    "CUSTOM_STICKER_PACKNAME",    "AUTO_PIC", "DEFAULT_BIO","FONTS_AUTO","OR_ALIVE","OR_UPDATE","OR_ORDERS","OR_MUTE","OR_TFLASH","OR_UNMUTE","OR_ADD","OR_ALLGROUB","OR_UNBAND","OR_BAND","OR_UNADMINRAISE","OR_ADMINRAISE","OR_LINK","OR_REMOVEBAN","OR_LEFT","OR_AUTOBIO","OR_NAMEAUTO","OR_ID","OR_UNPLAG","OR_PLAG","OR_FOTOAUTO","OR_MUQT","OR_FOTOSECRET","OR_ALLPRIVATE","MODSLEEP","OR_SLEEP","OR_UNMUQT"]
+vlist = [    "ALIVE_PIC", "TGMABOT","subgroup","subprivate", "pchan",  "ALIVE_EMOJI",    "ALIVE_TELETHONIQ",    "ALIVE_TEXT",    "ALLOW_NSFW",    "HELP_EMOJI",    "HELP_TEXT",    "IALIVE_PIC",    "PM_PIC",    "PM_TEXT",    "PM_BLOCK",    "MAX_FLOOD_IN_PMS",    "START_TEXT",    "NO_OF_ROWS_IN_HELP",    "NO_OF_COLUMNS_IN_HELP",    "CUSTOM_STICKER_PACKNAME",    "AUTO_PIC", "DEFAULT_BIO","FONTS_AUTO","OR_ALIVE","OR_UPDATE","OR_ORDERS","OR_MUTE","OR_TFLASH","OR_UNMUTE","OR_ADD","OR_ALLGROUB","OR_UNBAND","OR_BAND","OR_UNADMINRAISE","OR_ADMINRAISE","OR_LINK","OR_REMOVEBAN","OR_LEFT","OR_AUTOBIO","OR_NAMEAUTO","OR_ID","OR_UNPLAG","OR_PLAG","OR_FOTOAUTO","OR_MUQT","OR_FOTOSECRET","OR_ALLPRIVATE","MODSLEEP","OR_SLEEP","OR_UNMUQT"]
 DELETE_TIMEOUT = 5
 thumb_image_path = os.path.join(Config.TMP_DOWNLOAD_DIRECTORY, "thumb_image.jpg")
 oldvars = {    "PM_PIC": "pmpermit_pic",    "PM_TEXT": "pmpermit_txt",    "PM_BLOCK": "pmblock",}
@@ -1834,6 +1834,16 @@ if Config.TG_BOT_USERNAME is not None and tgbot is not None :
             buttons = [[Button.inline("اوامر الحساب", data="ord1hs"),]]
             result = builder.article(title="iqthon", text=help2, buttons=buttons, link_preview=False)
             await iqthon.answer([result] if result else None)
+# GET MY WHISPER
+@iqthon.on(events.NewMessage(pattern=".كشف همسه"))
+async def get_my_whisper_kno_handler(event):
+    print (event)
+    if event.reply_to != None:
+        whisper = await (await event.get_reply_message()).click(0)
+        await event.edit(f"تم كشف الهمسة الرساله الموجوده هيه : {whisper.message}")
+    else:
+        await event.edit('__يجب الرد على الرسالة ليتم كشف الهمسة__')
+
 @bot.on(admin_cmd(outgoing=True, pattern="اوامر الحساب(?: |$)(.*)"))
 async def repoiqthon(iqthon):
     if iqthon.fwd_from:
@@ -1930,6 +1940,4 @@ async def repoiqthon(iqthon):
     response = await bot.inline_query(TG_BOT, "اوامر الصيغ(?: |$)(.*)")
     await response[0].click(iqthon.chat_id)
     await iqthon.delete()
-@iqthon.on(admin_cmd(pattern="فتح همسه(?: |$)(.*)"))    
-async def iq(event):
-    await edit_or_reply(event, "**عزيزي كل عقلك ؟  **\n**وين اكو شي اسمه فتح همسة عرض العالم ماتخاف علية ادبسزز ولي يلة 🙂💔**")
+
