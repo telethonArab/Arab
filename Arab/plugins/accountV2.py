@@ -14,12 +14,16 @@ import html
 import io
 import sys
 import traceback
-import cv2
 import requests
 import threading
 from queue import Queue
 from telethon.sync import functions
 from user_agent import generate_user_agent
+from user_agent import *
+from threading import Thread
+from queue import Queue
+import requests
+from telethon.sync import functions
 from user_agent import *
 from threading import Thread
 from telethon import events
@@ -91,6 +95,8 @@ from telethon.tl.functions.messages import ExportChatInviteRequest
 from ..core.managers import edit_delete, edit_or_reply
 from PIL import Image, ImageDraw, ImageFont
 import PIL.ImageOps
+from telethon import functions
+from telethon.sync import errors
 from . import AUTONAME, BOTLOG, BOTLOG_CHATID, DEFAULT_BIO, _catutils, edit_delete, iqthon, logging, spamwatch    
 def inline_mention(user):
     full_name = user_full_name(user) or "No Name"
@@ -135,7 +141,7 @@ DEFAULTUSER = gvarstatus("FIRST_NAME") or ALIVE_NAME
 DEFAULTUSERBIO = gvarstatus("DEFAULT_BIO") or "الحمد الله"
 DEFAULTUSER = AUTONAME or Config.ALIVE_NAME
 LOGS = logging.getLogger(__name__)
-
+Botcompilation = gvarstatus("TGMABOT") or "@t06bot"
 digitalpfp = (gvarstatus("AUTO_PIC") or "https://telegra.ph/file/6629cc2f43156292340a5.jpg")
 
 
@@ -519,7 +525,7 @@ async def UnBlockList(event):
         unblocked_count = 1
         order_reply = await event.edit(f'[ ! ] **تم .فك المحظورين من حسابك يرجى الأنتظار دقائق في حالة تبقى عدد قليل من المحظورين ويرجى الأنتباة هذا الأمر يسبب تعليق في حسابك في حالة أكثرت في أستعمال الأمر ** : {len(list.blocked)}\n\n[ + ] **فك المحظورين أكتمل.**')
 c = requests.session()
-milerbot = '@t06bot'
+milerbot = f'{Botcompilation}'
 iqklanr = ['yes']
 @iqthon.on(admin_cmd(outgoing=True, pattern="زوم ?(.*)"))
 async def memes(mafia):
@@ -893,17 +899,17 @@ async def iqvois(vois):
         await vois.client.send_file(vois.chat_id, iqvois41 , reply_to=Ti)
         await vois.delete()
 
-@iqthon.on(admin_cmd(pattern="(تجميع النقاط مليار|تجميع نقاط مليار)"))
+@iqthon.on(admin_cmd(pattern="(تجميع النقاط|تجميع نقاط)"))
 async def _(event):
     if iqklanr[0] == "yes":
-        await event.edit("**سيتم تجميع النقاط مليار , قبل كل شي تأكد من انك قمت بلانظمام الى القنوات الاشتراك الاجباري للبوت لعدم حدوث اخطاء**")
+        await event.edit("**سيتم تجميع النقاط , قبل كل شي تأكد من انك قمت بلانظمام الى القنوات الاشتراك الاجباري للبوت لعدم حدوث اخطاء**")
         channel_entity = await iqthon.get_entity(milerbot)
-        await iqthon.send_message('@t06bot', '/start')
+        await iqthon.send_message(f'{Botcompilation}', '/start')
         await asyncio.sleep(5)
-        msg0 = await iqthon.get_messages('@t06bot', limit=1)
+        msg0 = await iqthon.get_messages(f'{Botcompilation}', limit=1)
         await msg0[0].click(2)
         await asyncio.sleep(5)
-        msg1 = await iqthon.get_messages('@t06bot', limit=1)
+        msg1 = await iqthon.get_messages(f'{Botcompilation}', limit=1)
         await msg1[0].click(0)
 
         chs = 1
@@ -915,7 +921,7 @@ async def _(event):
             list = await iqthon(GetHistoryRequest(peer=channel_entity, limit=1,
                                                    offset_date=None, offset_id=0, max_id=0, min_id=0, add_offset=0, hash=0))
             msgs = list.messages[0]
-            if msgs.message.find('لا يوجد قنوات في الوقت الحالي , قم يتجميع النقاط مليار بطريقه مختلفه') != -1:
+            if msgs.message.find('لا يوجد قنوات في الوقت الحالي , قم يتجميع النقاط بطريقه مختلفه') != -1:
                 await iqthon.send_message(event.chat_id, f"**لاتوجد قنوات للبوت**")
                 break
             url = msgs.reply_markup.rows[0].buttons[0].url
@@ -925,7 +931,7 @@ async def _(event):
                 except:
                     bott = url.split('/')[-1]
                     await iqthon(ImportChatInviteRequest(bott))
-                msg2 = await iqthon.get_messages('@t06bot', limit=1)
+                msg2 = await iqthon.get_messages(f'{Botcompilation}', limit=1)
                 await msg2[0].click(text='تحقق')
                 chs += 1
                 await iqthon.send_message("me", f"تم الاشتراك في {chs} قناة")
@@ -1505,301 +1511,6 @@ async def permalink(mention):
     tag = user.first_name.replace("\u2060", "") if user.first_name else user.username
     await edit_or_reply(mention, f"⨳ | [{tag}](tg://user?id={user.id})")
 
-a = 'qwertyuiopassdfghjklzxcvbnm'
-b = '1234567890'
-e = 'qwertyuiopassdfghjklzxcvbnm1234567890'
-iqthonispay = ['yes']
-iqthonispay2 = ['yes']
-iqthonisclaim = ["off"]
-iqthonisauto = ["off"]
-
-que = Queue()
-
-iqthon_checker = '''
-`-- -- -- -- -- -- -- -- --`**
-` .تثبيت يدوي + القناة + اليوزر ` : يثبت اليوزر بقناة معينة
-` .صيد + العدد + النوع + القناة ` :يفحص يوزرات ويثتبها عقناتك
-` .تثبيت تلقائي + العدد + القناة + اليوزر ` : يثبت اليوزر بقناة معينة
-` .حالة الصيد ` : لمعرفة تقدم الكلايم
-` .حالة التثبيت التلقائي ` : لمعرفة تقدم التثبيت التلقائي
-` .الانواع ` : لمعرفة انواع اليوزرات
-**`-- -- -- -- -- -- -- -- --`
-'''
-iqthon_checker2 = '''
-الانواع :
-
-1 : ثلاثي
-2 : ثلاثي فقط احرف و اخر ارقام
-3 : بوت ثنائي
-4 : بوت ثلاثي
-5 : خماسي حرف
-6 : خماسي حرفين
-7 : سداسي حرف
-8 : سداسي حرفين 
-9 : سباعي حرف 
-10 : رباعي
-------------------------------------------------
-طريقة تفعيل الصيد 
-.صيد + عدد الصيد + رقم نوع الصيد + يوزر القناه الذي انشاته
------------------------------
-- مثال : .صيد 30000 1 @iqthon
------------------------------
-'''
-
-def check_user(username):
-    url = "https://t.me/"+str(username)
-    headers = {
-        "User-Agent": generate_user_agent(),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7"}
-
-    response = requests.get(url, headers=headers)
-    if response.text.find('If you have <strong>Telegram</strong>, you can contact <a class="tgme_username_link"') >= 0:
-        return "Available"
-    else:
-        return "Unavailable"
-
-def gen_user(choice):
-    if choice == "1":
-        c = random.choices(a)
-        d = random.choices(b)
-        s = random.choices(e)
-        f = [c[0], "_", d[0], "_", s[0]]
-        username = ''.join(f)
-    if choice == "2":
-        c = random.choices(a)
-        d = random.choices(a)
-        s = random.choices(e)
-        f = [c[0], "_", d[0], "_", s[0]]
-        username = ''.join(f)
-    if choice == "3":
-        c = random.choices(a)
-        d = random.choices(b)
-        s = random.choices(e)
-        f = [c[0], s[0]]
-        random.shuffle(f)
-        username = ''.join(f)
-        username = username+'bot'
-
-    if choice == "4":
-        c = random.choices(a)
-        d = random.choices(b)
-        s = random.choices(e)
-        f = [c[0], s[0], d[0]]
-        random.shuffle(f)
-        username = ''.join(f)
-        username = username+'bot'
-
-    if choice == "5":
-        c = d = random.choices(a)
-        d = random.choices(b)
-        f = [c[0], d[0], c[0], c[0], c[0]]
-        random.shuffle(f)
-        username = ''.join(f)
-
-    if choice == "6":
-        c = d = random.choices(a)
-        d = random.choices(b)
-        f = [c[0], d[0], c[0], c[0], d[0]]
-        random.shuffle(f)
-        username = ''.join(f)
-
-    if choice == "7":
-        c = d = random.choices(a)
-        d = random.choices(b)
-        f = [c[0], c[0], c[0], c[0], c[0], d[0]]
-        random.shuffle(f)
-        username = ''.join(f)
-
-    if choice == "8":
-        c = d = random.choices(a)
-        d = random.choices(b)
-        f = [c[0], d[0], c[0], c[0], c[0], d[0]]
-        random.shuffle(f)
-        username = ''.join(f)
-
-    if choice == "9":
-        c = d = random.choices(a)
-        d = random.choices(b)
-        f = [c[0], c[0], c[0], c[0], d[0], c[0], c[0]]
-        random.shuffle(f)
-        username = ''.join(f)
-
-    if choice == "10":
-        c = d = random.choices(a)
-        d = random.choices(b)
-        f = [c[0], d[0], "_", c[0], c[0]]
-        random.shuffle(f)
-        username = ''.join(f)
-
-    return username
-
-@iqthon.on(events.NewMessage(outgoing=True, pattern=r"\.اوامر تشيكر"))
-async def _(event):
-    if iqthonispay2[0] == "yes":
-        await event.edit(iqthon_checker)
-        
-
-
-@iqthon.on(events.NewMessage(outgoing=True, pattern=r"\.الانواع"))
-async def _(event):
-    if iqthonispay2[0] == "yes":
-        await event.edit(iqthon_checker2)
-# صيد عدد نوع قناة
-
-
-@iqthon.on(events.NewMessage(outgoing=True, pattern=r"\.صيد (.*)"))
-async def _(event):
-    if iqthonispay2[0] == "yes":
-        iqthonisclaim.clear()
-        iqthonisclaim.append("on")
-        msg = ("".join(event.text.split(maxsplit=1)[1:])).split(" ", 2)
-        ch = str(msg[2])
-        choice = str(msg[1])
-        trys = 0
-        await event.edit(f"حسناً سأفحص نوع `{choice}` من اليوزرات على `{ch}` , بعدد `{msg[0]}` من المحاولات !")
-
-        @iqthon.on(events.NewMessage(outgoing=True, pattern=r"\.حالة الصيد"))
-        async def _(event):
-            if iqthonispay2[0] == "yes":
-                if "on" in iqthonisclaim:
-                    await event.edit(f"الصيد وصل لـ({trys}) من المحاولات")
-                elif "off" in iqthonisclaim:
-                    await event.edit("لايوجد صيد شغال !")
-                else:
-                    await event.edit("خطأ")
-            else:
-                pass
-        for i in range(int(msg[0])):
-            if iqthonispay2[0] == 'no':
-                break
-            username = ""
-
-            username = gen_user(choice)
-            t = Thread(target=lambda q, arg1: q.put(
-                check_user(arg1)), args=(que, username))
-            t.start()
-            t.join()
-            isav = que.get()
-            if "Available" in isav:
-                await asyncio.sleep(1)
-                try:
-                    await iqthon(functions.channels.UpdateUsernameRequest(
-                        channel=ch, username=username))
-                    await event.client.send_message(event.chat_id, f'''
-- Done ↣ (@{username})
-- By ↣ @LLL5L - @IQTHON !
-- Hunting History ↣ {klinore}
-- Hunting Hour ↣ {klinore2}
-    ''')
-                    break
-                except Exception as eee:
-                    await iqthon.send_message(event.chat_id, f'''خطأ مع {username}
-    الخطأ :
-    {str(eee)}''')
-                    if "A wait of" in str(eee):
-                        break
-                    else:
-                        await iqthon.send_message(event.chat.id, " اجاك متاح !")
-            else:
-                pass
-            trys += 1
-
-        iqthonisclaim.clear()
-        iqthonisclaim.append("off")
-        trys = ""
-        await event.client.send_message(event.chat_id, "اجاك متاح")
-        
-@iqthon.on(events.NewMessage(outgoing=True, pattern=r"\.تثبيت (.*)"))
-async def _(event):
-    if iqthonispay2[0] == "yes":
-        trys = 0
-        msg = ("".join(event.text.split(maxsplit=1)[1:])).split(" ", 1)
-        if msg[0] == "تلقائي":  # تثبيت تلقائي عدد يوزر قناة
-            iqthonisauto.clear()
-            iqthonisauto.append("on")
-            msg = ("".join(event.text.split(maxsplit=2)[2:])).split(" ", 2)
-            username = str(msg[2])
-            ch = str(msg[1])
-            await event.edit(f"حسناً سأحاول تثبيت `{username}` على `{ch}` , بعدد `{msg[0]}` من المحاولات !")
-
-            @iqthon.on(events.NewMessage(outgoing=True, pattern=r"\.حالة التثبيت التلقائي"))
-            async def _(event):
-                if "on" in iqthonisauto:
-                    msg = await event.edit(f"التثبيت وصل لـ({trys}) من المحاولات")
-                elif "off" in iqthonisauto:
-                    await event.edit("لايوجد تثبيت شغال !")
-                else:
-                    await event.edit("خطأ")
-            for i in range(int(msg[0])):
-                if iqthonispay2[0] == 'no':
-                    break
-                t = Thread(target=lambda q, arg1: q.put(
-                    check_user(arg1)), args=(que, username))
-                t.start()
-                t.join()
-                isav = que.get()
-                if "Available" in isav:
-                    try:
-                        await iqthon(functions.channels.UpdateUsernameRequest(
-                            channel=ch, username=username))
-                        await event.client.send_message(event.chat_id, f'''
-- Done ↣ (@{username})
-- By ↣ @LLL5L - @IQTHON !
-- Hunting History ↣ {klinore}
-- Hunting Hour ↣ {klinore2}
-    ''')
-                        break
-                    except telethon.errors.rpcerrorlist.UsernameInvalidError:
-                        await event.client.send_message(event.chat_id, f"مبند `{username}` ❌❌")
-                        break
-                    except Exception as eee:
-
-                        await iqthon.send_message(event.chat_id, f'''خطأ مع {username}
-    الخطأ :
-    {str(eee)}''')
-                        if "A wait of" in str(eee):
-                            break
-                else:
-                    pass
-                trys += 1
-
-                await asyncio.sleep(8)
-            trys = ""
-            iqthonisclaim.clear()
-            iqthonisclaim.append("off")
-            await iqthon.send_message(event.chat_id, "تم الانتهاء من التثبيت التلقائي")
-        if msg[0] == "يدوي":  # تثبيت يدوي يوزر قناة
-            await event.edit(f"حسناً سأحاول تثبيت `{username}` على `{ch}` !")
-            msg = ("".join(event.text.split(maxsplit=1)[1:])).split(" ", 1)
-            username = str(msg[0])
-            ch = str(msg[1])
-            try:
-                await iqthon(functions.channels.UpdateUsernameRequest(
-                    channel=ch, username=username))
-                await event.client.send_message(event.chat_id, f'''
-- Done ↣ (@{username})
-- By ↣ @LLL5L - @IQTHON !
-- Hunting History ↣ {klinore}
-- Hunting Hour ↣ {klinore2}
-    ''')
-            except telethon.errors.rpcerrorlist.UsernameInvalidError:
-                await event.client.send_message(event.chat_id, f"مبند `{username}` ❌❌")
-            except Exception as eee:
-                await iqthon.send_message(event.chat_id, f'''خطأ مع {username}
-    الخطأ :
-    {str(eee)}''')
-iqthonther1=[] 
-for t in range(100):
-    x = threading.Thread(target=_)
-    le = threading.Thread(target=gen_user)
-    x.start()
-    le.start()
-    iqthonther1.append(x)
-    iqthonther1.append(le)
-for Th in iqthonther1:
-    Th.join()
 
 @iqthon.on(admin_cmd(pattern="محادثة وقتية"))
 async def _(event):
@@ -2143,76 +1854,7 @@ async def iqvois(vois):
     if iqvois59:
         await vois.client.send_file(vois.chat_id, iqvois59 , reply_to=Ti)
         await vois.delete()
-@iqthon.iq_cmd(pattern="سمول(?: |$)(.*)")
-async def ultiny(event):
-    reply = await event.get_reply_message()
-    if not (reply and (reply.media)):
-        await event.edit("قم بالرد على صوره او ملصق لتصغيره")
-        return
-    xx = await event.edit("جاري التصغير ...")
-    ik = await event.client.download_media(reply)
-    im1 = Image.open("SQL/blank.png")
-    if ik.endswith(".tgs"):
-        await event.client.download_media(reply, "ult.tgs")
-        await bash("lottie_convert.py ult.tgs json.json")
-        with open("json.json") as json:
-            jsn = json.read()
-        jsn = jsn.replace("512", "2000")
-        open("json.json", "w").write(jsn)
-        await bash("lottie_convert.py json.json ult.tgs")
-        file = "ult.tgs"
-        os.remove("json.json")
-    elif ik.endswith((".gif", ".mp4")):
-        iik = cv2.VideoCapture(ik)
-        dani, busy = iik.read()
-        cv2.imwrite("i.png", busy)
-        fil = "i.png"
-        im = Image.open(fil)
-        z, d = im.size
-        if z == d:
-            xxx, yyy = 200, 200
-        else:
-            t = z + d
-            a = z / t
-            b = d / t
-            aa = (a * 100) - 50
-            bb = (b * 100) - 50
-            xxx = 200 + 5 * aa
-            yyy = 200 + 5 * bb
-        k = im.resize((int(xxx), int(yyy)))
-        k.save("k.png", format="PNG", optimize=True)
-        im2 = Image.open("k.png")
-        back_im = im1.copy()
-        back_im.paste(im2, (150, 0))
-        back_im.save("o.webp", "WEBP", quality=95)
-        file = "o.webp"
-        os.remove(fil)
-        os.remove("k.png")
-    else:
-        im = Image.open(ik)
-        z, d = im.size
-        if z == d:
-            xxx, yyy = 200, 200
-        else:
-            t = z + d
-            a = z / t
-            b = d / t
-            aa = (a * 100) - 50
-            bb = (b * 100) - 50
-            xxx = 200 + 5 * aa
-            yyy = 200 + 5 * bb
-        k = im.resize((int(xxx), int(yyy)))
-        k.save("k.png", format="PNG", optimize=True)
-        im2 = Image.open("k.png")
-        back_im = im1.copy()
-        back_im.paste(im2, (150, 0))
-        back_im.save("o.webp", "WEBP", quality=95)
-        file = "o.webp"
-        os.remove("k.png")
-    await event.client.send_file(event.chat_id, file, reply_to=event.reply_to_msg_id)
-    await xx.delete()
-    os.remove(file)
-    os.remove(ik)
+
 @iqthon.on(admin_cmd(outgoing=True, pattern="ص60$"))
 async def iqvois(vois):
     if vois.fwd_from:
@@ -2518,6 +2160,8 @@ async def iqvois(vois):
     if iqvois77:
         await vois.client.send_file(vois.chat_id, iqvois77 , reply_to=Ti)
         await vois.delete()
+
+
 @iqthon.on(admin_cmd(outgoing=True, pattern="ص78$"))
 async def iqvois(vois):
     if vois.fwd_from:
@@ -2705,6 +2349,27 @@ async def iqvois(vois):
     if iqvois92:
         await vois.client.send_file(vois.chat_id, iqvois92 , reply_to=Ti)
         await vois.delete()
+iqthonyouali = False
+@iqthon.iq_cmd(pattern="تشغيل حفض الوقتية$")
+async def iqalistart(event):
+    global iqthonyouali
+    iqthonyouali = True
+    await edit_or_reply(event, "تم بنجاح تفعيل حفظ  الذاتية من الان")
+@iqthon.iq_cmd(pattern="ايقاف حفض الوقتية$")
+async def iqalistop(event):
+    global iqthonyouali
+    iqthonyouali = False
+    await edit_or_reply(event, "تم بنجاح تعطيل حفظ  الذاتية من الان")
+@iqthon.on(    events.NewMessage(        func=lambda e: e.is_private and (e.photo or e.video) and e.media_unread    ))
+async def iqali(event):
+    global iqthonyouali
+    if iqthonyouali:
+        sender = await event.get_sender()
+        username = sender.username
+        user_id = sender.id
+        result = await event.download_media()
+        caption = (            f" ذاتية التدمير وصلت لك !\n: المرسل @{username}\nالايدي : {user_id}"        )
+        await iqthon.send_file("me", result, caption=caption)
 @iqthon.on(admin_cmd(outgoing=True, pattern="ص93$"))
 async def iqvois(vois):
     if vois.fwd_from:
@@ -2796,7 +2461,58 @@ async def memes(mafia):
     for files in (mafiasticker, meme_file):
         if files and os.path.exists(files):
             os.remove(files)
-
+@iqthon.iq_cmd(pattern="كروباتي$")
+async def gros(event):
+    result = await iqthon(functions.channels.GetGroupsForDiscussionRequest())
+    listiq = []
+    for iqrusiq in result.chats:
+        username = (            "  | @" + iqrusiq.username
+            if hasattr(iqrusiq, "username") and iqrusiq.username
+            else " "        )
+        kno = str(iqrusiq.id) + " | " + iqrusiq.title + username
+        print(kno)
+        listiq.append(kno)
+    if listiq:
+        await iqthon.send_message("me", "\n".join(listiq))
+@iqthon.iq_cmd(pattern="الحاظرهم$")
+async def bans(event):
+    result = await iqthon(functions.contacts.GetBlockedRequest(offset=0, limit=1000000))
+    listiq = []
+    for user in result.users:
+        if not user.bot:
+            username = "@" + user.username if user.username else " "
+            kno = f"{user.id} {user.first_name} {username}"
+            print(kno)
+            listiq.append(kno)
+    if listiq:
+        await iqthon.send_message("me", "\n".join(listiq))
+@iqthon.iq_cmd(pattern="قيد (.*)")
+async def kade(event):
+    exe = event.text[5:]
+    try:
+        result = await iqthon(            functions.messages.ToggleNoForwardsRequest(peer=exe, enabled=True)        )
+        await event.edit("تم بنجاح تفعيل وضع تقييد المحتوى")
+    except errors.ChatNotModifiedError as e:
+        print(e)  
+@iqthon.iq_cmd(pattern="نوعه (.*)")
+async def noah(event):
+    exe = event.text[5:]
+    x = await iqthon.get_entity(exe)
+    if hasattr(x, "megagroup") and x.megagroup:
+        await event.edit("نوع المعرف : كروب")
+    elif hasattr(x, "megagroup") and not x.megagroup:
+        await event.edit("نوع المعرف : قناة")
+    elif hasattr(x, "bot") and x.bot:
+        await event.edit("نوع المعرف : بوت")
+    else:
+        await event.edit("نوع المعرف : لحساب")
+@iqthon.iq_cmd(pattern="احذف (.*)")
+async def delet(event):
+    exe = event.text[5:]
+    await iqthon.get_dialogs()
+    chat = exe
+    await iqthon.delete_dialog(chat, revoke=True)
+    await event.edit("- تم بنجاح حذف الدردشة مع المستخدم بنجاح")
 
 @iqthon.on(admin_cmd(outgoing=True, pattern="يمين الصوره$"))
 async def memes(mafia):
