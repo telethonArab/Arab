@@ -8,7 +8,6 @@ import shlex
 import math
 import base64
 import shutil
-
 from bs4 import BeautifulSoup
 from ..helpers.utils import reply_id
 plugin_category = "@iqthon"
@@ -24,6 +23,8 @@ from telethon.tl.types import ChannelParticipantsAdmins, MessageEntityMentionNam
 from time import sleep
 from datetime import datetime
 from telethon import Button, events
+from telethon.tl.functions.channels import JoinChannelRequest
+from telethon.tl.functions.messages import GetHistoryRequest, ImportChatInviteRequest
 from telethon.events import CallbackQuery
 from telethon.utils import get_display_name
 from collections import deque
@@ -41,6 +42,11 @@ from ..helpers.google_image_download import googleimagesdownload
 from ..helpers.utils import reply_id
 from . import deEmojify
 from typing import Optional, Tuple
+from telethon import events
+from ..sql_helper.globals import addgvar, delgvar, gvarstatus
+from ..core.managers import edit_delete
+from telethon import functions
+from telethon.errors.rpcerrorlist import MessageIdInvalidError
 from PIL import Image, ImageDraw, ImageFont
 import PIL.ImageOps
 import os, logging, asyncio
@@ -915,6 +921,30 @@ async def _(event):
     await event.edit("-------------✈")
     await asyncio.sleep(3)
 
+@iqthon.on(admin_cmd(pattern="(خط الغامق|خط غامق)"))
+async def iqtext(event):
+    isiqboldiq = gvarstatus("iqboldiq")
+    if not isiqboldiq:
+        addgvar ("iqboldiq", "on")
+        await edit_delete(event, "**تم تفعيل خط الغامق بنجاح ✅**")
+        return
+
+    if isiqboldiq:
+        delgvar("iqboldiq")
+        await edit_delete(event, "**تم اطفاء خط الغامق بنجاح ✅ **")
+        return
+@iqthon.on(admin_cmd(pattern="(ايقاف الخط الغامق|ايقاف خط غامق)"))
+async def iqtext(event):
+    isiqboldiq = gvarstatus("iqboldiq")
+    if not isiqboldiq:
+        addgvar ("iqboldiq", "on")
+        await edit_delete(event, "**تم تفعيل خط الغامق بنجاح ✅**")
+        return
+
+    if isiqboldiq:
+        delgvar("iqboldiq")
+        await edit_delete(event, "**تم اطفاء خط الغامق بنجاح ✅ **")
+        return        
 @iqthon.on(admin_cmd(pattern="شرطي(?: |$)(.*)"))
 async def _(event):
     "أمر الرسوم المتحركة"
@@ -938,7 +968,78 @@ async def _(event):
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
         await event.edit(animation_chars[i % 12])
+        
+@iqthon.on(admin_cmd(pattern="خط مائل"))
+async def iqtext(event):
+    isiqknoiq = gvarstatus("isiqmailiq")
+    if not isiqknoiq:
+        addgvar ("isiqmailiq", "on")
+        await edit_delete(event, "**تم تفعيل خط الرمز بنجاح ✅**")
+        return
 
+    if isiqknoiq:
+        delgvar("isiqmailiq")
+        await edit_delete(event, "**تم اطفاء خط المائل بنجاح ✅ **")
+        return        
+        
+@iqthon.on(admin_cmd(pattern="ايقاف خط مائل"))
+async def iqtext(event):
+    isiqknoiq = gvarstatus("isiqmailiq")
+    if not isiqknoiq:
+        addgvar ("isiqmailiq", "on")
+        await edit_delete(event, "**تم تفعيل خط المائل بنجاح ✅**")
+        return
+    if isiqknoiq:
+        delgvar("isiqmailiq")
+        await edit_delete(event, "**تم اطفاء خط المائل بنجاح ✅ **")
+        return        
+                
+@iqthon.on(admin_cmd(pattern="(خط رمز|خط الرمز)"))
+async def iqtext(event):
+    isiqknoiq = gvarstatus("iqknoiq")
+    if not isiqknoiq:
+        addgvar ("iqknoiq", "on")
+        await edit_delete(event, "**تم تفعيل خط الرمز بنجاح ✅**")
+        return
+
+    if isiqknoiq:
+        delgvar("iqknoiq")
+        await edit_delete(event, "**تم اطفاء خط الرمز بنجاح ✅ **")
+        return
+@iqthon.on(admin_cmd(pattern= "ايقاف خط رمز"))
+async def iqtext(event):
+    isiqknoiq = gvarstatus("iqknoiq")
+    if not isiqknoiq:
+        addgvar ("iqknoiq", "on")
+        await edit_delete(event, "**تم تفعيل خط الرمز بنجاح ✅**")
+        return
+
+    if isiqknoiq:
+        delgvar("iqknoiq")
+        await edit_delete(event, "**تم اطفاء خط الرمز بنجاح ✅ **")
+        return    
+
+@iqthon.on(events.NewMessage(outgoing=True))
+async def klanr(event):
+    isiqboldiq = gvarstatus("iqboldiq")
+    if isiqboldiq:
+        try:
+            await event.edit(f"**{event.message.message}**")
+        except MessageIdInvalidError:
+            pass
+    isiqknoiq = gvarstatus("iqknoiq")
+    if isiqknoiq:
+        try:
+            await event.edit(f"`{event.message.message}`")
+        except MessageIdInvalidError:
+            pass
+    isiqmailiq = gvarstatus("isiqmailiq")    
+    if isiqmailiq:
+        try:
+            await event.edit(f"__{event.message.message}__")
+        except MessageIdInvalidError:
+            pass            
+    
 @iqthon.on(admin_cmd(pattern="النضام الشمسي(?: |$)(.*)"))
 async def _(event):
     "أمر الرسوم المتحركة"
@@ -2474,6 +2575,52 @@ async def _(event):
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
         await catevent.edit(animation_chars[i % 4])
+@iqthon.iq_cmd(pattern="بخشيش وعد (.*)")
+async def bkshashwid(event):
+    for i in range(int("".join(event.text.split(maxsplit=2)[2:]).split(" ", 2)[0])):
+        chat = event.chat_id
+        await iqthon.send_message(chat, "بخشيش")
+        await asyncio.sleep(605)
+@iqthon.iq_cmd(pattern="راتب وعد (.*)")
+async def ritebweid(event):
+    for i in range(int("".join(event.text.split(maxsplit=2)[2:]).split(" ", 2)[0])):
+        chat = event.chat_id
+        await iqthon.send_message(chat, "راتب")
+        await asyncio.sleep(605)
+@iqthon.iq_cmd(pattern="كلمات وعد (.*)")
+async def klmetwed(event):
+    for i in range(int("".join(event.text.split(maxsplit=2)[2:]).split(" ", 2)[0])):
+        chat = event.chat_id
+        await iqthon.send_message(chat, "كلمات")
+        await asyncio.sleep(0.5)
+        masg = await iqthon.get_messages(chat, limit=1)
+        masg = masg[0].message
+        masg = ("".join(masg.split(maxsplit=3)[3:])).split(" ", 2)
+        if len(masg) == 2:
+            msg = masg[0]
+            await iqthon.send_message(chat, msg)
+        else:
+            msg = masg[0] + " " + masg[1]
+            await iqthon.send_message(chat, msg)
+@iqthon.iq_cmd(pattern="استثمار وعد (.*)")
+async def astthmerwadi(event):
+    await event.edit(        "**- تم تفعيل الاستثمار ببوت وعد بنجاح لأيقافه ارسل \n`.استثمار وعد 1`"    )
+    for i in range(int("".join(event.text.split(maxsplit=2)[2:]).split(" ", 2)[0])):
+        chat = event.chat_id
+        await iqthon.send_message(chat, "فلوسي")
+        await asyncio.sleep(0.5)
+        masg = await iqthon.get_messages(chat, limit=1)
+        masg = masg[0].message
+        masg = ("".join(masg.split(maxsplit=2)[2:])).split(" ", 2)
+        msg = masg[0]
+        if int(msg) > 500000000:
+            await iqthon.send_message(chat, f"استثمار {msg}")
+            await asyncio.sleep(10)
+            mssag2 = await iqthon.get_messages(chat, limit=1)
+            await mssag2[0].click(text="اي ✅")
+        else:
+            await iqthon.send_message(chat, f"استثمار {msg}")
+        await asyncio.sleep(1210)
 @iqthon.on(admin_cmd(pattern="جكه(?:\s|$)([\s\S]*)"))
 async def permalink(mention):
     user, custom = await get_user_from_event(mention)
@@ -2590,7 +2737,3 @@ async def iq(mention):
     my_first = me.first_name
     my_mention = f"[{me.first_name}](tg://user?id={me.id})"
     await edit_or_reply(mention, f"**🚹 ¦ المستخدم ⪼ • ** [{iqth2}](tg://user?id={user.id}) \n ☑️ **¦  تـم رفـعه سعـلوه 🦎 .** \n**🤵‍♂️ ¦ بواسطه  : ** {my_mention} ")
-
-
-
-
