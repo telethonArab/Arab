@@ -49,7 +49,7 @@ def start_bot():
     return False
 Checker = start_bot()
 if Checker == False:
-    print("كتمل تنصيب #1")
+    print("كتمل تنصيب test #1")
 
 if len(sys.argv) not in (1, 3, 4):
     iqthon.disconnect()
