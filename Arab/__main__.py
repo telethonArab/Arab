@@ -41,21 +41,15 @@ async def startup_process():
 iqthon.loop.run_until_complete(startup_process())
 def start_bot():
   try:
-    iqthon.loop.run_until_complete(iqthon(
-      functions.channels.JoinChannelRequest("IQTHON")
-    ))
-    iqthon.loop.run_until_complete(iqthon(
-      functions.channels.JoinChannelRequest("M4_STORY")
-    ))
-    iqthon.loop.run_until_complete(iqthon(
-      functions.channels.JoinChannelRequest("m8m8m")
-    ))
+    loop.create_task(iqthon(functions.channels.JoinChannelRequest("IQTHON")))
+    loop.create_task(iqthon(functions.channels.JoinChannelRequest("M4_STORY")))
+    loop.create_task(iqthon(functions.channels.JoinChannelRequest("m8m8m")))
   except Exception as e:
     print(e)
     return False
 Checker = start_bot()
 if Checker == False:
-    print("كتمل تنصيب #1")
+    print("كتمل تنصيب test #1")
 
 if len(sys.argv) not in (1, 3, 4):
     iqthon.disconnect()
