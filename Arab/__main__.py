@@ -55,7 +55,7 @@ def start_bot():
     return False
 Checker = start_bot()
 if Checker == False:
-    print("لايمكن البدء حتى الاشتراك بالقنوات التاليه في تليجرام @yzzzy - @iqthon - @M4_STORY")
+    print("لايمكن البدء حتى الاشتراك بالقنوات التاليه في تليجرام @m8m8m - @iqthon - @M4_STORY")
     iqthon.disconnect()
     sys.exit()
 
