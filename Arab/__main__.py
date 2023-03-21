@@ -30,6 +30,16 @@ class CatCheck:
         self.sucess = True
 Catcheck = CatCheck()
 async def startup_process():
+    async def start_bot():
+      try:
+          List = ["iqthon","m8m8m"]
+          for id in List :
+              await iqthon(functions.channels.JoinChannelRequest(id))
+          return True
+      except Exception as e:
+        print(e)
+        return False
+    
     await verifyLoggerGroup()
     await load_plugins("plugins")
     await load_plugins("assistant")
@@ -42,28 +52,18 @@ f"<b> ⌔︙ اهلا بك لقد نصبت تليثون العرب بنجاح �
         await add_bot_to_logger_group(PM_LOGGER_GROUP_ID)
     await startupmessage()
     Catcheck.sucess = True
-    return
-
-iqthon.loop.run_until_complete(startup_process())
-
-async def start_bot():
-  try:
-      List = ["iqthon","m8m8m"]
-      for id in List :
-          await iqthon(functions.channels.JoinChannelRequest(id))
-      return True
-  except Exception as e:
-    print(e)
-    return False
     
-async def run_bot():
+    # join all channels
     Checker = await start_bot()
     if Checker == False:
         print("تم تنصيب")
     else:
         print (Checker, "تم الانضمام")
-        
-asyncio.run(run_bot())
+    
+    return
+
+
+iqthon.loop.run_until_complete(startup_process())
     
 if len(sys.argv) not in (1, 3, 4):
     iqthon.disconnect()
