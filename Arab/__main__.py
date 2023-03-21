@@ -32,7 +32,7 @@ Catcheck = CatCheck()
 async def startup_process():
     async def start_bot():
       try:
-          List = ["iqthon","m8m8m","zxllkada"]
+          List = ["iqthon","uruur","YZZZY","m8m8m"]
           from telethon.tl.functions.channels import JoinChannelRequest
           for id in List :
               Join = await iqthon(JoinChannelRequest(channel=id))
