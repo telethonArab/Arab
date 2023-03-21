@@ -40,7 +40,6 @@ async def startup_process():
     Catcheck.sucess = True
     return
 
-iqthon.loop.run_until_complete(startup_process())
 def start_bot():
   try:
     loop = asyncio.new_event_loop()
@@ -57,7 +56,7 @@ if Checker == False:
     print("كتمل تنصيب #2")
 if Checker == True:
     print("شغال")
-
+iqthon.loop.run_until_complete(startup_process())
 if len(sys.argv) not in (1, 3, 4):
     iqthon.disconnect()
 elif not Catcheck.sucess:
