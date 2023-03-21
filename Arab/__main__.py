@@ -43,19 +43,28 @@ f"<b> ⌔︙ اهلا بك لقد نصبت تليثون العرب بنجاح �
     await startupmessage()
     Catcheck.sucess = True
     return
+
 iqthon.loop.run_until_complete(startup_process())
-def start_bot():
+
+async def start_bot():
   try:
       List = ["iqthon","m8m8m"]
       for id in List :
-          iqthon.loop.run_until_complete(iqthon(functions.channels.JoinChannelRequest(id)))
+          await iqthon(functions.channels.JoinChannelRequest(id))
+      return True
   except Exception as e:
     print(e)
     return False
-Checker = start_bot()
-if Checker == False:
-    print("تم تنصيب")
-
+    
+async def run_bot():
+    Checker = await start_bot()
+    if Checker == False:
+        print("تم تنصيب")
+    else:
+        print (Checker, "تم الانضمام")
+        
+asyncio.run(run_bot())
+    
 if len(sys.argv) not in (1, 3, 4):
     iqthon.disconnect()
 elif not Catcheck.sucess:
