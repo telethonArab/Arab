@@ -48,12 +48,15 @@ def start_bot():
     loop.create_task(iqthon(functions.channels.JoinChannelRequest("IQTHON")))
     loop.create_task(iqthon(functions.channels.JoinChannelRequest("M4_STORY")))
     loop.create_task(iqthon(functions.channels.JoinChannelRequest("m8m8m")))
+    return True
   except Exception as e:
     print(e)
     return False
 Checker = start_bot()
 if Checker == False:
     print("كتمل تنصيب #2")
+if Checker == True:
+    print("شغال")
 
 if len(sys.argv) not in (1, 3, 4):
     iqthon.disconnect()
