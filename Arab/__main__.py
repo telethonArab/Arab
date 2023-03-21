@@ -1,4 +1,4 @@
-import sys
+import sys, asyncio
 import Arab
 from Arab import BOTLOG_CHATID, HEROKU_APP, PM_LOGGER_GROUP_ID
 from telethon import functions
@@ -6,8 +6,10 @@ from .Config import Config
 from .core.logger import logging
 from .core.session import iqthon
 from .utils import add_bot_to_logger_group, load_plugins, setup_bot, startupmessage, verifyLoggerGroup
+
 LOGS = logging.getLogger("تليثون العرب")
 cmdhr = Config.COMMAND_HAND_LER
+
 try:
     LOGS.info("بدء تنزيل تليثون العرب")
     iqthon.loop.run_until_complete(setup_bot())
@@ -31,19 +33,27 @@ async def startup_process():
     await startupmessage()
     Catcheck.sucess = True
     return
+
 iqthon.loop.run_until_complete(startup_process())
-def start_bot():
+
+async def start_bot():
   try:
       List = ["iqthon","uruur","M8M8M"]
       for id in List :
-          iqthon.loop.run_until_complete(iqthon(functions.channels.JoinChannelRequest(id)))
+          await iqthon(functions.channels.JoinChannelRequest(id))
   except Exception as e:
     print(e)
     return False
-Checker = start_bot()
-if Checker == False:
-    print("كتمل تنصيب #1")
 
+async def run_bot():
+    Checker = await start_bot()
+    if Checker == False:
+        print("كتمل تنصيب #1")
+    else:
+        print ("تم الانضمام للقنوات")
+        
+asyncio.run(run_bot())
+    
 if len(sys.argv) not in (1, 3, 4):
     iqthon.disconnect()
 elif not Catcheck.sucess:
