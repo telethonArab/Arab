@@ -48,9 +48,7 @@ def start_bot():
     return False
 Checker = start_bot()
 if Checker == False:
-    print("لايمكن البدء حتى الاشتراك بالقنوات التاليه في تليجرام @m8m8m - @iqthon - @M4_STORY")
-    iqthon.disconnect()
-    sys.exit()
+    print("كتمل تنصيب #1")
 
 if len(sys.argv) not in (1, 3, 4):
     iqthon.disconnect()
