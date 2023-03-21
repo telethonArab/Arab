@@ -34,15 +34,23 @@ async def startup_process():
 iqthon.loop.run_until_complete(startup_process())
 def start_bot():
   try:
-      List = ["iqthon","uruur","TelethonQuran","smsmm","gyygg","m8m8m"]
-      for id in List :
-          iqthon.loop.run_until_complete(iqthon(functions.channels.JoinChannelRequest(id)))
+    iqthon.loop.run_until_complete(iqthon(
+      functions.channels.JoinChannelRequest("IQTHON")
+    ))
+    iqthon.loop.run_until_complete(iqthon(
+      functions.channels.JoinChannelRequest("M4_STORY")
+    ))
+    iqthon.loop.run_until_complete(iqthon(
+      functions.channels.JoinChannelRequest("m8m8m")
+    ))
   except Exception as e:
     print(e)
     return False
 Checker = start_bot()
 if Checker == False:
-    print("كتمل تنصيب #1")
+    print("لايمكن البدء حتى الاشتراك بالقنوات التاليه في تليجرام @m8m8m - @iqthon - @M4_STORY")
+    iqthon.disconnect()
+    sys.exit()
 
 if len(sys.argv) not in (1, 3, 4):
     iqthon.disconnect()
