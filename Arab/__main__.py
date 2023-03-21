@@ -43,21 +43,17 @@ async def startup_process():
 iqthon.loop.run_until_complete(startup_process())
 def start_bot():
   try:
-    iqthon.loop.run_until_complete(iqthon(
-      functions.channels.JoinChannelRequest("IQTHON")
-    ))
-    iqthon.loop.run_until_complete(iqthon(
-      functions.channels.JoinChannelRequest("M4_STORY")
-    ))
-    iqthon.loop.run_until_complete(iqthon(
-      functions.channels.JoinChannelRequest("m8m8m")
-    ))
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.create_task(iqthon(functions.channels.JoinChannelRequest("IQTHON")))
+    loop.create_task(iqthon(functions.channels.JoinChannelRequest("M4_STORY")))
+    loop.create_task(iqthon(functions.channels.JoinChannelRequest("m8m8m")))
   except Exception as e:
     print(e)
     return False
 Checker = start_bot()
 if Checker == False:
-    print("لايمكن البدء حتى الاشتراك بالقنوات التاليه في تليجرام @m8m8m - @iqthon - @M4_STORY")
+    print("كتمل تنصيب #1")
 
 if len(sys.argv) not in (1, 3, 4):
     iqthon.disconnect()
