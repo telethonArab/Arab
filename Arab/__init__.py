@@ -1,7 +1,7 @@
 import time
 import heroku3
+from sample_config import Config
 
-from .Config import Config
 from .core.logger import logging
 from .core.session import iqthon
 from .sql_helper.globals import addgvar, delgvar, gvarstatus
