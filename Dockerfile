@@ -1,13 +1,11 @@
-FROM telethonArab/telethonAr:slim-buster
+FROM telethonArab/Arab:slim-buster
 
-#clonning repo 
-RUN git clone https://github.com/telethonArab/Arab /root/Arab
-#working directory 
+RUN git clone https://github.com/telethonArab/Arab.git /root/Arab
+
 WORKDIR /root/Arab
 
-# Install requirements
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 ENV PATH="/home/Arab/bin:$PATH"
 
-CMD ["python3","-m","Arab"
+CMD ["python3","-m","Arab"]
