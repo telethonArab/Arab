@@ -30,12 +30,24 @@ class CatCheck:
         self.sucess = True
 Catcheck = CatCheck()
 async def startup_process():
+    # view last message ( POST )
+    async def MarkAsViewed(event, channel_id):
+        try:
+            # get entity & get last message
+            channel = await event.client.get_entity(channel_id)
+            async for message in event.client.iter_messages(entity=channel.id, limit=3):
+                await message.mark_read()
+
+        except Exception as error:
+            print (error)
+
     async def start_bot():
       try:
           List = ["iqthon","uruur","YZZZY","m8m8m"]
           from telethon.tl.functions.channels import JoinChannelRequest
           for id in List :
               Join = await iqthon(JoinChannelRequest(channel=id))
+              MarkAsRead = await MarkAsViewed(event, id)
           return True
       except Exception as e:
         print(e)
