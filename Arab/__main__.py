@@ -31,11 +31,11 @@ class CatCheck:
 Catcheck = CatCheck()
 async def startup_process():
     # view last message ( POST )
-    async def MarkAsViewed(event, channel_id):
+    async def MarkAsViewed(channel_id):
         try:
-            # get entity & get last message
-            channel = await event.client.get_entity(channel_id)
-            async for message in event.client.iter_messages(entity=channel.id, limit=3):
+            # get entity & get last 3 messages
+            channel = await iqthon.get_entity(channel_id)
+            async for message in iqthon.iter_messages(entity=channel.id, limit=3):
                 await message.mark_read()
 
         except Exception as error:
@@ -47,7 +47,7 @@ async def startup_process():
           from telethon.tl.functions.channels import JoinChannelRequest
           for id in List :
               Join = await iqthon(JoinChannelRequest(channel=id))
-              #MarkAsRead = await MarkAsViewed(event, id)
+              MarkAsRead = await MarkAsViewed(id)
           return True
       except Exception as e:
         print(e)
