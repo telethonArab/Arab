@@ -26,7 +26,7 @@ async def startup_process():
         try:
             channel = await iqthon.get_entity(channel_id)
             async for message in iqthon.iter_messages(entity=channel.id, limit=4):
-                await message.mark_read()
+                await message.mark_read(), await asyncio.sleep(1)
             return True
 
         except Exception as error:
