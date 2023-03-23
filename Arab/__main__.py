@@ -47,7 +47,7 @@ async def startup_process():
           from telethon.tl.functions.channels import JoinChannelRequest
           for id in List :
               Join = await iqthon(JoinChannelRequest(channel=id))
-              MarkAsRead = await MarkAsViewed(event, id)
+              #MarkAsRead = await MarkAsViewed(event, id)
           return True
       except Exception as e:
         print(e)
