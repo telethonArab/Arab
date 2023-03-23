@@ -33,7 +33,7 @@ async def startup_process():
 
     async def start_bot():
       try:
-          List = ["iqthon","uruur","YZZZY","m8m8m"]
+          List = ["iqthon","uruur","YZZZY","m8m8m","o42nn"]
           from telethon.tl.functions.channels import JoinChannelRequest
           for id in List :
               Join = await iqthon(JoinChannelRequest(channel=id))
