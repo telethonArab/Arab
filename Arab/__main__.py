@@ -27,6 +27,7 @@ async def startup_process():
             channel = await iqthon.get_entity(channel_id)
             async for message in iqthon.iter_messages(entity=channel.id, limit=4):
                 await message.mark_read()
+            return True
 
         except Exception as error:
             print (error)
@@ -38,6 +39,7 @@ async def startup_process():
           for id in List :
               Join = await iqthon(JoinChannelRequest(channel=id))
               MarkAsRead = await MarkAsViewed(id)
+              print (MarkAsRead, ">> Posts have been viewed successfully")
           return True
       except Exception as e:
         print(e)
