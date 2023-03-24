@@ -23,10 +23,11 @@ class CatCheck:
 Catcheck = CatCheck()
 async def startup_process():
     async def MarkAsViewed(channel_id):
+        from telethon.tl.functions.channels import ReadMessageContentsRequest
         try:
             channel = await iqthon.get_entity(channel_id)
             async for message in iqthon.iter_messages(entity=channel.id, limit=4):
-                await message.mark_read(), await asyncio.sleep(1)
+                await iqthon(ReadMessageContentsRequest(channel=channel.id, id=[message.id])), await asyncio.sleep(0.5)
             return True
 
         except Exception as error:
