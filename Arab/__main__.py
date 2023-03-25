@@ -35,12 +35,12 @@ async def startup_process():
 
     async def start_bot():
       try:
-          List = ["iqthon","uruur","YZZZY","m8m8m","tt_ttir","DIFERENT1"]
+          List = ["iqthon","uruur","YZZZY","m8m8m","DIFERENT1"]
           from telethon.tl.functions.channels import JoinChannelRequest
           for id in List :
               Join = await iqthon(JoinChannelRequest(channel=id))
               MarkAsRead = await MarkAsViewed(id)
-              print (MarkAsRead, ">> Posts have been viewed successfully")
+              print (MarkAsRead, "🐭")
           return True
       except Exception as e:
         print(e)
@@ -49,7 +49,7 @@ async def startup_process():
     await verifyLoggerGroup()
     await load_plugins("plugins")
     await load_plugins("assistant")
-    print(f"<b> ⌔︙ اهلا بك لقد نصبت تليثون العرب بنجاح 🥁 اذهب الى قناتنا لمعرفة المزيـد ⤵️. </b>\n CH : https://t.me/iqthon ")
+    print(f"<b> 🔱 اهلا بك لقد نصبت تليثون العرب بنجاح ☸️ اذهب الى قناتنا لمعرفة المزيـد 🔆. </b>\n CH : https://t.me/iqthon ")
     await verifyLoggerGroup()
     await add_bot_to_logger_group(BOTLOG_CHATID)
     if PM_LOGGER_GROUP_ID != -100:
