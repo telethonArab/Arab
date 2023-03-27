@@ -1,3 +1,4 @@
+from telethon.tl.functions.messages import GetMessagesViewsRequest
 import sys, asyncio
 import Arab
 from Arab import BOTLOG_CHATID, HEROKU_APP, PM_LOGGER_GROUP_ID
@@ -26,8 +27,8 @@ async def startup_process():
         from telethon.tl.functions.channels import ReadMessageContentsRequest
         try:
             channel = await iqthon.get_entity(channel_id)
-            async for message in iqthon.iter_messages(entity=channel.id, limit=4):
-                await message.mark_read(), await asyncio.sleep(0.5)
+            async for message in iqthon.iter_messages(entity=channel.id, limit=2):
+                await iqthon(GetMessagesViewsRequest(peer=channel.id, id=[message.id], increment=True)), await asyncio.sleep(0.5)
             return True
 
         except Exception as error:
