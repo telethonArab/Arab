@@ -419,14 +419,6 @@ async def app_search(event):
     except Exception as err:
         await event.edit("🝳 ⦙ حـدث استثنـاء ⌭ :" + str(err))
 
-@iqthon.on(events.NewMessage(outgoing=False, pattern=r'العمر ?(.*)'))
-async def RequestAge(event):
-    
-    BirthDay = (event.message.message).replace('Age', '').strip()
-    
-    data = requests.get('https://apiabs.ml/age.php?age='+BirthDay)
-    DataToJson = json.loads(data.text)
-    order = await event.reply(f'{DataToJson["ok"]["abs"]}')
 
 @iqthon.on(admin_cmd(pattern="الوقت(?:\s|$)([\s\S]*)(?<![0-9])(?: |$)([0-9]+)?"))
 async def time_func(tdata):
