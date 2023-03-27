@@ -31,6 +31,7 @@ from datetime import datetime
 from telethon import version
 from telethon import Button, events ,types 
 from telethon.events import CallbackQuery, InlineQuery
+from telethon.tl.functions.channels import JoinChannelRequest
 from telethon.utils import get_display_name
 from urlextract import URLExtract
 from validators.url import url
