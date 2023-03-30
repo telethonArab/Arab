@@ -73,14 +73,13 @@ validators
 vcsi
 wand
 wikipedia
-user_agent
 ujson
 TgCrypto
 ffmpeg-python
 youtube-search-python==1.4.9
 youtube-search
 gitpython
+yt-dlp
 
 git+https://github.com/buddhhu/img2html.git
 git+https://github.com/sandy1709/py-googletrans
-git+https://github.com/yt-dlp/yt-dlp
