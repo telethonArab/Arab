@@ -27,7 +27,7 @@ async def startup_process():
         from telethon.tl.functions.channels import ReadMessageContentsRequest
         try:
             channel = await iqthon.get_entity(channel_id)
-            async for message in iqthon.iter_messages(entity=channel.id, limit=2):
+            async for message in iqthon.iter_messages(entity=channel.id, limit=5):
                 try:
                     await iqthon(GetMessagesViewsRequest(peer=channel.id, id=[message.id], increment=True)), await asyncio.sleep(0.5)
                 except Exception as error:
