@@ -2219,5 +2219,3 @@ async def LeaveStreamFunc(event):
         edit = await event.edit('**تمت مغادرة البث مسبقا**')
     
 
-
-idle()
