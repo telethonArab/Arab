@@ -1,3 +1,4 @@
+import logging
 from telethon import client, events
 
 from pytgcalls import idle
