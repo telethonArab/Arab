@@ -16,9 +16,6 @@ LOGS = logging.getLogger(__name__)
 async def PyStart():
     global iqthon_py
     try:
-        me = await iqthon.get_me()
-        print (me)
-        iqthon.start()
         iqthon_py = PyTgCalls(iqthon)
         await iqthon_py.start()
     except Exception as error:
