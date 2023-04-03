@@ -14,6 +14,7 @@ LOGS = logging.getLogger(__name__)
 
 
 async def PyStart():
+    global iqthon_py
     try:
         iqthon_py = PyTgCalls(iqthon)
         await iqthon_py.start()
