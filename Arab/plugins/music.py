@@ -11,10 +11,17 @@ from Arab import iqthon
 
 import asyncio
 LOGS = logging.getLogger(__name__)
+
 iqthon_py = PyTgCalls(iqthon)
-iqthon_py.start()
+
+async def PyStart():
+    try:
+        await iqthon_py.start()
+    except Exception as error:
+        print (error)
 
 async def JoinThenStreamVideo(chat_id, StreamFile):
+    await PyStart()
     await iqthon_py.join_group_call(
         int(chat_id),
         AudioVideoPiped(
@@ -24,8 +31,10 @@ async def JoinThenStreamVideo(chat_id, StreamFile):
         ),
         stream_type=StreamType().local_stream,
     )
+    await idle()
     
 async def JoinThenStreamAudio(chat_id, StreamFile):
+    await PyStart()
     await iqthon_py.join_group_call(
         int(chat_id),
         AudioPiped(
@@ -34,6 +43,7 @@ async def JoinThenStreamAudio(chat_id, StreamFile):
         ),
         stream_type=StreamType().local_stream,
     )
+    await idle()
     
 async def LeaveStream(chat_id):
     await iqthon_py.leave_group_call(
