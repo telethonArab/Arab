@@ -9,7 +9,7 @@ from pytgcalls.types.input_stream.quality import HighQualityVideo
 from Arab import iqthon
 
 import asyncio
-
+LOGS = logging.getLogger(__name__)
 iqthon_py = PyTgCalls(iqthon)
 iqthon_py.start()
 
