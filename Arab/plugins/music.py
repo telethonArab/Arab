@@ -11,7 +11,6 @@ from Arab import iqthon
 import asyncio
 LOGS = logging.getLogger(__name__)
 iqthon_py = PyTgCalls(iqthon)
-iqthon_py.start()
 
 async def JoinThenStreamVideo(chat_id, StreamFile):
     await iqthon_py.join_group_call(
