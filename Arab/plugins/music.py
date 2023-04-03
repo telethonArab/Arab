@@ -10,6 +10,9 @@ from Arab import iqthon
 
 import asyncio
 
+iqthon_py = PyTgCalls(iqthon)
+iqthon_py.start()
+
 async def JoinThenStreamVideo(chat_id, StreamFile):
     await iqthon_py.join_group_call(
         int(chat_id),
