@@ -12,10 +12,10 @@ from Arab import iqthon
 import asyncio
 LOGS = logging.getLogger(__name__)
 
-iqthon_py = PyTgCalls(iqthon)
 
 async def PyStart():
     try:
+        iqthon_py = PyTgCalls(iqthon)
         await iqthon_py.start()
     except Exception as error:
         print (error)
