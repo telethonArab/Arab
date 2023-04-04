@@ -20,7 +20,7 @@ new_iqthon.start()
 async def PyStart():
     global iqthon_py
     try:
-        iqthon_py = PyTgCalls(iqthon)
+        iqthon_py = PyTgCalls(new_iqthon)
         await iqthon_py.start()
     except Exception as error:
         print (error)
