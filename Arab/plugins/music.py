@@ -16,11 +16,11 @@ import asyncio
 LOGS = logging.getLogger(__name__)
 
 new_iqthon = TelegramClient(StringSession(Config.STRING_SESSION), Config.APP_ID, Config.API_HASH)
-new_iqthon.start()
 
 async def PyStart():
     global iqthon_py
     try:
+        await new_iqthon.start()
         iqthon_py = PyTgCalls(new_iqthon)
         await iqthon_py.start()
     except Exception as error:
