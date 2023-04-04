@@ -123,7 +123,7 @@ PP_CHANGED = "**⚘ ⦙  تم تغير صورة حسابك بنجاح  ✅**"
 PP_TOO_SMOL = "**⚘ ⦙  هذه الصورة صغيرة جدًا قم بإختيار صورة أخرى  ⚠️**"
 PP_ERROR = "**⚘ ⦙  حدث خطأ أثناء معالجة الصورة  ⚠️**"
 BIO_SUCCESS = "**⚘ ⦙  تم تغيير بايو حسابك بنجاح  ✅**"
-
+FOTOSECRET = gvarstatus("OR_FOTOSECRET") or "(جلب الذاتية|جلب الوقتية|جلب الذاتيه|جلب الوقتيه|سيف)"
 iqthonfont = gvarstatus("DEFAULT_PIC") or "Arab/sql_helper/IQTHONIMOGE.ttf"
 FONT_FILE_TO_USE = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
 autopic_path = os.path.join(os.getcwd(), "Arab", "original_pic.png")
@@ -439,7 +439,7 @@ async def memes(mafia):
         if files and os.path.exists(files):
             os.remove(files)
 
-@iqthon.on(admin_cmd(pattern="(جلب الذاتية|جلب الوقتية|جلب الذاتيه|جلب الوقتيه|سيف)"))
+@iqthon.on(admin_cmd(pattern=f"{FOTOSECRET}"))
 async def thatah(event):
     if not event.is_reply:
         return await event.edit("ُ")
