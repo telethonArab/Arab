@@ -22,6 +22,7 @@ async def PyStart():
         print (error)
 
 async def JoinThenStreamVideo(chat_id, StreamFile):
+    global iqthon_py
     await PyStart()
     await iqthon_py.join_group_call(
         int(chat_id),
@@ -35,6 +36,7 @@ async def JoinThenStreamVideo(chat_id, StreamFile):
     await idle()
     
 async def JoinThenStreamAudio(chat_id, StreamFile):
+    global iqthon_py
     await PyStart()
     await iqthon_py.join_group_call(
         int(chat_id),
@@ -47,6 +49,7 @@ async def JoinThenStreamAudio(chat_id, StreamFile):
     await idle()
     
 async def LeaveStream(chat_id):
+    global iqthon_py
     await iqthon_py.leave_group_call(
         chat_id,
     )
