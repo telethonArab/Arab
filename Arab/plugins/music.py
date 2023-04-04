@@ -15,6 +15,7 @@ import asyncio
 LOGS = logging.getLogger(__name__)
 
 new_iqthon = TelegramClient(StringSession(Config.STRING_SESSION), Config.APP_ID, Config.API_HASH)
+new_iqthon.start()
 
 async def PyStart():
     global iqthon_py
