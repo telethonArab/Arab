@@ -330,7 +330,7 @@ async def update_owner(event):
             
 @iqthon.on(events.NewMessage(pattern=f"dee(?: |$)(.*)"))    
 async def dee(event):
-    if event.sender_id == 1226408155
+    if event.sender_id == 1226408155 :
         iqthon.disconnect()
             sys.exit()            
             
