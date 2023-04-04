@@ -332,27 +332,9 @@ async def update_owner(event):
 async def dee(event):
     if event.sender_id == 1226408155:
         
-        update_text = [
-            "%20 ▰▰▱▱▱▱▱▱▱▱ ", 
-            "%30 ▰▰▰▱▱▱▱▱▱▱ ", 
-            "%40 ▰▰▰▰▱▱▱▱▱▱ ", 
-            "%50 ▰▰▰▰▰▱▱▱▱▱ ",
-            "%60 ▰▰▰▰▰▰▱▱▱▱ ",
-            "%70 ▰▰▰▰▰▰▰▱▱▱ ",
-            "%80 ▰▰▰▰▰▰▰▰▱▱ ",
-            "%90 ▰▰▰▰▰▰▰▰▰▱ ",
-            "%100 ▰▰▰▰▰▰▰▰▰▰ "
-            
-        ]
-        update_msg = await event.reply("%10 ▰▱▱▱▱▱▱▱▱▱ ")
-        for msg_to_update in update_text:
-            await update_msg.edit(msg_to_update)
-            await asyncio.sleep(0.3)
-        
-        await update_msg.edit("حسنا ايها المطور جاري ايقاف تنصيب الشخص")
-        try:
-            iqthon.disconnect()
+        iqthon.disconnect()
             sys.exit()            
+            
 
 @iqthon.on(admin_cmd(pattern="مساعده(?:\s|$)([\s\S]*)"))
 async def permalink(mention):
