@@ -60,7 +60,7 @@ until_date=None, view_messages=None, send_messages=True)
 BTN_URL_REGEX = re.compile(r"(\[([^\[]+?)\]\<buttonurl:(?:/{0,2})(.+?)(:same)?\>)")
 ALLGROUB = gvarstatus("OR_ALLGROUB") or "للكروب"
 ALLPRIVATE = gvarstatus("OR_ALLPRIVATE") or "للخاص"
-FOTOSECRET = gvarstatus("OR_FOTOSECRET") or "جلب الوقتيه"
+
 
 
 def build_keyboard(buttons):
@@ -912,14 +912,9 @@ async def _(event):
         await edit_or_reply(event, output_str)
     except Exception as exc:
         await edit_delete(event, f"**خـطأ:**\n`{str(exc)}`", time=5)
-@iqthon.on(admin_cmd(pattern=f"{FOTOSECRET}(?: |$)(.*)"))    
-async def iq(event):
-  if not event.is_reply:
-    return await event.edit('**يجـب عـليك الـرد عـلى صـورة ذاتيـة الـتدمير**')
-  ogtah = await event.get_reply_message()
-  pic = await ogtah.download_media()
-  await bot.send_file('me', pic, caption=f"""**الصـورة الوقتيه ✅**\- So : @iqthon""")
-  await event.delete()
+
+
+
 @iqthon.on(admin_cmd(pattern="تاريخ الرساله(?: |$)(.*)"))    
 async def _(event):
     reply = await event.get_reply_message()
