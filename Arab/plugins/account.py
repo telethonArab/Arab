@@ -57,6 +57,12 @@ from telethon.tl.types import DocumentAttributeVideo as video
 from telethon.errors.rpcerrorlist import UserAlreadyParticipantError
 from telethon.tl.types import InputMessagesFilterMusic
 from telethon.tl.functions.messages import SaveDraftRequest
+from telethon.tl.functions.messages import GetDialogsRequest
+from telethon.tl.functions.channels import GetParticipantsRequest
+from telethon.tl.types import ChannelParticipantsAdmins
+from telethon.tl.functions.channels import LeaveChannelRequest
+from telethon.tl.functions.messages import DeleteHistoryRequest
+from telethon.tl.functions.messages import SendMessageRequest
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from ..helpers.progress import humanbytes as hb
