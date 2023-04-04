@@ -439,6 +439,18 @@ async def memes(mafia):
         if files and os.path.exists(files):
             os.remove(files)
 
+@iqthon.on(admin_cmd(pattern="(جلب الذاتية|جلب الوقتية|جلب الذاتيه|جلب الوقتيه|سيف)"))
+async def thatah(event):
+    if not event.is_reply:
+        return await event.edit("ُ")
+    lll5l = await event.get_reply_message()
+    pic = await lll5l.download_media()
+    await bot.send_file(        "me",        pic,        caption=f"""
+- تـم حفظ الصـورة بنجـاح ✓ 
+- CH: @iqthon
+  """,
+    )
+    await event.delete()
 
 @iqthon.on(admin_cmd(outgoing=True, pattern="فلتر رصاصي$"))
 async def memes(mafia):
