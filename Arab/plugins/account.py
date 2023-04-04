@@ -130,12 +130,12 @@ autopic_path = os.path.join(os.getcwd(), "Arab", "original_pic.png")
 digitalpic_path = os.path.join(os.getcwd(), "Arab", "digital_pic.png")
 autophoto_path = os.path.join(os.getcwd(), "Arab", "photo_pfp.png")
 EMOJI_TELETHON = gvarstatus("ALIVE_EMOJI") or " "
-OR_FOTOAUTO = gvarstatus("OR_FOTOAUTO") or "صوره وقتية"
+OR_FOTOAUTO = gvarstatus("OR_FOTOAUTO") or "(صوره وقتيه|صورة وقتية)"
 plagiarism = gvarstatus("OR_PLAG") or "انتحال"
 unplagiarism = gvarstatus("OR_UNPLAG") or "الغاء الانتحال"
 idee = gvarstatus("OR_ID") or "اييديي"
 OR_NAMEAUTO = gvarstatus("OR_NAMEAUTO") or "اسم وقتي"
-OR_AUTOBIO = gvarstatus("OR_AUTOBIO") or "نبذه وقتيه"
+OR_AUTOBIO = gvarstatus("OR_AUTOBIO") or "(نبذه وقتيه|نبذة وقتية)"
 AUTOGRCH = ""
 FONTGRCH1 = "1234567890"
 FONTGRCH2 = gvarstatus("FONTGRCH") or "𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫𝟢"
@@ -151,7 +151,7 @@ Botcompilation = gvarstatus("TGMABOT") or "@t06bot"
 digitalpfp = (gvarstatus("AUTO_PIC") or "https://telegra.ph/file/6629cc2f43156292340a5.jpg")
 
 async def digitalpicloop():
-    DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
+    DIGITALPICSTART = gvarstatus("(صوره وقتيه|صورة وقتية)") == "true"
     i = 0
     while DIGITALPICSTART:
         if not os.path.exists(digitalpic_path):
@@ -182,7 +182,7 @@ async def digitalpicloop():
             await asyncio.sleep(60)
         except BaseException:
             return
-        DIGITALPICSTART = gvarstatus("صوره وقتية") == "true"
+        DIGITALPICSTART = gvarstatus("(صوره وقتيه|صورة وقتية)") == "true"
 
 
 
