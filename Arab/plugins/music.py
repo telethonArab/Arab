@@ -10,6 +10,7 @@ from pytgcalls.types.input_stream.quality import HighQualityVideo
 from Arab import iqthon
 
 from ..Config import Config
+from telethon.sessions import StringSession
 
 import asyncio
 LOGS = logging.getLogger(__name__)
