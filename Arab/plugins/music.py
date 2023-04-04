@@ -124,7 +124,7 @@ async def VideoFileToVoiceChat(event):
         edit = await event.edit('**يجب الرد على الفيديو**')
 
 # LEAVE STREAM
-@iqthon.on(events.NewMessage(outgoing=True, pattern=r'.غادر البث'))
+@iqthon.on(events.NewMessage(outgoing=True, pattern=r'.اغلاق البث'))
 async def LeaveStreamFunc(event):
     try:
         leave = await LeaveStream(int(event.chat_id))
