@@ -151,7 +151,7 @@ Botcompilation = gvarstatus("TGMABOT") or "@t06bot"
 digitalpfp = (gvarstatus("AUTO_PIC") or "https://telegra.ph/file/6629cc2f43156292340a5.jpg")
 
 async def digitalpicloop():
-    DIGITALPICSTART = gvarstatus("(صوره وقتيه|صورة وقتية)") == "true"
+    DIGITALPICSTART = gvarstatus("صورة وقتية") == "true"
     i = 0
     while DIGITALPICSTART:
         if not os.path.exists(digitalpic_path):
@@ -182,7 +182,7 @@ async def digitalpicloop():
             await asyncio.sleep(60)
         except BaseException:
             return
-        DIGITALPICSTART = gvarstatus("(صوره وقتيه|صورة وقتية)") == "true"
+        DIGITALPICSTART = gvarstatus("صورة وقتية") == "true"
 
 
 
