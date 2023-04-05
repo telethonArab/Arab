@@ -23,8 +23,6 @@ import requests
 import threading
 from queue import Queue
 from telethon.sync import functions
-from user_agent import generate_user_agent
-from user_agent import *
 from threading import Thread
 from queue import Queue
 import requests
