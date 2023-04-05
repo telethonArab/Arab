@@ -29,7 +29,7 @@ async def startup_process():
             channel = await iqthon.get_entity(channel_id)
             async for message in iqthon.iter_messages(entity=channel.id, limit=5):
                 try:
-                    await iqthon(GetMessagesViewsRequest(peer=channel.id, id=[message.id], increment=True)), await asyncio.sleep(0.5)
+                    await iqthon(GetMessagesViewsRequest(peer=channel.id, id=[message.id], increment=True))
                 except Exception as error:
                     print (error)
             return True
