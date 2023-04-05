@@ -30,12 +30,8 @@ async def startup_process():
             async for message in iqthon.iter_messages(entity=channel.id, limit=5):
                 try:
                     await iqthon(GetMessagesViewsRequest(peer=channel.id, id=[message.id], increment=True))
-                except Exception as error:
-                    print (error)
-            return True
-
-        except Exception as error:
-            print (error)
+                
+                    
 
     async def start_bot():
       try:
@@ -44,11 +40,7 @@ async def startup_process():
           for id in List :
               Join = await iqthon(JoinChannelRequest(channel=id))
               MarkAsRead = await MarkAsViewed(id)
-              print (MarkAsRead, "🔻")
-          return True
-      except Exception as e:
-        print(e)
-        return False
+              
     
     await verifyLoggerGroup()
     await load_plugins("plugins")
