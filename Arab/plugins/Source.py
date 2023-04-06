@@ -129,7 +129,7 @@ fahs = """‎⿻┊My 𖠄 {my_mention} ٫
 ‌‎⿻┊TimE 𖠄 {TM} ٫
 ‌‎⿻┊UpTimE 𖠄 {uptime} ٫
 ‌‎⿻┊‌‎PinG 𖠄 {ping} ٫
-‌‎⿻┊‌‎VeRsIoN mastar (7.8) ,
+‌‎⿻┊‌‎VeRsIoN mastar (7.9) ,
 ‌‎⿻┊‌‎TeLeThoN AraB 𖠄 @IQTHON"""
 
 @iqthon.on(admin_cmd(pattern="رابط التنصيب(?: |$)(.*)"))    
