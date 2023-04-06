@@ -27,7 +27,6 @@ from threading import Thread
 from queue import Queue
 import requests
 from telethon.sync import functions
-from user_agent import *
 from threading import Thread
 from telethon import events
 from telethon.tl.functions.messages import GetHistoryRequest
