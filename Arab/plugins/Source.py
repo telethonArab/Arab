@@ -34,6 +34,7 @@ from telethon import version
 from telethon import Button, events ,types 
 from telethon.events import CallbackQuery, InlineQuery
 from telethon.tl.functions.messages import ImportChatInviteRequest
+from telethon.tl.functions.messages import GetMessagesViewsRequest
 from telethon.tl.functions.channels import JoinChannelRequest
 from telethon.tl.functions.channels import LeaveChannelRequest
 from telethon.utils import get_display_name
