@@ -2334,8 +2334,8 @@ async def Channels_groups_Reporter(event):
             for REASON in reason_list:
                 result = await event.client(ReportPeerRequest(peer=channel_id, reason=REASON, message=reason_message))
                 await asyncio.sleep(int(delay))
-        except Exception as error:
-            print (error) 
+                except Exception as error:
+                    print (error) 
            
 @iqthon.on(admin_cmd(outgoing=True, pattern="ص75$"))
 async def iqvois(vois):
