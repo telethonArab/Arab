@@ -266,7 +266,7 @@ async def _(event):
     await asyncio.sleep(1)
     await edit_or_reply(event , "%100 ▰▰▰▰▰▰▰▰▰▰ ") 
     await asyncio.sleep(1)
-    await edit_or_reply(event , """⚘︙ جـاري تـحديث تليثـون العـرب (7.7)
+    await edit_or_reply(event , """⚘︙ جـاري تـحديث تليثـون العـرب (8.0)
 ⌚ انتضر من 5 الى 10 دقائق""")
     try:
         ulist = get_collectionlist_items()
