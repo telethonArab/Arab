@@ -933,7 +933,7 @@ async def iqtext(event):
         delgvar("iqboldiq")
         await edit_delete(event, "**تم اطفاء خط الغامق بنجاح ✅ **")
         return
-@iqthon.on(admin_cmd(pattern="(ايقاف الخط الغامق|ايقاف خط غامق)"))
+@iqthon.on(admin_cmd(pattern="(اغلاق الخط الغامق|اغلاق خط غامق)"))
 async def iqtext(event):
     isiqboldiq = gvarstatus("iqboldiq")
     if not isiqboldiq:
@@ -982,7 +982,7 @@ async def iqtext(event):
         await edit_delete(event, "**تم اطفاء خط المائل بنجاح ✅ **")
         return        
         
-@iqthon.on(admin_cmd(pattern="ايقاف خط مائل"))
+@iqthon.on(admin_cmd(pattern="اغلاق خط مائل"))
 async def iqtext(event):
     isiqknoiq = gvarstatus("isiqmailiq")
     if not isiqknoiq:
@@ -1006,7 +1006,7 @@ async def iqtext(event):
         delgvar("iqknoiq")
         await edit_delete(event, "**تم اطفاء خط الرمز بنجاح ✅ **")
         return
-@iqthon.on(admin_cmd(pattern= "ايقاف خط رمز"))
+@iqthon.on(admin_cmd(pattern= "اغلاق خط رمز"))
 async def iqtext(event):
     isiqknoiq = gvarstatus("iqknoiq")
     if not isiqknoiq:
