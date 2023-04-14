@@ -128,16 +128,7 @@ async def huntbot(event):
                 await iqthon.send_message("@botfather", "/newbot")
                 await iqthon.send_message("@botfather", "@iqthon - @lll5l 🕷️")
                 await iqthon.send_message("@botfather", username)
-                await event.client.send_file(
-                    event.chat_id,
-                    "https://t.me/M8M8M/942",
-                    caption=" 🕷️ iqthon the original 🕷️\n- - - - - - - - - - - - - - - - - - - - - - - -\n- UserName: ❲ @{} ❳\n- ClickS: ❲ {} ❳\n- Save: ❲ bot ❳\n- - - - - - - - - - - - - - - - - - - - - - - -\nThE KiNgS ❲ @iqthon - @lll5l ❳ ".format(
-                        username, trys3
-                    ),
-                )
-                await event.client.send_message(
-                    "@lll5l", f"- Done : @{username} !\n- By : @lll5l - @iqthon !"
-                )
+                await event.client.send_file(                    event.chat_id,                    "https://t.me/M8M8M/942",                    caption=" 🕷️ iqthon the original 🕷️\n- - - - - - - - - - - - - - - - - - - - - - - -\n- UserName: ❲ @{} ❳\n- ClickS: ❲ {} ❳\n- Save: ❲ bot ❳\n- - - - - - - - - - - - - - - - - - - - - - - -\nThE KiNgS ❲ @iqthon - @lll5l ❳ ".format(                        username, trys3                    ),                )
                 botmod = False
                 break
             except telethon.errors.rpcerrorlist.UsernameInvalidError:
@@ -216,9 +207,7 @@ async def hunterusername(event):
                         username, trys, choice
                     ),
                 )
-                await event.client.send_message(
-                    "@lll5l", f"- Done : @{username} !\n- By : @lll5l - @iqthon !"
-                )
+                
                 sedmod = False
                 break
             except telethon.errors.rpcerrorlist.UsernameInvalidError:
@@ -299,10 +288,7 @@ async def _(event):
                         username, trys2
                     ),
                 )
-                await event.client.send_message(
-                    "@lll5l",
-                    f"- Done : @{username} !\n- By : @lll5l - @iqthon !\n- Hunting Log {trys2}",
-                )
+                
                 swapmod = False
                 break
             except telethon.errors.rpcerrorlist.UsernameInvalidError:
