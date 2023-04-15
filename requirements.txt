@@ -87,6 +87,8 @@ git+https://github.com/pytgcalls/pytgcalls
 pyminizip
 pybase64
 covid
+googletrans
+user_agent
 
 git+https://github.com/buddhhu/img2html.git
 git+https://github.com/sandy1709/py-googletrans
