@@ -161,7 +161,6 @@ DEFAULTUSER = AUTONAME or Config.ALIVE_NAME
 Botcompilation = gvarstatus("TGMABOT") or "@KBKBOT"
 digitalpfp = (gvarstatus("AUTO_PIC") or "https://telegra.ph/file/6629cc2f43156292340a5.jpg")
 from ..utils import is_admin
-os.system("pip install googletrans")
 from googletrans import Translator
 async def digitalpicloop():
     DIGITALPICSTART = gvarstatus("صورة وقتية") == "true"
