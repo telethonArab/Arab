@@ -4,7 +4,7 @@ import requests
 import telethon
 from telethon.sync import functions
 from user_agent import generate_user_agent
-os.system("pip install user_agent")
+
 from Arab import iqthon
 a = "qwertyuiopassdfghjklzxcvbnm"
 b = "1234567890"
