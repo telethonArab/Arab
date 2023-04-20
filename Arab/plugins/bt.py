@@ -398,7 +398,7 @@ async def _(event):
     if event.reply_to_msg_id:
         reply_to_id = await event.get_reply_message()
     chat = "@VidogramAIbot"
-    iqtevent = await edit_or_reply(event, "**جاري الجواب عن سؤالك ChatGPT ..**")
+    iqtevent = await edit_or_reply(event, "**جاري الجواب عن سؤالك لديك 10 اسئلة فقط خلال كل 24 ساعة ChatGPT ..**")
     async with event.client.conversation(chat) as conv:
         try:
             response = conv.wait_event(                events.NewMessage(incoming=True, from_users=6107640967)            )
