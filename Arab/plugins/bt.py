@@ -388,3 +388,28 @@ async def _iq(iqthon):
         await edit_or_reply(iqthon, f"```{output_result}```")
     except Exception as e:
         await edit_delete(iqthon, f"                                              **خطأ :**\n`{str(e)}`                       ", 5)
+
+
+# ضل راقب ولابسك 🤣
+@iqthon.on(admin_cmd(pattern="سؤال ?(.*)"))
+async def _(event):
+    input_str = event.pattern_match.group(1)
+    reply_to_id = await reply_id(event)
+    if event.reply_to_msg_id:
+        reply_to_id = await event.get_reply_message()
+    chat = "@VidogramAIbot"
+    iqtevent = await edit_or_reply(event, "**جاري الجواب عن سؤالك ChatGPT ..**")
+    async with event.client.conversation(chat) as conv:
+        try:
+            response = conv.wait_event(                events.NewMessage(incoming=True, from_users=6107640967)            )
+            await event.client.send_message(chat, "{}".format(input_str))
+            response = await response
+            await event.client.send_read_acknowledge(conv.chat_id)
+        except YouBlockedUserError:
+            await iqtevent.edit("** تحـقق من انـك لم تقـم بحظر البوت @VidogramAIbot .. ثم اعـد استخدام الامـر ... ♥️**")
+            return
+        if response.text.startswith("قم بوضع سؤالك بجانب الأمر"):
+            await iqtevent.edit("قم بوضع سؤالك بجانب الأمر")
+        else:
+            await iqtevent.delete()
+            await event.client.send_message(event.chat_id, response.message)
