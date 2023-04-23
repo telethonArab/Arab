@@ -108,7 +108,7 @@ async def zakrafarun(event):
             .replace("y", "𝘆")
             .replace("z", "𝘇")        )
         await event.edit(uppercase_text)
-@iqthon.ar_cmd(pattern="انشاء ?(.*)")
+@iqthon.iq_cmd(pattern="انشاء ?(.*)")
 async def inshai(event):
     msg = event.text.split()
     username = msg[1]
