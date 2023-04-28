@@ -1,5 +1,5 @@
-import random, requests, asyncio
-import time
+import random, requests, asyncio , os,  time
+
 from fake_useragent import UserAgent
 from telethon import TelegramClient, events
 from telethon.tl.functions.channels import CreateChannelRequest
