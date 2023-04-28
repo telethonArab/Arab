@@ -20,6 +20,8 @@ a = "qwertyuiopassdfghjklzxcvbnm"
 b = "1234567890"
 e = "qwertyuiopassdfghjklzxcvbnm1234567890"
 
+# بس توصلة افضحك 😁😂
+
 stop_phishing = True
 workers = {
     'ثلاثيات': {
