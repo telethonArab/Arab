@@ -108,7 +108,7 @@ def check_user(username, session, user_agent):
     else:
         return False
 
-@iqthon.on(events.NewMessage(outgoing=True, pattern=r'.ايقاف الصيد'))
+@iqthon.on(events.NewMessage(outgoing=True, pattern=r'.اغلاق الصيد'))
 async def StopPhishingHundler(event):
     global stop_phishing
     
@@ -176,15 +176,15 @@ async def CheckAndApply(event):
         RUN = await UpdateUsername(event, username)
 
 # USERNAMES UNCHECK
-@iqthon.on(events.NewMessage(outgoing=True, pattern=r'.الغاء سحب ?(.*)'))
+@iqthon.on(events.NewMessage(outgoing=True, pattern=r'.اغلاق سحب ?(.*)'))
 async def UnCheck(event):
-    username = (event.message.message).replace('.الغاء سحب', '').strip()
+    username = (event.message.message).replace('.اغلاق سحب', '').strip()
     username = (event.message.message).replace('@', '').strip()
     
     if username in USERNAMES:
         USERNAMES.remove(username)
         
-    reply = await event.reply(f'**تم الغاء سحب لـ @{username}**')
+    reply = await event.reply(f'**تم اغلاق سحب لـ @{username}**')
     
 
 async def CheckUsername(event, user, user_id):
