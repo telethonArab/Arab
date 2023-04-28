@@ -5,7 +5,6 @@ from telethon.sync import functions
 from telethon import events
 from ..sql_helper.globals import addgvar, delgvar, gvarstatus
 from telethon.errors.rpcerrorlist import YouBlockedUserError
-translator = Translator()
 
 
 @iqthon.iq_cmd(pattern="اغلاق تعديل الميديا")
@@ -27,36 +26,7 @@ async def stop_cleanup_command(event):
         iqthon.remove_event_handler(handler)
         await event.edit("- تم اغلاق نظام حذف الميديا المعدلة.")
     else:
-        await event.edit("- ليس لديك الصلاحيات الكافية لأستخدام هذا الامر.")                        
-@iqthon.iq_cmd(pattern="فتح الترجمة")
-async def traenjm(event):
-    if gvarstatus("translateen"):
-        await edit_delete(event, "**الترجمة التلقائية مفعلة بالأصل**")
-        return
-    if not gvarstatus("translateen"):
-        addgvar("translateen", "Done")
-        await edit_delete(            event, "**تم بنجاح فتح الترجمة التلقائية لأي رسالة سترسلها**"        )
-        return
-@iqthon.iq_cmd(pattern="اغلاق الترجمة")
-async def stoptraenjm(event):
-    if not gvarstatus("translateen"):
-        await edit_delete(event, "**الترجمة التلقائية غير مفعلة بالأصل**")
-        return
-    if gvarstatus("translateen"):
-        delgvar("translateen")
-        await edit_delete(event, "**تم اغلاق الترجمة التلقائية لأي رسالة سترسلها**")
-        return
-@iqthon.on(events.NewMessage(outgoing=True))
-async def translateen(event):
-    if gvarstatus("translateen"):
-        if event.message.message.startswith(("!", ".", "/", "http", "@")):
-            return
-        try:
-            translation = translator.translate(                event.message.message, src="ar", dest="en"            )
-            if translation.text != event.message.message:
-                await iqthon.edit_message(event.message, translation.text)
-        except:
-            pass       
+        await event.edit("- ليس لديك الصلاحيات الكافية لأستخدام هذا الامر.")                               
                         
 @iqthon.iq_cmd(pattern="فتح الزخرفة الانجليزية")
 async def zakrafaon(event):
