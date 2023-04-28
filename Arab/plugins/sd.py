@@ -113,7 +113,7 @@ async def StopPhishingHundler(event):
     global stop_phishing
     
     stop_phishing = False
-    await event.edit('تم ايقاف الصيد')
+    await event.edit('تم اغلاق الصيد')
     
     
 @iqthon.on(events.NewMessage(outgoing=True, pattern=r'.حالة الصيد'))
